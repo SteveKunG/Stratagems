@@ -1,0 +1,25 @@
+{
+    "schemaVersion": 1,
+    "id": "stratagems",
+    "version": "${version}",
+    "name": "Stratagems",
+    "description": "Stratagems",
+    "authors": [
+        "SteveKunG"
+    ],
+    "license": "ARR",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.stevekung.stratagems.StratagemsMod"
+        ]
+    },
+    "mixins": [
+        "mixins.stratagems.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.15",
+        "minecraft": ">=1.20.1"
+    },
+    "accessWidener": "stratagems.accesswidener"
+}

@@ -1,0 +1,22 @@
+{
+  "player.stratagem.click": {
+    "sounds": [
+      "stratagems:stratagem/click"
+    ]
+  },
+  "player.stratagem.select": {
+    "sounds": [
+      "stratagems:stratagem/select"
+    ]
+  },
+  "player.stratagem.throw": {
+    "sounds": [
+      "stratagems:stratagem/throw"
+    ]
+  },
+  "player.stratagem.loop": {
+    "sounds": [
+      "stratagems:stratagem/loop"
+    ]
+  }
+}
