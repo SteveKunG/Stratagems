@@ -1,5 +1,7 @@
-package com.stevekung.stratagems;
+package com.stevekung.stratagems.registry;
 
+import com.stevekung.stratagems.Stratagem;
+import com.stevekung.stratagems.StratagemsMod;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;

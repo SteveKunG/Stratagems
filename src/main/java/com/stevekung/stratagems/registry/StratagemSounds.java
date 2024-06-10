@@ -1,5 +1,6 @@
-package com.stevekung.stratagems;
+package com.stevekung.stratagems.registry;
 
+import com.stevekung.stratagems.StratagemsMod;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
