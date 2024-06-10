@@ -1,6 +1,8 @@
 package com.stevekung.stratagems;
 
 import org.apache.commons.lang3.StringUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.sounds.SoundSource;
 
 public class StratagemManager
 {
@@ -10,6 +12,13 @@ public class StratagemManager
     private String tempStratagemCode = "";
     private String selectedStratagemCode;
     private Stratagem selectedStratagem;
+
+    private final Minecraft minecraft;
+
+    private StratagemManager()
+    {
+        this.minecraft = Minecraft.getInstance();
+    }
 
     public static StratagemManager getInstance()
     {
@@ -65,6 +74,7 @@ public class StratagemManager
     {
         this.selectedStratagemCode = null;
         this.selectedStratagem = null;
+        this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
     }
 
     public boolean hasSelectedStratagem()

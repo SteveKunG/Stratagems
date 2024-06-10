@@ -39,7 +39,6 @@ public class StratagemsMod implements ModInitializer
             {
                 manager.setStratagemsMenuOpen(!manager.isStratagemsMenuOpen());
                 manager.clearStratagemCode();
-                minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
             }
 
             var arrowKeySound = false;
@@ -102,7 +101,6 @@ public class StratagemsMod implements ModInitializer
             if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
             {
                 LOGGER.info("Throwing {}", manager.getSelectedStratagem().name());
-                minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
                 minecraft.player.playSound(StratagemSounds.STRATAGEM_THROW, 1f, 1.0f);
                 manager.clearStratagemCode();
             }
