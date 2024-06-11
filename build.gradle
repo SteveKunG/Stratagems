@@ -17,6 +17,13 @@ loom {
                 property "devauth.configDir", "${devauth_dir}"
             }
         }
+        datagen {
+            server()
+            name "Fabric Data Generation"
+            property "fabric-api.datagen"
+            property "fabric-api.datagen.output-dir", "${file("src/generated/resources")}"
+            runDir "build/datagen"
+        }
     }
 }
 

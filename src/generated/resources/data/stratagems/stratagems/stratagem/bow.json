@@ -1,0 +1,15 @@
+{
+  "code": "ssawd",
+  "name": {
+    "translate": "item.minecraft.bow"
+  },
+  "icon": {
+    "Count": 1,
+    "id": "minecraft:bow",
+    "tag": {
+      "Damage": 0
+    }
+  },
+  "incoming_duration": 100,
+  "next_use_cooldown": 6000
+}

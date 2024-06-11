@@ -1,0 +1,12 @@
+{
+  "code": "swaswdsw",
+  "name": {
+    "translate": "block.minecraft.white_bed"
+  },
+  "icon": {
+    "Count": 1,
+    "id": "minecraft:white_bed"
+  },
+  "incoming_duration": 400,
+  "next_use_cooldown": 12000
+}

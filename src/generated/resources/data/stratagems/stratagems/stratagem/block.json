@@ -1,0 +1,12 @@
+{
+  "code": "wdsd",
+  "name": {
+    "translate": "block.minecraft.stone"
+  },
+  "icon": {
+    "Count": 1,
+    "id": "minecraft:stone"
+  },
+  "incoming_duration": 100,
+  "next_use_cooldown": 1200
+}

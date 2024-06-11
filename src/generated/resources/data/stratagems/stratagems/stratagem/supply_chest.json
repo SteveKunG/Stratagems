@@ -1,0 +1,12 @@
+{
+  "code": "sswd",
+  "name": {
+    "translate": "block.minecraft.chest"
+  },
+  "icon": {
+    "Count": 1,
+    "id": "minecraft:chest"
+  },
+  "incoming_duration": 200,
+  "next_use_cooldown": 6000
+}

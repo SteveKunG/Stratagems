@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 
@@ -65,7 +66,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (manager.hasTempStratagemCode())
             {
-                var stratagemRegistry = minecraft.level.registryAccess().lookupOrThrow(StratagemsMod.STRATAGEM_KEY).listElementIds().map(StratagemsMod.STRATAGEM_REGISTRY::get).toList();
+                var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(StratagemsMod.STRATAGEM_KEY).holders().map(Holder.Reference::value).toList();
                 var tempStratagemCode = manager.getTempStratagemCode();
 
                 if (stratagemRegistry.stream().noneMatch(s -> s.code().startsWith(tempStratagemCode)))
@@ -124,7 +125,7 @@ public class StratagemsClientMod implements ClientModInitializer
             return;
         }
 
-        var stratagemRegistry = minecraft.level.registryAccess().lookupOrThrow(StratagemsMod.STRATAGEM_KEY).listElementIds().map(StratagemsMod.STRATAGEM_REGISTRY::get).toList();
+        var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(StratagemsMod.STRATAGEM_KEY).holders().map(Holder.Reference::value).toList();
         var white = FastColor.ARGB32.color(255, 255, 255, 255);
         var gray = FastColor.ARGB32.color(255, 128, 128, 128);
         var grayAlpha = FastColor.ARGB32.color(128, 128, 128, 128);
@@ -172,7 +173,8 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().translate(0, 0, hasCode ? 0 : -300);
-                    guiGraphics.renderItem(stratagem.itemStack(), 8, 24 + index * 30);
+                    int finalIndex = index;
+                    stratagem.icon().ifLeft(itemStack -> guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30));
                     guiGraphics.pose().popPose();
                 }
 
@@ -228,7 +230,8 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, hasCode ? 0 : -300);
-                guiGraphics.renderItem(stratagem.itemStack(), 8, 24 + index * 30);
+                int finalIndex = index;
+                stratagem.icon().ifLeft(itemStack -> guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30));
                 guiGraphics.pose().popPose();
 
                 // broken
