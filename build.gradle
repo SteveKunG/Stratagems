@@ -28,6 +28,11 @@ loom {
 }
 
 String fileName = "${archives_base_name}-mc${minecraft_version}"
+List<String> devExcludes = [".cache", "**/datagen/"]
+
+jar {
+    excludes = devExcludes
+}
 
 remapJar {
     archiveVersion = "v${project.version}"
