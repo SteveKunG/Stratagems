@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.StratagemManager;
-import com.stevekung.stratagems.StratagemsMod;
+import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -67,7 +67,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (manager.hasTempStratagemCode())
             {
-                var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(StratagemsMod.STRATAGEM_KEY).holders().map(Holder.Reference::value).toList();
+                var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).holders().map(Holder.Reference::value).toList();
                 var tempStratagemCode = manager.getTempStratagemCode();
 
                 if (stratagemRegistry.stream().noneMatch(s -> s.code().startsWith(tempStratagemCode)))
@@ -126,7 +126,7 @@ public class StratagemsClientMod implements ClientModInitializer
             return;
         }
 
-        var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(StratagemsMod.STRATAGEM_KEY).holders().map(Holder.Reference::value).toList();
+        var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).holders().map(Holder.Reference::value).toList();
         var white = FastColor.ARGB32.color(255, 255, 255, 255);
         var gray = FastColor.ARGB32.color(255, 128, 128, 128);
         var grayAlpha = FastColor.ARGB32.color(128, 128, 128, 128);

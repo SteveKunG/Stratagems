@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.stevekung.stratagems.registry.ModRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -24,7 +25,7 @@ public record Stratagem(String code, Component name, Either<ItemStack, ResourceL
             ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("duration").forGetter(Stratagem::duration),
             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("next_use_cooldown").forGetter(Stratagem::nextUseCooldown)
     ).apply(instance, Stratagem::new));
-    public static final Codec<Holder<Stratagem>> CODEC = RegistryFileCodec.create(StratagemsMod.STRATAGEM_KEY, DIRECT_CODEC);
+    public static final Codec<Holder<Stratagem>> CODEC = RegistryFileCodec.create(ModRegistries.STRATAGEM, DIRECT_CODEC);
 
     private static DataResult<String> validateStratagemCode(String value)
     {

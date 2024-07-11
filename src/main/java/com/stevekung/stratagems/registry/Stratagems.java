@@ -37,6 +37,6 @@ public class Stratagems
 
     private static ResourceKey<Stratagem> createKey(String name)
     {
-        return ResourceKey.create(StratagemsMod.STRATAGEM_KEY, StratagemsMod.id(name));
+        return ResourceKey.create(ModRegistries.STRATAGEM, StratagemsMod.id(name));
     }
 }
