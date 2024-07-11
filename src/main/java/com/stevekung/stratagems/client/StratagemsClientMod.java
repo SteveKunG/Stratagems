@@ -13,6 +13,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 
@@ -82,7 +83,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     manager.setSelectedStratagemCode(tempStratagemCode);
 
                     manager.setSelectedStratagem(stratagemRegistry.stream().filter(s -> s.code().equals(tempStratagemCode)).findFirst().get());
-                    LOGGER.info("Select {}", manager.getSelectedStratagem().name());
+                    LOGGER.info("Select {}", manager.getSelectedStratagem().name().getString());
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
 
@@ -98,7 +99,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
         {
-            LOGGER.info("Throwing {}", manager.getSelectedStratagem().name());
+            LOGGER.info("Throwing {}", manager.getSelectedStratagem().name().getString());
             minecraft.player.playSound(StratagemSounds.STRATAGEM_THROW, 1f, 1.0f);
             manager.clearStratagemCode();
         }
@@ -162,7 +163,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     guiGraphics.drawString(minecraft.font, "Activating", 32, 32 + index * 30, white);
                 }
 
-                var arrowWidth = minecraft.font.width(combinedArrows.toString());
+                var arrowWidth = minecraft.font.width(combinedArrows.toString()) + 10;
 
                 if (max < arrowWidth)
                 {
@@ -211,7 +212,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, hasCode ? white : gray);
                 }
 
-                var arrowWidth = minecraft.font.width(combinedArrows.toString());
+                var arrowWidth = minecraft.font.width(combinedArrows.toString()) + 10;
 
                 if (max < arrowWidth)
                 {
