@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, int incomingDuration, Optional<Integer> duration, int nextUseCooldown)
 {
     public static final Codec<Stratagem> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ExtraCodecs.NON_EMPTY_STRING.flatXmap(Stratagem::validateStratagemCode, Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
+            ExtraCodecs.NON_EMPTY_STRING.validate(Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
             ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
             Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),
             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("incoming_duration").forGetter(Stratagem::incomingDuration),
