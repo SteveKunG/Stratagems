@@ -4,7 +4,7 @@
     "translate": "block.minecraft.stone"
   },
   "icon": {
-    "Count": 1,
+    "count": 1,
     "id": "minecraft:stone"
   },
   "incoming_duration": 100,

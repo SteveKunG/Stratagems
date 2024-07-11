@@ -16,7 +16,7 @@ public class StratagemsMod implements ModInitializer
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "stratagems";
 
-    public static final ResourceKey<Registry<Stratagem>> STRATAGEM_KEY = ResourceKey.createRegistryKey(id("stratagem"));
+    public static final ResourceKey<Registry<Stratagem>> STRATAGEM_KEY = ResourceKey.createRegistryKey(ResourceLocation.withDefaultNamespace("stratagem"));
 
     @Override
     public void onInitialize()
@@ -29,7 +29,7 @@ public class StratagemsMod implements ModInitializer
 
     public static ResourceLocation id(String path)
     {
-        return new ResourceLocation(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     private static void addListenerForDynamic(DynamicRegistryView registryView, ResourceKey<? extends Registry<?>> key)

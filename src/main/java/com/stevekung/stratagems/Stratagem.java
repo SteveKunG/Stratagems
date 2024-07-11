@@ -8,6 +8,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
@@ -17,7 +18,7 @@ public record Stratagem(String code, Component name, Either<ItemStack, ResourceL
 {
     public static final Codec<Stratagem> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ExtraCodecs.NON_EMPTY_STRING.flatXmap(Stratagem::validateStratagemCode, Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
-            ExtraCodecs.COMPONENT.fieldOf("name").forGetter(Stratagem::name),
+            ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
             Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),
             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("incoming_duration").forGetter(Stratagem::incomingDuration),
             ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("duration").forGetter(Stratagem::duration),

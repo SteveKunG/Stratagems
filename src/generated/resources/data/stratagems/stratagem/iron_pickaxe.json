@@ -4,11 +4,8 @@
     "translate": "item.minecraft.iron_pickaxe"
   },
   "icon": {
-    "Count": 1,
-    "id": "minecraft:iron_pickaxe",
-    "tag": {
-      "Damage": 0
-    }
+    "count": 1,
+    "id": "minecraft:iron_pickaxe"
   },
   "incoming_duration": 200,
   "next_use_cooldown": 6000

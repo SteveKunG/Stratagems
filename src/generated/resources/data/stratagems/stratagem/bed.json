@@ -4,7 +4,7 @@
     "translate": "block.minecraft.white_bed"
   },
   "icon": {
-    "Count": 1,
+    "count": 1,
     "id": "minecraft:white_bed"
   },
   "incoming_duration": 400,

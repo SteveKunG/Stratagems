@@ -4,11 +4,8 @@
     "translate": "item.minecraft.bow"
   },
   "icon": {
-    "Count": 1,
-    "id": "minecraft:bow",
-    "tag": {
-      "Damage": 0
-    }
+    "count": 1,
+    "id": "minecraft:bow"
   },
   "incoming_duration": 100,
   "next_use_cooldown": 6000

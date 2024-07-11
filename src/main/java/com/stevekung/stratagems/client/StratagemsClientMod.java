@@ -9,6 +9,7 @@ import com.stevekung.stratagems.registry.StratagemSounds;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
@@ -115,7 +116,7 @@ public class StratagemsClientMod implements ClientModInitializer
         }
     }
 
-    private static void renderHud(GuiGraphics guiGraphics, float partialTicks)
+    private static void renderHud(GuiGraphics guiGraphics, DeltaTracker deltaTracker)
     {
         var manager = StratagemManager.getInstance();
         var minecraft = Minecraft.getInstance();
