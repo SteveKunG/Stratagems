@@ -3,6 +3,10 @@
   "name": {
     "translate": "block.minecraft.chest"
   },
+  "action": {
+    "type": "stratagems:spawn_supply",
+    "loot_table": "minecraft:chests/spawn_bonus_chest"
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:chest"

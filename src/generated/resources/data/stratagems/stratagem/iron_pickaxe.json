@@ -3,6 +3,13 @@
   "name": {
     "translate": "item.minecraft.iron_pickaxe"
   },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:iron_pickaxe"
+    }
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:iron_pickaxe"

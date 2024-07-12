@@ -3,6 +3,13 @@
   "name": {
     "translate": "block.minecraft.white_bed"
   },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:white_bed"
+    }
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:white_bed"

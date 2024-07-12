@@ -1,0 +1,15 @@
+{
+  "code": "wsdaw",
+  "name": {
+    "translate": "block.minecraft.respawn_anchor"
+  },
+  "action": {
+    "type": "stratagems:reinforce"
+  },
+  "icon": {
+    "count": 1,
+    "id": "minecraft:respawn_anchor"
+  },
+  "incoming_duration": 200,
+  "next_use_cooldown": 2400
+}

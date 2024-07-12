@@ -3,6 +3,13 @@
   "name": {
     "translate": "block.minecraft.stone"
   },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "item": {
+      "count": 64,
+      "id": "minecraft:stone"
+    }
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:stone"

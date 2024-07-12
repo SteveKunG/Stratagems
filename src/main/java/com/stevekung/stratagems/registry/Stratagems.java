@@ -5,14 +5,20 @@ import java.util.Optional;
 import com.mojang.datafixers.util.Either;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemsMod;
+import com.stevekung.stratagems.action.ReinforceAction;
+import com.stevekung.stratagems.action.SpawnItemAction;
+import com.stevekung.stratagems.action.SpawnSupplyAction;
+import com.stevekung.stratagems.action.StratagemAction;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 
 public class Stratagems
 {
+    public static final ResourceKey<Stratagem> REINFORCE = createKey("reinforce");
     public static final ResourceKey<Stratagem> BOW = createKey("bow");
     public static final ResourceKey<Stratagem> SUPPLY_CHEST = createKey("supply_chest");
     public static final ResourceKey<Stratagem> IRON_SWORD = createKey("iron_sword");
@@ -22,17 +28,18 @@ public class Stratagems
 
     public static void bootstrap(BootstrapContext<Stratagem> context)
     {
-        register(context, BOW, "ssawd", Items.BOW.getDescription(), new ItemStack(Items.BOW), 100, 6000);
-        register(context, SUPPLY_CHEST, "sswd", Items.CHEST.getDescription(), new ItemStack(Items.CHEST), 200, 6000);
-        register(context, IRON_SWORD, "saswd", Items.IRON_SWORD.getDescription(), new ItemStack(Items.IRON_SWORD), 100, 6000);
-        register(context, IRON_PICKAXE, "saswwd", Items.IRON_PICKAXE.getDescription(), new ItemStack(Items.IRON_PICKAXE), 200, 6000);
-        register(context, BLOCK, "wdsd", Items.STONE.getDescription(), new ItemStack(Items.STONE), 100, 1200);
-        register(context, BED, "swaswdsw", Items.WHITE_BED.getDescription(), new ItemStack(Items.WHITE_BED), 400, 12000);
+        register(context, REINFORCE, "wsdaw", Items.RESPAWN_ANCHOR.getDescription(), new ItemStack(Items.RESPAWN_ANCHOR), ReinforceAction.reinforce(), 200, 2400);
+        register(context, BOW, "ssawd", Items.BOW.getDescription(), new ItemStack(Items.BOW), SpawnItemAction.spawnItem(new ItemStack(Items.BOW)), 100, 6000);
+        register(context, SUPPLY_CHEST, "sswd", Items.CHEST.getDescription(), new ItemStack(Items.CHEST), SpawnSupplyAction.spawnSupply(BuiltInLootTables.SPAWN_BONUS_CHEST), 200, 6000);
+        register(context, IRON_SWORD, "saswd", Items.IRON_SWORD.getDescription(), new ItemStack(Items.IRON_SWORD), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_SWORD)), 100, 6000);
+        register(context, IRON_PICKAXE, "saswwd", Items.IRON_PICKAXE.getDescription(), new ItemStack(Items.IRON_PICKAXE), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_PICKAXE)), 200, 6000);
+        register(context, BLOCK, "wdsd", Items.STONE.getDescription(), new ItemStack(Items.STONE), SpawnItemAction.spawnItem(new ItemStack(Items.STONE, 64)), 100, 1200);
+        register(context, BED, "swaswdsw", Items.WHITE_BED.getDescription(), new ItemStack(Items.WHITE_BED), SpawnItemAction.spawnItem(new ItemStack(Items.WHITE_BED)), 400, 12000);
     }
 
-    static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, Component name, ItemStack icon, int incomingDuration, int nextUseCooldown)
+    static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, Component name, ItemStack icon, StratagemAction.Builder action, int incomingDuration, int nextUseCooldown)
     {
-        context.register(key, new Stratagem(code, name, Either.left(icon), incomingDuration, Optional.empty(), nextUseCooldown));
+        context.register(key, new Stratagem(code, name, Either.left(icon), action.build(), incomingDuration, Optional.empty(), nextUseCooldown));
     }
 
     private static ResourceKey<Stratagem> createKey(String name)

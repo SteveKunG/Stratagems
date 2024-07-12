@@ -3,6 +3,13 @@
   "name": {
     "translate": "item.minecraft.bow"
   },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:bow"
+    }
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:bow"

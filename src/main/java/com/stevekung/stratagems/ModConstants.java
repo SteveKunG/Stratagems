@@ -3,7 +3,6 @@ package com.stevekung.stratagems;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-
 import net.minecraft.Util;
 
 public interface ModConstants
