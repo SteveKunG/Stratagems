@@ -5,7 +5,7 @@
   },
   "action": {
     "type": "stratagems:spawn_item",
-    "item": {
+    "primary": {
       "count": 64,
       "id": "minecraft:stone"
     }

@@ -29,7 +29,7 @@ public class Stratagems
     public static void bootstrap(BootstrapContext<Stratagem> context)
     {
         register(context, REINFORCE, "wsdaw", Items.RESPAWN_ANCHOR.getDescription(), new ItemStack(Items.RESPAWN_ANCHOR), ReinforceAction.reinforce(), 200, 2400);
-        register(context, BOW, "ssawd", Items.BOW.getDescription(), new ItemStack(Items.BOW), SpawnItemAction.spawnItem(new ItemStack(Items.BOW)), 100, 6000);
+        register(context, BOW, "ssawd", Items.BOW.getDescription(), new ItemStack(Items.BOW), SpawnItemAction.spawnItems(new ItemStack(Items.BOW), new ItemStack(Items.ARROW, 64)), 100, 6000);
         register(context, SUPPLY_CHEST, "sswd", Items.CHEST.getDescription(), new ItemStack(Items.CHEST), SpawnSupplyAction.spawnSupply(BuiltInLootTables.SPAWN_BONUS_CHEST), 200, 6000);
         register(context, IRON_SWORD, "saswd", Items.IRON_SWORD.getDescription(), new ItemStack(Items.IRON_SWORD), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_SWORD)), 100, 6000);
         register(context, IRON_PICKAXE, "saswwd", Items.IRON_PICKAXE.getDescription(), new ItemStack(Items.IRON_PICKAXE), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_PICKAXE)), 200, 6000);
