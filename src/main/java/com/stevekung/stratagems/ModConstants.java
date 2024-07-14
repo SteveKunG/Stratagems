@@ -3,7 +3,9 @@ package com.stevekung.stratagems;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+
 import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
 
 public interface ModConstants
 {
@@ -29,5 +31,10 @@ public interface ModConstants
         String STRATAGEMS_DOWN = "key.stratagems_down";
         String STRATAGEMS_LEFT = "key.stratagems_left";
         String STRATAGEMS_RIGHT = "key.stratagems_right";
+    }
+
+    interface Packets
+    {
+        ResourceLocation SPAWN_STRATAGEM = StratagemsMod.id("spawn_stratagem");
     }
 }

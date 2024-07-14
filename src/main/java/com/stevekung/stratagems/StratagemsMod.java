@@ -1,13 +1,19 @@
 package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
+import com.stevekung.stratagems.action.StratagemActionContext;
+import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +30,15 @@ public class StratagemsMod implements ModInitializer
 
         DynamicRegistries.registerSynced(ModRegistries.STRATAGEM, Stratagem.DIRECT_CODEC, DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY);
         DynamicRegistrySetupCallback.EVENT.register(registryView -> addListenerForDynamic(registryView, ModRegistries.STRATAGEM));
+
+        PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
+        {
+            var level = context.player().serverLevel();
+            var stra = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem())).value();
+            var stratagemContext = new StratagemActionContext(level, payload.blockPos(), level.random);
+            stra.action().action(stratagemContext);
+        });
     }
 
     public static ResourceLocation id(String path)
