@@ -1,14 +1,13 @@
 package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.action.StratagemActionContext;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
-
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
@@ -17,6 +16,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class StratagemsMod implements ModInitializer
 {
@@ -38,6 +38,9 @@ public class StratagemsMod implements ModInitializer
             var stra = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem())).value();
             var stratagemContext = new StratagemActionContext(level, payload.blockPos(), level.random);
             stra.action().action(stratagemContext);
+        });
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            System.out.println(server.getLevel(Level.OVERWORLD).getStratagemData());
         });
     }
 
