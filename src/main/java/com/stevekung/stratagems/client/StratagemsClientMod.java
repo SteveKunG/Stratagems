@@ -110,7 +110,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 ClientPlayNetworking.send(new SpawnStratagemPacket(minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getKey(manager.getSelectedStratagem()), BlockPos.containing(minecraft.hitResult.getLocation())));
             }
 
-            minecraft.player.playSound(StratagemSounds.STRATAGEM_THROW, 1f, 1.0f);
+            minecraft.player.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             manager.clearStratagemCode();
         }
 

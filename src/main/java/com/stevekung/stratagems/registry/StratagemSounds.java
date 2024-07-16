@@ -9,7 +9,7 @@ public class StratagemSounds
 {
     public static final SoundEvent STRATAGEM_CLICK = register("player.stratagem.click");
     public static final SoundEvent STRATAGEM_SELECT = register("player.stratagem.select");
-    public static final SoundEvent STRATAGEM_THROW = register("player.stratagem.throw");
+    public static final SoundEvent STRATAGEM_LAND = register("player.stratagem.land");
     public static final SoundEvent STRATAGEM_LOOP = register("player.stratagem.loop");
 
     public static void init()

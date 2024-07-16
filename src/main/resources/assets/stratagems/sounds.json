@@ -9,9 +9,9 @@
       "stratagems:stratagem/select"
     ]
   },
-  "player.stratagem.throw": {
+  "player.stratagem.land": {
     "sounds": [
-      "stratagems:stratagem/throw"
+      "stratagems:stratagem/land"
     ]
   },
   "player.stratagem.loop": {
