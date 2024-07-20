@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.StratagemManager;
+import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModRegistries;
@@ -34,6 +35,7 @@ public class StratagemsClientMod implements ClientModInitializer
         KeyBindings.init();
 
         EntityRendererRegistry.register(ModEntities.STRATAGEM_BALL, ThrownItemRenderer::new);
+        EntityRendererRegistry.register(ModEntities.STRATAGEM_POD, StratagemPodRenderer::new);
 
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
         HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
