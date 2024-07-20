@@ -6,16 +6,19 @@ import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.StratagemManager;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvents;
@@ -29,6 +32,8 @@ public class StratagemsClientMod implements ClientModInitializer
     public void onInitializeClient()
     {
         KeyBindings.init();
+
+        EntityRendererRegistry.register(ModEntities.STRATAGEM_BALL, ThrownItemRenderer::new);
 
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
         HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
@@ -110,7 +115,6 @@ public class StratagemsClientMod implements ClientModInitializer
                 ClientPlayNetworking.send(new SpawnStratagemPacket(minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getKey(manager.getSelectedStratagem()), BlockPos.containing(minecraft.hitResult.getLocation())));
             }
 
-            minecraft.player.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             manager.clearStratagemCode();
         }
 

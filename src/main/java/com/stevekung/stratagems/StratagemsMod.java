@@ -1,11 +1,15 @@
 package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.action.StratagemActionContext;
+import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.registry.ModEntities;
+import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
@@ -16,6 +20,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
 public class StratagemsMod implements ModInitializer
@@ -27,6 +33,8 @@ public class StratagemsMod implements ModInitializer
     public void onInitialize()
     {
         StratagemSounds.init();
+        ModEntities.init();
+        ModEntityDataSerializers.init();
 
         DynamicRegistries.registerSynced(ModRegistries.STRATAGEM, Stratagem.DIRECT_CODEC, DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY);
         DynamicRegistrySetupCallback.EVENT.register(registryView -> addListenerForDynamic(registryView, ModRegistries.STRATAGEM));
@@ -34,12 +42,18 @@ public class StratagemsMod implements ModInitializer
         PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
-            var level = context.player().serverLevel();
-            var stra = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem())).value();
-            var stratagemContext = new StratagemActionContext(level, payload.blockPos(), level.random);
-            stra.action().action(stratagemContext);
+            var player = context.player();
+            var level = player.serverLevel();
+            var stratagemHolder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()));
+
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
+            var stratagemBall = new StratagemBall(level, player);
+            stratagemBall.setVariant(stratagemHolder);
+            stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
+            level.addFreshEntity(stratagemBall);
         });
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+        ServerLifecycleEvents.SERVER_STARTED.register(server ->
+        {
             System.out.println(server.getLevel(Level.OVERWORLD).getStratagemData());
         });
     }
