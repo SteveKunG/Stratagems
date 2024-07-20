@@ -22,6 +22,7 @@ public class StratagemActions
     public static final StratagemActionType REINFORCE = register("reinforce", ReinforceAction.CODEC);
     public static final StratagemActionType SPAWN_ITEM = register("spawn_item", SpawnItemAction.CODEC);
     public static final StratagemActionType SPAWN_SUPPLY = register("spawn_supply", SpawnSupplyAction.CODEC);
+    public static final StratagemActionType SPAWN_BOMB = register("spawn_bomb", SpawnBombAction.CODEC);
 
     private static StratagemActionType register(String name, MapCodec<? extends StratagemAction> codec)
     {

@@ -5,10 +5,8 @@ import java.util.Optional;
 import com.mojang.datafixers.util.Either;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemsMod;
-import com.stevekung.stratagems.action.ReinforceAction;
-import com.stevekung.stratagems.action.SpawnItemAction;
-import com.stevekung.stratagems.action.SpawnSupplyAction;
-import com.stevekung.stratagems.action.StratagemAction;
+import com.stevekung.stratagems.action.*;
+
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -24,7 +22,7 @@ public class Stratagems
     public static final ResourceKey<Stratagem> IRON_SWORD = createKey("iron_sword");
     public static final ResourceKey<Stratagem> IRON_PICKAXE = createKey("iron_pickaxe");
     public static final ResourceKey<Stratagem> BLOCK = createKey("block");
-    public static final ResourceKey<Stratagem> BED = createKey("bed");
+    public static final ResourceKey<Stratagem> TNT = createKey("tnt");
 
     public static void bootstrap(BootstrapContext<Stratagem> context)
     {
@@ -34,7 +32,7 @@ public class Stratagems
         register(context, IRON_SWORD, "saswd", Items.IRON_SWORD.getDescription(), new ItemStack(Items.IRON_SWORD), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_SWORD)), 100, 6000);
         register(context, IRON_PICKAXE, "saswwd", Items.IRON_PICKAXE.getDescription(), new ItemStack(Items.IRON_PICKAXE), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_PICKAXE)), 200, 6000);
         register(context, BLOCK, "wdsd", Items.STONE.getDescription(), new ItemStack(Items.STONE), SpawnItemAction.spawnItem(new ItemStack(Items.STONE, 64)), 100, 1200);
-        register(context, BED, "swaswdsw", Items.WHITE_BED.getDescription(), new ItemStack(Items.WHITE_BED), SpawnItemAction.spawnItem(new ItemStack(Items.WHITE_BED)), 400, 12000);
+        register(context, TNT, "swaswdsw", Items.TNT.getDescription(), new ItemStack(Items.TNT), SpawnBombAction.spawnBomb(40), 400, 12000);
     }
 
     static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, Component name, ItemStack icon, StratagemAction.Builder action, int incomingDuration, int nextUseCooldown)

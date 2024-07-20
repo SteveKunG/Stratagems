@@ -1,0 +1,16 @@
+{
+  "code": "swaswdsw",
+  "name": {
+    "translate": "block.minecraft.tnt"
+  },
+  "action": {
+    "type": "stratagems:spawn_bomb",
+    "fuse": 40
+  },
+  "icon": {
+    "count": 1,
+    "id": "minecraft:tnt"
+  },
+  "incoming_duration": 400,
+  "next_use_cooldown": 12000
+}
