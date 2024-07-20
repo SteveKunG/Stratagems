@@ -100,6 +100,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
         if (!this.level().isClientSide())
         {
             var stratagemPod = new StratagemPod(ModEntities.STRATAGEM_POD, this.level());
+            stratagemPod.setVariant(this.getVariant());
             stratagemPod.moveTo(this.blockPosition(), 0.0f, 0.0f);
             this.level().addFreshEntity(stratagemPod);
             var stratagemContext = new StratagemActionContext((ServerLevel)this.level(), this.blockPosition(), this.random);

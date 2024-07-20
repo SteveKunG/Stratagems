@@ -10,10 +10,13 @@
       "id": "minecraft:iron_pickaxe"
     }
   },
+  "properties": {
+    "beam_color": -9185281,
+    "incoming_duration": 200,
+    "next_use_cooldown": 6000
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:iron_pickaxe"
-  },
-  "incoming_duration": 200,
-  "next_use_cooldown": 6000
+  }
 }

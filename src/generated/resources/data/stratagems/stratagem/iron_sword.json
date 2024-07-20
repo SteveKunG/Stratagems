@@ -10,10 +10,13 @@
       "id": "minecraft:iron_sword"
     }
   },
+  "properties": {
+    "beam_color": -9185281,
+    "incoming_duration": 100,
+    "next_use_cooldown": 6000
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:iron_sword"
-  },
-  "incoming_duration": 100,
-  "next_use_cooldown": 6000
+  }
 }

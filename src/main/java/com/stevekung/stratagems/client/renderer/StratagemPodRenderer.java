@@ -31,8 +31,7 @@ public class StratagemPodRenderer extends EntityRenderer<StratagemPod>
 
         //Minecraft.getInstance().levelRenderer.cullingFrustum.isVisible(new AABB(pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1, pos.getX() + 1, Math.min(pos.getY(), 1024) + 1, pos.getZ() + 1))TODO
         {
-            BeaconRenderer.renderBeaconBeam(poseStack, buffer, BeaconRenderer.BEAM_LOCATION, partialTicks, 1.0f, gameTime, 0, 1024, FastColor.ARGB32.color(115, 215, 255), 0.1F, 0.25F);
-            //BeaconRenderer.renderBeaconBeam(poseStack, buffer, BeaconRenderer.BEAM_LOCATION, partialTicks, 1.0f, gameTime, 0, 1024, FastColor.ARGB32.color(255, 60, 60), 0.1F, 0.25F);
+            BeaconRenderer.renderBeaconBeam(poseStack, buffer, BeaconRenderer.BEAM_LOCATION, partialTicks, 1.0f, gameTime, 0, 1024, entity.getVariant().value().properties().beamColor(), 0.1F, 0.25F);
         }
         poseStack.popPose();
     }

@@ -10,10 +10,13 @@
       "id": "minecraft:stone"
     }
   },
+  "properties": {
+    "beam_color": -9185281,
+    "incoming_duration": 100,
+    "next_use_cooldown": 1200
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:stone"
-  },
-  "incoming_duration": 100,
-  "next_use_cooldown": 1200
+  }
 }

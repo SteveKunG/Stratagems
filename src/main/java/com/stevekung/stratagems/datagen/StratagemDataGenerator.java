@@ -26,7 +26,9 @@ public class StratagemDataGenerator implements DataGeneratorEntrypoint
     {
         callback.add("code", 0);
         callback.add("name", 1);
-        callback.add("icon", 2);
+        callback.add("action", 2);
+        callback.add("properties", 3);
+        callback.add("icon", 4);
     }
 
     @Override

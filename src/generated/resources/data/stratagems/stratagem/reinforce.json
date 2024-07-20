@@ -6,10 +6,13 @@
   "action": {
     "type": "stratagems:reinforce"
   },
+  "properties": {
+    "beam_color": -9185281,
+    "incoming_duration": 200,
+    "next_use_cooldown": 2400
+  },
   "icon": {
     "count": 1,
     "id": "minecraft:respawn_anchor"
-  },
-  "incoming_duration": 200,
-  "next_use_cooldown": 2400
+  }
 }

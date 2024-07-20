@@ -1,7 +1,5 @@
 package com.stevekung.stratagems;
 
-import java.util.Optional;
-
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -21,16 +19,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 
-public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, int incomingDuration, Optional<Integer> duration, int nextUseCooldown)
+public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, StratagemProperties properties)
 {
     public static final Codec<Stratagem> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ExtraCodecs.NON_EMPTY_STRING.validate(Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
             ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
             Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),
             StratagemActions.DIRECT_CODEC.fieldOf("action").forGetter(Stratagem::action),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("incoming_duration").forGetter(Stratagem::incomingDuration),
-            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("duration").forGetter(Stratagem::duration),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("next_use_cooldown").forGetter(Stratagem::nextUseCooldown)
+            StratagemProperties.CODEC.fieldOf("properties").forGetter(Stratagem::properties)
             ).apply(instance, Stratagem::new));
     public static final Codec<Holder<Stratagem>> CODEC = RegistryFileCodec.create(ModRegistries.STRATAGEM, DIRECT_CODEC);
     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Stratagem>> STREAM_CODEC = ByteBufCodecs.holderRegistry(ModRegistries.STRATAGEM);
