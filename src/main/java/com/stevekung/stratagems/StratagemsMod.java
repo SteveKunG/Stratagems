@@ -1,7 +1,6 @@
 package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
@@ -9,9 +8,9 @@ import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
@@ -54,7 +53,18 @@ public class StratagemsMod implements ModInitializer
         });
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
-            System.out.println(server.getLevel(Level.OVERWORLD).getStratagemData());
+            System.out.println(((StratagemsDataAccessor) server.getLevel(Level.OVERWORLD)).getStratagemData());
+        });
+        ServerTickEvents.START_SERVER_TICK.register(server ->
+        {
+            server.getProfiler().push("stratagem");
+
+            if (server.tickRateManager().runsNormally())
+            {
+                ((StratagemsDataAccessor) server.getLevel(Level.OVERWORLD)).getStratagemData().tick();
+            }
+
+            server.getProfiler().pop();
         });
     }
 

@@ -1,13 +1,29 @@
 package com.stevekung.stratagems;
 
-import net.minecraft.core.HolderLookup.Provider;
+import java.util.List;
+
+import com.google.common.collect.Lists;
+import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.registry.Stratagems;
+import net.minecraft.Util;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
 public class StratagemsData extends SavedData
 {
     private static final String STRATAGEM_FILE_ID = "stratagems";
+    private final List<ResourceKey<Stratagem>> stratagemList = Util.make(Lists.newArrayList(), list ->
+    {
+        list.add(Stratagems.REINFORCE);
+        list.add(Stratagems.SUPPLY_CHEST);
+        list.add(Stratagems.BLOCK);
+    });
     private final ServerLevel level;
     private int tick;
 
@@ -34,32 +50,33 @@ public class StratagemsData extends SavedData
 
     public static StratagemsData load(ServerLevel level, CompoundTag tag)
     {
-        var raids = new StratagemsData(level);
-        raids.tick = tag.getInt("Tick");
-        //        var listTag = tag.getList("Raids", 10);
-        //
-        //        for (var i = 0; i < listTag.size(); i++) {
-        //            var compoundTag = listTag.getCompound(i);
-        //            var raid = new Raid(level, compoundTag);
-        //            raids.raidMap.put(raid.getId(), raid);
-        //        }
+        var stratagems = new StratagemsData(level);
+        var listTag = tag.getList("stratagems", Tag.TAG_COMPOUND);
 
-        return raids;
+        for (var i = 0; i < listTag.size(); i++)
+        {
+            var compoundTag = listTag.getCompound(i);
+            stratagems.stratagemList.add(ResourceKey.create(ModRegistries.STRATAGEM, ResourceLocation.parse(compoundTag.getString("stratagem"))));
+            stratagems.tick = tag.getInt("tick");
+        }
+
+        return stratagems;
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, Provider registries)
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider)
     {
-        tag.putInt("Tick", this.tick);
-        //        var listTag = new ListTag();
-        //
-        //        for (var raid : this.raidMap.values()) {
-        //            var compoundTag = new CompoundTag();
-        //            raid.save(compoundTag);
-        //            listTag.add(compoundTag);
-        //        }
-        //
-        //        tag.put("Raids", listTag);
+        var listTag = new ListTag();
+
+        for (var stratagem : this.stratagemList)
+        {
+            var compoundTag = new CompoundTag();
+            compoundTag.putString("stratagem", stratagem.location().toString());
+            compoundTag.putInt("tick", this.tick);
+            listTag.add(compoundTag);
+        }
+
+        tag.put("stratagems", listTag);
         return tag;
     }
 
