@@ -3,15 +3,12 @@ package com.stevekung.stratagems.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.stevekung.stratagems.entity.StratagemPod;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.phys.AABB;
 
 public class StratagemPodRenderer extends EntityRenderer<StratagemPod>
 {

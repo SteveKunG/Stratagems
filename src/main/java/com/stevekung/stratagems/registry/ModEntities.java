@@ -13,7 +13,7 @@ import net.minecraft.world.entity.MobCategory;
 public class ModEntities
 {
     public static final EntityType<StratagemBall> STRATAGEM_BALL = EntityType.Builder.<StratagemBall>of(StratagemBall::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(10).updateInterval(10).build();
-    public static final EntityType<StratagemPod> STRATAGEM_POD = EntityType.Builder.<StratagemPod>of(StratagemPod::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(10).updateInterval(20).build();
+    public static final EntityType<StratagemPod> STRATAGEM_POD = EntityType.Builder.of(StratagemPod::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(10).updateInterval(20).build();
 
     public static void init()
     {
@@ -21,8 +21,8 @@ public class ModEntities
         register("stratagem_pod", STRATAGEM_POD);
     }
 
-    private static <T extends Entity> EntityType<T> register(String key, EntityType<T> type)
+    private static <T extends Entity> void register(String key, EntityType<T> type)
     {
-        return Registry.register(BuiltInRegistries.ENTITY_TYPE, StratagemsMod.id(key), type);
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, StratagemsMod.id(key), type);
     }
 }

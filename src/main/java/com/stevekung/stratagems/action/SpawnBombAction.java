@@ -29,7 +29,7 @@ public record SpawnBombAction(Optional<Integer> fuse) implements StratagemAction
         var level = context.level();
         var blockPos = context.blockPos();
         var primedTnt = new PrimedTnt(level, blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5, null);
-        this.fuse.ifPresent(fuse -> primedTnt.setFuse(fuse));
+        this.fuse.ifPresent(primedTnt::setFuse);
         level.playSound(null, primedTnt.getX(), primedTnt.getY(), primedTnt.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
         level.addFreshEntity(primedTnt);
     }
