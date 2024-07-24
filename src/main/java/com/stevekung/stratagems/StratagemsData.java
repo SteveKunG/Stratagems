@@ -32,7 +32,12 @@ public class StratagemsData extends SavedData
 
     public static SavedData.Factory<StratagemsData> factory(ServerLevel level)
     {
-        return new SavedData.Factory<>(() -> new StratagemsData(level), (compoundTag, provider) -> load(level, compoundTag), CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
+        return new SavedData.Factory<>(() -> new StratagemsData(level), (compoundTag, provider) ->
+        {
+            var data = load(level, compoundTag);
+            StratagemsMod.CLIENT_STRATAGEM_LIST = data.getStratagemList();
+            return data;
+        }, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
     }
 
     public StratagemsData(ServerLevel level)

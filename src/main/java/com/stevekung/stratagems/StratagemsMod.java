@@ -1,6 +1,10 @@
 package com.stevekung.stratagems;
 
+import java.util.List;
+
 import org.slf4j.Logger;
+
+import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
@@ -29,6 +33,8 @@ public class StratagemsMod implements ModInitializer
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "stratagems";
 
+    public static List<StratagemsTicker> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
+
     @Override
     public void onInitialize()
     {
@@ -52,13 +58,14 @@ public class StratagemsMod implements ModInitializer
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(stratagemBall);
         });
-        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) ->
+        {
             StratagemCommands.register(dispatcher, context);
         });
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
             server.overworld().getDataStorage().save();
-            System.out.println(((StratagemsDataAccessor) server.overworld()).getStratagemData().getStratagemList());
+            System.out.println(((StratagemsDataAccessor)server.overworld()).getStratagemData().getStratagemList());
         });
         ServerTickEvents.START_SERVER_TICK.register(server ->
         {
@@ -66,7 +73,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                ((StratagemsDataAccessor) server.overworld()).getStratagemData().tick();
+                ((StratagemsDataAccessor)server.overworld()).getStratagemData().tick();
             }
 
             server.getProfiler().pop();

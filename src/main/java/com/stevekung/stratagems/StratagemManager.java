@@ -1,8 +1,11 @@
 package com.stevekung.stratagems;
 
 import org.apache.commons.lang3.StringUtils;
+
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 
 public class StratagemManager
@@ -12,7 +15,7 @@ public class StratagemManager
     private boolean stratagemsMenuOpen;
     private String tempStratagemCode = "";
     private String selectedStratagemCode;
-    private Stratagem selectedStratagem;
+    private ResourceKey<Stratagem> selectedStratagem;
 
     private final Minecraft minecraft;
 
@@ -83,12 +86,12 @@ public class StratagemManager
         return this.selectedStratagem != null;
     }
 
-    public Stratagem getSelectedStratagem()
+    public ResourceKey<Stratagem> getSelectedStratagem()
     {
         return this.selectedStratagem;
     }
 
-    public void setSelectedStratagem(Stratagem selectedStratagem)
+    public void setSelectedStratagem(ResourceKey<Stratagem> selectedStratagem)
     {
         this.selectedStratagem = selectedStratagem;
     }

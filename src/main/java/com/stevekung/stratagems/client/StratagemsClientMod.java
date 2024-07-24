@@ -5,10 +5,10 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.StratagemManager;
+import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
-import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -21,7 +21,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 
@@ -79,22 +78,22 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (manager.hasTempStratagemCode())
             {
-                var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).holders().map(Holder.Reference::value).toList();
+                var stratagemRegistry = StratagemsMod.CLIENT_STRATAGEM_LIST.stream().map(ticker -> ticker.getStratagem()).toList();
                 var tempStratagemCode = manager.getTempStratagemCode();
 
-                if (stratagemRegistry.stream().noneMatch(s -> s.code().startsWith(tempStratagemCode)))
+                if (stratagemRegistry.stream().noneMatch(s -> s.value().code().startsWith(tempStratagemCode)))
                 {
                     manager.clearTempStratagemCode();
                     LOGGER.info("FAIL");
                     fail = true;
                 }
-                if (stratagemRegistry.stream().anyMatch(s -> s.code().equals(tempStratagemCode)))
+                if (stratagemRegistry.stream().anyMatch(s -> s.value().code().equals(tempStratagemCode)))
                 {
                     LOGGER.info("SELECT");
                     manager.setSelectedStratagemCode(tempStratagemCode);
 
-                    manager.setSelectedStratagem(stratagemRegistry.stream().filter(s -> s.code().equals(tempStratagemCode)).findFirst().get());
-                    LOGGER.info("Select {}", manager.getSelectedStratagem().name().getString());
+                    manager.setSelectedStratagem(stratagemRegistry.stream().filter(s -> s.value().code().equals(tempStratagemCode)).findFirst().get().unwrapKey().get());
+                    LOGGER.info("Select {}", manager.getSelectedStratagem().location().toString());
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
 
@@ -110,11 +109,11 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
         {
-            LOGGER.info("Throwing {}", manager.getSelectedStratagem().name().getString());
+            LOGGER.info("Throwing {}", manager.getSelectedStratagem().location().toString());
 
             if (minecraft.hitResult != null)
             {
-                ClientPlayNetworking.send(new SpawnStratagemPacket(minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getKey(manager.getSelectedStratagem()), BlockPos.containing(minecraft.hitResult.getLocation())));
+                ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelectedStratagem().location(), BlockPos.containing(minecraft.hitResult.getLocation())));
             }
 
             manager.clearStratagemCode();
@@ -143,7 +142,6 @@ public class StratagemsClientMod implements ClientModInitializer
             return;
         }
 
-        var stratagemRegistry = minecraft.level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).holders().map(Holder.Reference::value).toList();
         var white = FastColor.ARGB32.color(255, 255, 255, 255);
         var gray = FastColor.ARGB32.color(255, 128, 128, 128);
         var grayAlpha = FastColor.ARGB32.color(128, 128, 128, 128);
@@ -155,8 +153,9 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagem : stratagemRegistry)
+            for (var stratagemTicker : StratagemsMod.CLIENT_STRATAGEM_LIST)
             {
+                var stratagem = stratagemTicker.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
                 var hasCode = code.startsWith(manager.getSelectedStratagemCode());
@@ -210,8 +209,9 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagem : stratagemRegistry)
+            for (var stratagemTicker : StratagemsMod.CLIENT_STRATAGEM_LIST)
             {
+                var stratagem = stratagemTicker.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
                 var hasCode = code.startsWith(tempStratagemCode);
