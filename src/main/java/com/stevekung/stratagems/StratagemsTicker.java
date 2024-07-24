@@ -50,6 +50,7 @@ public class StratagemsTicker
         this.incomingDuration = properties.incomingDuration();
         this.duration = properties.duration().orElse(0);
         this.nextUseCooldown = properties.nextUseCooldown();
+        this.remainingUse = properties.remainingUse().orElse(-1);
     }
 
     public void save(CompoundTag compoundTag)
