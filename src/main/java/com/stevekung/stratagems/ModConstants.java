@@ -37,4 +37,15 @@ public interface ModConstants
     {
         ResourceLocation SPAWN_STRATAGEM = StratagemsMod.id("spawn_stratagem");
     }
+
+    interface Tag
+    {
+        String STRATAGEM = "stratagem";
+        String STRATAGEMS = "stratagems";
+        String TICK = "tick";
+        String INCOMING_DURATION = "incoming_duration";
+        String DURATION = "duration";
+        String NEXT_USE_COOLDOWN = "next_use_cooldown";
+        String STATE = "state";
+    }
 }

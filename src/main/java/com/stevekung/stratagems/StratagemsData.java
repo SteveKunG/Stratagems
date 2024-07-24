@@ -1,9 +1,10 @@
 package com.stevekung.stratagems;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.stevekung.stratagems.registry.ModRegistries;
+import com.google.common.collect.Sets;
 import com.stevekung.stratagems.registry.Stratagems;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
@@ -11,21 +12,22 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
 public class StratagemsData extends SavedData
 {
     private static final String STRATAGEM_FILE_ID = "stratagems";
-    private final List<ResourceKey<Stratagem>> stratagemList = Util.make(Lists.newArrayList(), list ->
-    {
-        list.add(Stratagems.REINFORCE);
-        list.add(Stratagems.SUPPLY_CHEST);
-        list.add(Stratagems.BLOCK);
-    });
+    private final List<StratagemsTicker> stratagemList = Lists.newArrayList();
     private final ServerLevel level;
     private int tick;
+
+    private static final Set<ResourceKey<Stratagem>> DEFAULT_STRATAGEMS = Util.make(Sets.newLinkedHashSet(), set ->
+    {
+        set.add(Stratagems.REINFORCE);
+        set.add(Stratagems.SUPPLY_CHEST);
+        set.add(Stratagems.BLOCK);
+    });
 
     public static SavedData.Factory<StratagemsData> factory(ServerLevel level)
     {
@@ -41,23 +43,30 @@ public class StratagemsData extends SavedData
     public void tick()
     {
         this.tick++;
+        this.stratagemList.forEach(StratagemsTicker::tick);
 
-        if (this.tick % 200 == 0)
+        if (this.tick % 100 == 0)
         {
             this.setDirty();
         }
     }
 
+    public void useStratagem(ResourceKey<Stratagem> resourceKey)
+    {
+        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey)).forEach(StratagemsTicker::useStratagem);
+    }
+
     public static StratagemsData load(ServerLevel level, CompoundTag tag)
     {
         var stratagems = new StratagemsData(level);
-        var listTag = tag.getList("stratagems", Tag.TAG_COMPOUND);
+        stratagems.tick = tag.getInt(ModConstants.Tag.TICK);
+
+        var listTag = tag.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
 
         for (var i = 0; i < listTag.size(); i++)
         {
             var compoundTag = listTag.getCompound(i);
-            stratagems.stratagemList.add(ResourceKey.create(ModRegistries.STRATAGEM, ResourceLocation.parse(compoundTag.getString("stratagem"))));
-            stratagems.tick = tag.getInt("tick");
+            stratagems.stratagemList.add(new StratagemsTicker(level, compoundTag));
         }
 
         return stratagems;
@@ -68,15 +77,25 @@ public class StratagemsData extends SavedData
     {
         var listTag = new ListTag();
 
+        if (this.stratagemList.isEmpty())
+        {
+            DEFAULT_STRATAGEMS.forEach(resourceKey ->
+            {
+                var compoundTag = new CompoundTag();
+                compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString());
+                this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
+            });
+        }
+
         for (var stratagem : this.stratagemList)
         {
             var compoundTag = new CompoundTag();
-            compoundTag.putString("stratagem", stratagem.location().toString());
-            compoundTag.putInt("tick", this.tick);
+            stratagem.save(compoundTag);
             listTag.add(compoundTag);
         }
 
-        tag.put("stratagems", listTag);
+        tag.put(ModConstants.Tag.STRATAGEMS, listTag);
+        tag.putInt(ModConstants.Tag.TICK, this.tick);
         return tag;
     }
 
