@@ -7,6 +7,9 @@
     "type": "stratagems:spawn_supply",
     "loot_table": "minecraft:chests/spawn_bonus_chest"
   },
+  "rule": {
+    "type": "stratagems:default"
+  },
   "properties": {
     "beam_color": -9185281,
     "incoming_duration": 200,

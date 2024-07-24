@@ -33,6 +33,7 @@ public class StratagemPodRenderer extends EntityRenderer<StratagemPod>
         poseStack.popPose();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ResourceLocation getTextureLocation(StratagemPod entity)
     {

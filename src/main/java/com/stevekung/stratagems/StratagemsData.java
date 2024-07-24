@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
@@ -53,7 +54,7 @@ public class StratagemsData extends SavedData
 
     public void useStratagem(ResourceKey<Stratagem> resourceKey)
     {
-        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey) && ticker.isReady()).forEach(StratagemsTicker::useStratagem);
+        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey) && ticker.canUse()).forEach(StratagemsTicker::useStratagem);
         this.setDirty();
     }
 
@@ -80,7 +81,7 @@ public class StratagemsData extends SavedData
 
         if (this.stratagemList.isEmpty())
         {
-            this.addDefaultStratagems();
+            this.addDefaultStratagems(provider);
         }
 
         for (var stratagem : this.stratagemList)
@@ -95,11 +96,16 @@ public class StratagemsData extends SavedData
         return tag;
     }
 
-    public void addDefaultStratagems()
+    public void addDefaultStratagems(HolderLookup.Provider provider)
     {
         DEFAULT_STRATAGEMS.forEach(resourceKey ->
         {
             var compoundTag = new CompoundTag();
+            var stratagem = provider.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey).value().properties();
+            compoundTag.putInt(ModConstants.Tag.INCOMING_DURATION, stratagem.incomingDuration());
+            compoundTag.putInt(ModConstants.Tag.DURATION, stratagem.duration().orElse(0));
+            compoundTag.putInt(ModConstants.Tag.NEXT_USE_COOLDOWN, stratagem.nextUseCooldown());
+            compoundTag.putInt(ModConstants.Tag.REMAINING_USE, stratagem.remainingUse().orElse(-1));
             compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString());
             this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
         });

@@ -7,7 +7,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.action.StratagemAction;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemActions;
-
+import com.stevekung.stratagems.registry.StratagemRules;
+import com.stevekung.stratagems.rule.DefaultStratagemRule;
+import com.stevekung.stratagems.rule.StratagemRule;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -19,13 +21,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 
-public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, StratagemProperties properties)
+public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, StratagemRule rule, StratagemProperties properties)
 {
     public static final Codec<Stratagem> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ExtraCodecs.NON_EMPTY_STRING.validate(Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
             ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
             Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),
             StratagemActions.DIRECT_CODEC.fieldOf("action").forGetter(Stratagem::action),
+            StratagemRules.CODEC.optionalFieldOf("rule", DefaultStratagemRule.defaultRule().build()).forGetter(Stratagem::rule),
             StratagemProperties.CODEC.fieldOf("properties").forGetter(Stratagem::properties)
             ).apply(instance, Stratagem::new));
     public static final Codec<Holder<Stratagem>> CODEC = RegistryFileCodec.create(ModRegistries.STRATAGEM, DIRECT_CODEC);

@@ -6,6 +6,9 @@
   "action": {
     "type": "stratagems:reinforce"
   },
+  "rule": {
+    "type": "stratagems:reinforce"
+  },
   "properties": {
     "beam_color": -9185281,
     "incoming_duration": 200,

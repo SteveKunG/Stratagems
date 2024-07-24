@@ -10,6 +10,9 @@
       "id": "minecraft:iron_sword"
     }
   },
+  "rule": {
+    "type": "stratagems:default"
+  },
   "properties": {
     "beam_color": -9185281,
     "incoming_duration": 100,

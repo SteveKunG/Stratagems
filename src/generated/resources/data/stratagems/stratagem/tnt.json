@@ -7,6 +7,9 @@
     "type": "stratagems:spawn_bomb",
     "fuse": 40
   },
+  "rule": {
+    "type": "stratagems:default"
+  },
   "properties": {
     "beam_color": -50116,
     "incoming_duration": 400,
