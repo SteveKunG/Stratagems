@@ -2,6 +2,7 @@ package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
+import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
@@ -9,6 +10,7 @@ import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
@@ -21,7 +23,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.Level;
 
 public class StratagemsMod implements ModInitializer
 {
@@ -51,9 +52,13 @@ public class StratagemsMod implements ModInitializer
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(stratagemBall);
         });
+        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> {
+            StratagemCommands.register(dispatcher, context);
+        });
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
-            System.out.println(((StratagemsDataAccessor) server.getLevel(Level.OVERWORLD)).getStratagemData());
+            server.overworld().getDataStorage().save();
+            System.out.println(((StratagemsDataAccessor) server.overworld()).getStratagemData().getStratagemList());
         });
         ServerTickEvents.START_SERVER_TICK.register(server ->
         {
@@ -61,7 +66,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                ((StratagemsDataAccessor) server.getLevel(Level.OVERWORLD)).getStratagemData().tick();
+                ((StratagemsDataAccessor) server.overworld()).getStratagemData().tick();
             }
 
             server.getProfiler().pop();

@@ -22,7 +22,7 @@ public class StratagemsData extends SavedData
     private final ServerLevel level;
     private int tick;
 
-    private static final Set<ResourceKey<Stratagem>> DEFAULT_STRATAGEMS = Util.make(Sets.newLinkedHashSet(), set ->
+    public static final Set<ResourceKey<Stratagem>> DEFAULT_STRATAGEMS = Util.make(Sets.newLinkedHashSet(), set ->
     {
         set.add(Stratagems.REINFORCE);
         set.add(Stratagems.SUPPLY_CHEST);
@@ -53,7 +53,8 @@ public class StratagemsData extends SavedData
 
     public void useStratagem(ResourceKey<Stratagem> resourceKey)
     {
-        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey)).forEach(StratagemsTicker::useStratagem);
+        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey) && ticker.isReady()).forEach(StratagemsTicker::useStratagem);
+        this.setDirty();
     }
 
     public static StratagemsData load(ServerLevel level, CompoundTag tag)
@@ -79,12 +80,7 @@ public class StratagemsData extends SavedData
 
         if (this.stratagemList.isEmpty())
         {
-            DEFAULT_STRATAGEMS.forEach(resourceKey ->
-            {
-                var compoundTag = new CompoundTag();
-                compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString());
-                this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
-            });
+            this.addDefaultStratagems();
         }
 
         for (var stratagem : this.stratagemList)
@@ -97,6 +93,21 @@ public class StratagemsData extends SavedData
         tag.put(ModConstants.Tag.STRATAGEMS, listTag);
         tag.putInt(ModConstants.Tag.TICK, this.tick);
         return tag;
+    }
+
+    public void addDefaultStratagems()
+    {
+        DEFAULT_STRATAGEMS.forEach(resourceKey ->
+        {
+            var compoundTag = new CompoundTag();
+            compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString());
+            this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
+        });
+    }
+
+    public List<StratagemsTicker> getStratagemList()
+    {
+        return this.stratagemList;
     }
 
     public static String getFileId()

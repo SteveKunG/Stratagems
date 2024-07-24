@@ -9,7 +9,8 @@
   "properties": {
     "beam_color": -9185281,
     "incoming_duration": 200,
-    "next_use_cooldown": 2400
+    "next_use_cooldown": 2400,
+    "remaining_use": 20
   },
   "icon": {
     "count": 1,
