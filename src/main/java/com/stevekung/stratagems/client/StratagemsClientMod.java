@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.StringUtil;
 
 public class StratagemsClientMod implements ClientModInitializer
 {
@@ -78,21 +79,21 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (manager.hasTempStratagemCode())
             {
-                var stratagemRegistry = StratagemsMod.CLIENT_STRATAGEM_LIST.stream().map(ticker -> ticker.getStratagem()).toList();
+                var stratagemRegistry = StratagemsMod.CLIENT_STRATAGEM_LIST.stream().toList();
                 var tempStratagemCode = manager.getTempStratagemCode();
 
-                if (stratagemRegistry.stream().noneMatch(s -> s.value().code().startsWith(tempStratagemCode)))
+                if (stratagemRegistry.stream().filter(t -> t.isReady()).noneMatch(s -> s.getStratagem().value().code().startsWith(tempStratagemCode)))
                 {
                     manager.clearTempStratagemCode();
                     LOGGER.info("FAIL");
                     fail = true;
                 }
-                if (stratagemRegistry.stream().anyMatch(s -> s.value().code().equals(tempStratagemCode)))
+                if (stratagemRegistry.stream().filter(t -> t.isReady()).anyMatch(s -> s.getStratagem().value().code().equals(tempStratagemCode)))
                 {
                     LOGGER.info("SELECT");
                     manager.setSelectedStratagemCode(tempStratagemCode);
 
-                    manager.setSelectedStratagem(stratagemRegistry.stream().filter(s -> s.value().code().equals(tempStratagemCode)).findFirst().get().unwrapKey().get());
+                    manager.setSelectedStratagem(stratagemRegistry.stream().filter(s -> s.getStratagem().value().code().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().get());
                     LOGGER.info("Select {}", manager.getSelectedStratagem().location().toString());
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
@@ -179,11 +180,16 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
 
                 var arrowWidth = minecraft.font.width(combinedArrows.toString()) + 10;
+                var textWidth = minecraft.font.width(stratagem.name());
 
                 if (max < arrowWidth)
                 {
                     //max = arrowWidth + 60;
                     max = arrowWidth - 20;
+                }
+                if (max < textWidth)
+                {
+                    max = textWidth;
                 }
 
                 if (equals)
@@ -191,7 +197,15 @@ public class StratagemsClientMod implements ClientModInitializer
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().translate(0, 0, hasCode ? 0 : -300);
                     var finalIndex = index;
-                    stratagem.icon().ifLeft(itemStack -> guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30));
+                    stratagem.icon().ifLeft(itemStack ->
+                    {
+                        if (stratagemTicker.remainingUse > 0)
+                        {
+                            itemStack.setCount(stratagemTicker.remainingUse);
+                        }
+                        guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 24 + finalIndex * 30);
+                    });
                     guiGraphics.pose().popPose();
                 }
 
@@ -214,26 +228,46 @@ public class StratagemsClientMod implements ClientModInitializer
                 var stratagem = stratagemTicker.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var hasCode = code.startsWith(tempStratagemCode);
+                var hasCode = code.startsWith(tempStratagemCode) && stratagemTicker.isReady();
 
                 guiGraphics.drawString(minecraft.font, stratagem.name(), 32, 20 + index * 30, hasCode ? white : gray);
 
                 var combinedArrows = new StringBuilder();
 
-                for (var i = 0; i < codeChar.length; i++)
+                for (var i = 0; i < codeChar.length && stratagemTicker.isReady(); i++)
                 {
                     var arrows = ModConstants.charToArrow(codeChar[i]);
                     combinedArrows.append(arrows);
 
-                    guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, hasCode ? white : gray);
+                    if (stratagemTicker.isReady())
+                    {
+                        guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, hasCode ? white : gray);
+                    }
+                }
+                
+                if (!stratagemTicker.isReady())
+                {
+                    if (stratagemTicker.incomingDuration > 0)
+                    {
+                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.incomingDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                    }
+                    else if (stratagemTicker.nextUseCooldown > 0)
+                    {
+                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.nextUseCooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                    }
                 }
 
                 var arrowWidth = minecraft.font.width(combinedArrows.toString()) + 10;
+                var textWidth = minecraft.font.width(stratagem.name());
 
                 if (max < arrowWidth)
                 {
                     //max = arrowWidth + 60;
                     max = arrowWidth - 20;
+                }
+                if (max < textWidth)
+                {
+                    max = textWidth;
                 }
 
                 if (hasCode)
@@ -249,7 +283,15 @@ public class StratagemsClientMod implements ClientModInitializer
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, hasCode ? 0 : -300);
                 var finalIndex = index;
-                stratagem.icon().ifLeft(itemStack -> guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30));
+                stratagem.icon().ifLeft(itemStack ->
+                {
+                    if (stratagemTicker.remainingUse > 0)
+                    {
+                        itemStack.setCount(stratagemTicker.remainingUse);
+                    }
+                    guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
+                    guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagemTicker.remainingUse), 8, 24 + finalIndex * 30);
+                });
                 guiGraphics.pose().popPose();
 
                 // broken
