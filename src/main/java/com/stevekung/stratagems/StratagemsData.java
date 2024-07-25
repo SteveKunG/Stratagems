@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
+
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -33,12 +34,7 @@ public class StratagemsData extends SavedData
 
     public static SavedData.Factory<StratagemsData> factory(ServerLevel level)
     {
-        return new SavedData.Factory<>(() -> new StratagemsData(level), (compoundTag, provider) ->
-        {
-            var data = load(level, compoundTag);
-            StratagemsMod.CLIENT_STRATAGEM_LIST = data.getStratagemList();
-            return data;
-        }, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
+        return new SavedData.Factory<>(() -> new StratagemsData(level), (compoundTag, provider) -> load(level, compoundTag), CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
     }
 
     public StratagemsData(ServerLevel level)

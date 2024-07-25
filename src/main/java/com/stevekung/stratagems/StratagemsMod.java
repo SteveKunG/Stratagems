@@ -1,9 +1,7 @@
 package com.stevekung.stratagems;
 
-import java.util.List;
-
 import org.slf4j.Logger;
-import com.google.common.collect.Lists;
+
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
@@ -12,6 +10,7 @@ import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -31,8 +30,6 @@ public class StratagemsMod implements ModInitializer
 {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "stratagems";
-
-    public static List<StratagemsTicker> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
 
     @Override
     public void onInitialize()
@@ -63,6 +60,7 @@ public class StratagemsMod implements ModInitializer
             var stratagemData = server.overworld().getStratagemData();
             stratagemData.setDirty();
             server.overworld().getDataStorage().save();
+            StratagemUtils.CLIENT_STRATAGEM_LIST = stratagemData.getStratagemList();
             LOGGER.info("This world has stratagem(s): {}", stratagemData.getStratagemList().stream().map(ticker -> ticker.getResourceKey().location()).toList());
         });
         ServerTickEvents.START_SERVER_TICK.register(server ->

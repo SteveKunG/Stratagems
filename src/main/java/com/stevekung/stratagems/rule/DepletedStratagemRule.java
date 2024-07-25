@@ -23,7 +23,8 @@ public class DepletedStratagemRule implements StratagemRule
     {
         if (ticker.remainingUse == 0)
         {
-            LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
+//            LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
+            return false;
         }
         return ticker.remainingUse > 0;
     }
@@ -31,17 +32,17 @@ public class DepletedStratagemRule implements StratagemRule
     @Override
     public void onUse(StratagemsTicker ticker)
     {
+        System.out.println(ticker.remainingUse);
         if (ticker.remainingUse != null && ticker.remainingUse == 0)
         {
+            ticker.state = StratagemState.DEPLETED;
             LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
             return;
         }
-
-        // Set state from READY to IN_USE
-        ticker.state = StratagemState.IN_USE;
-
         if (ticker.remainingUse != null && ticker.remainingUse > 0)
         {
+            // Set state from READY to IN_USE
+            ticker.state = StratagemState.IN_USE;
             ticker.remainingUse--;
             LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
         }
@@ -103,7 +104,15 @@ public class DepletedStratagemRule implements StratagemRule
                 {
                     LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY);
                     ticker.state = StratagemState.READY;
-                    ticker.resetStratagemTicks(ticker.stratagem().properties());
+                    var properties = ticker.stratagem().properties();
+                    ticker.incomingDuration = properties.incomingDuration();
+
+                    if (properties.duration().isPresent())
+                    {
+                        ticker.duration = properties.duration().get();
+                    }
+
+                    ticker.cooldown = properties.cooldown();
                 }
             }
         }

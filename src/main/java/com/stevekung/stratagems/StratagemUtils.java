@@ -13,17 +13,17 @@ public class StratagemUtils
 
     public static boolean clientNoneMatch(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemsTicker::isReady).noneMatch(ticker -> ticker.getCode().startsWith(tempStratagemCode));
+        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemsTicker::canUse).noneMatch(ticker -> ticker.getCode().startsWith(tempStratagemCode));
     }
 
     public static boolean clientFoundMatch(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemsTicker::isReady).anyMatch(ticker -> ticker.getCode().equals(tempStratagemCode));
+        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemsTicker::canUse).anyMatch(ticker -> ticker.getCode().equals(tempStratagemCode));
     }
 
     public static ResourceKey<Stratagem> getStratagemKeyFromCode(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(ticker -> ticker.isReady() && ticker.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().orElseThrow();
+        return CLIENT_STRATAGEM_LIST.stream().filter(ticker -> ticker.canUse() && ticker.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().orElseThrow();
     }
 
     public static boolean anyMatchHolder(List<StratagemsTicker> list, Holder<Stratagem> stratagemHolder)

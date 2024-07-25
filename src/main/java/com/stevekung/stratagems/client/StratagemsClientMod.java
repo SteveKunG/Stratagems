@@ -1,16 +1,17 @@
 package com.stevekung.stratagems.client;
 
 import org.slf4j.Logger;
+
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.StratagemMenuManager;
 import com.stevekung.stratagems.StratagemUtils;
-import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -153,7 +154,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagemTicker : StratagemsMod.CLIENT_STRATAGEM_LIST)
+            for (var stratagemTicker : StratagemUtils.CLIENT_STRATAGEM_LIST)
             {
                 var stratagem = stratagemTicker.stratagem();
                 var code = stratagem.code();
@@ -194,7 +195,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     var finalIndex = index;
                     stratagem.icon().ifLeft(itemStack ->
                     {
-                        if (stratagemTicker.remainingUse > 0)
+                        if (stratagemTicker.remainingUse != null && stratagemTicker.remainingUse > 0)
                         {
                             itemStack.setCount(stratagemTicker.remainingUse);
                         }
@@ -218,18 +219,22 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagemTicker : StratagemsMod.CLIENT_STRATAGEM_LIST)
+            for (var stratagemTicker : StratagemUtils.CLIENT_STRATAGEM_LIST)
             {
                 var stratagem = stratagemTicker.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var hasCode = code.startsWith(tempStratagemCode) && stratagemTicker.isReady();
+                var hasCode = code.startsWith(tempStratagemCode) && stratagemTicker.canUse();
 
                 guiGraphics.drawString(minecraft.font, stratagem.name(), 32, 20 + index * 30, hasCode ? white : gray);
 
                 var combinedArrows = new StringBuilder();
 
-                for (var i = 0; i < codeChar.length && stratagemTicker.isReady(); i++)
+                if (stratagemTicker.remainingUse != null && stratagemTicker.remainingUse == 0)
+                {
+                    guiGraphics.drawString(minecraft.font, "Unavailable", 32, 32 + index * 30, hasCode ? white : gray);
+                }
+                for (var i = 0; i < codeChar.length && stratagemTicker.canUse(); i++)
                 {
                     var arrows = ModConstants.charToArrow(codeChar[i]);
                     combinedArrows.append(arrows);
@@ -280,12 +285,17 @@ public class StratagemsClientMod implements ClientModInitializer
                 var finalIndex = index;
                 stratagem.icon().ifLeft(itemStack ->
                 {
-                    if (stratagemTicker.remainingUse > 0)
+                    if (stratagemTicker.remainingUse != null && stratagemTicker.remainingUse > 0)
                     {
                         itemStack.setCount(stratagemTicker.remainingUse);
                     }
+
                     guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
-                    guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagemTicker.remainingUse), 8, 24 + finalIndex * 30);
+
+                    if (stratagemTicker.remainingUse != null)
+                    {
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagemTicker.remainingUse), 8, 24 + finalIndex * 30);
+                    }
                 });
                 guiGraphics.pose().popPose();
 

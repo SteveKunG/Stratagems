@@ -33,8 +33,8 @@ public class ReinforceStratagemRule implements StratagemRule
     {
         if (ticker.remainingUse > 0)
         {
-            LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
             ticker.remainingUse--;
+            LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
         }
     }
 
