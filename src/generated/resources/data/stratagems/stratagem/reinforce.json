@@ -11,8 +11,8 @@
   },
   "properties": {
     "beam_color": -9185281,
+    "cooldown": 2400,
     "incoming_duration": 0,
-    "next_use_cooldown": 2400,
     "remaining_use": 20
   },
   "icon": {

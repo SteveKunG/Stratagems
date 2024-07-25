@@ -18,7 +18,7 @@ public final class StratagemsTicker
     private final Holder<Stratagem> stratagem;
     public int incomingDuration;
     public Integer duration;
-    public int nextUseCooldown;
+    public int cooldown;
     public Integer remainingUse;
     public StratagemState state;
 
@@ -37,7 +37,7 @@ public final class StratagemsTicker
             this.duration = compoundTag.getInt(ModConstants.Tag.DURATION);
         }
 
-        this.nextUseCooldown = compoundTag.getInt(ModConstants.Tag.NEXT_USE_COOLDOWN);
+        this.cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
 
         if (compoundTag.contains(ModConstants.Tag.REMAINING_USE, Tag.TAG_INT))
         {
@@ -66,7 +66,7 @@ public final class StratagemsTicker
             this.duration = properties.duration().get();
         }
 
-        this.nextUseCooldown = properties.nextUseCooldown();
+        this.cooldown = properties.cooldown();
 
         if (properties.remainingUse().isPresent())
         {
@@ -86,7 +86,7 @@ public final class StratagemsTicker
             compoundTag.putInt(ModConstants.Tag.DURATION, this.duration);
         }
 
-        compoundTag.putInt(ModConstants.Tag.NEXT_USE_COOLDOWN, this.nextUseCooldown);
+        compoundTag.putInt(ModConstants.Tag.COOLDOWN, this.cooldown);
 
         if (this.remainingUse != null)
         {

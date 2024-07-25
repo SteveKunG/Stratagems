@@ -42,14 +42,14 @@ public class Stratagems
         register(context, TNT, "swaswdsw", new ItemStack(Items.TNT), SpawnBombAction.spawnBomb(40), DefaultStratagemRule.defaultRule(), 400, 12000, 3, RED_COLOR);
     }
 
-    static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, StratagemRule.Builder rule, int incomingDuration, int nextUseCooldown, int remainingUse, int beamColor)
+    static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, StratagemRule.Builder rule, int incomingDuration, int cooldown, int remainingUse, int beamColor)
     {
-        context.register(key, new Stratagem(code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), rule.build(), new StratagemProperties(incomingDuration, Optional.empty(), nextUseCooldown, Optional.of(remainingUse), beamColor)));
+        context.register(key, new Stratagem(code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), rule.build(), new StratagemProperties(incomingDuration, Optional.empty(), cooldown, Optional.of(remainingUse), beamColor)));
     }
 
-    static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, int incomingDuration, int nextUseCooldown, int beamColor)
+    static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, int incomingDuration, int cooldown, int beamColor)
     {
-        context.register(key, new Stratagem(code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), DefaultStratagemRule.defaultRule().build(), new StratagemProperties(incomingDuration, Optional.empty(), nextUseCooldown, Optional.empty(), beamColor)));
+        context.register(key, new Stratagem(code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), DefaultStratagemRule.defaultRule().build(), new StratagemProperties(incomingDuration, Optional.empty(), cooldown, Optional.empty(), beamColor)));
     }
 
     private static ResourceKey<Stratagem> createKey(String name)

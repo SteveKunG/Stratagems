@@ -246,9 +246,9 @@ public class StratagemsClientMod implements ClientModInitializer
                     {
                         guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.incomingDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
-                    else if (stratagemTicker.nextUseCooldown > 0)
+                    else if (stratagemTicker.cooldown > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.nextUseCooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.cooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                 }
 

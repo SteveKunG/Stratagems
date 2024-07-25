@@ -80,22 +80,22 @@ public class DefaultStratagemRule implements StratagemRule
             {
                 LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.COOLDOWN);
                 ticker.state = StratagemState.COOLDOWN;
-                ticker.nextUseCooldown = ticker.stratagem().properties().nextUseCooldown();
+                ticker.cooldown = ticker.stratagem().properties().cooldown();
             }
 
             if (ticker.state == StratagemState.COOLDOWN)
             {
-                if (ticker.nextUseCooldown > 0)
+                if (ticker.cooldown > 0)
                 {
-                    ticker.nextUseCooldown--;
+                    ticker.cooldown--;
 
-                    if (ticker.nextUseCooldown % 20 == 0)
+                    if (ticker.cooldown % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has nextUseCooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.nextUseCooldown));
+                        LOGGER.info("{} stratagem has cooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.cooldown));
                     }
                 }
 
-                if (ticker.nextUseCooldown == 0)
+                if (ticker.cooldown == 0)
                 {
                     LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY);
                     ticker.state = StratagemState.READY;

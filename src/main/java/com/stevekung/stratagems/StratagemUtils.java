@@ -49,7 +49,7 @@ public class StratagemUtils
             compoundTag.putInt(ModConstants.Tag.DURATION, properties.duration().get());
         }
 
-        compoundTag.putInt(ModConstants.Tag.NEXT_USE_COOLDOWN, properties.nextUseCooldown());
+        compoundTag.putInt(ModConstants.Tag.COOLDOWN, properties.cooldown());
 
         if (properties.remainingUse().isPresent())
         {

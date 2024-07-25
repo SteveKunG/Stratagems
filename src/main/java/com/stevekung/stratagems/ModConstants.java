@@ -45,7 +45,7 @@ public interface ModConstants
         String TICK = "tick";
         String INCOMING_DURATION = "incoming_duration";
         String DURATION = "duration";
-        String NEXT_USE_COOLDOWN = "next_use_cooldown";
+        String COOLDOWN = "cooldown";
         String REMAINING_USE = "remaining_use";
         String STATE = "state";
     }

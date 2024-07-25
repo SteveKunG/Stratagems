@@ -43,24 +43,24 @@ public class ReinforceStratagemRule implements StratagemRule
     {
         if (ticker.state != StratagemState.COOLDOWN && ticker.remainingUse == 0)
         {
-            ticker.nextUseCooldown = ticker.stratagem().properties().nextUseCooldown();
+            ticker.cooldown = ticker.stratagem().properties().cooldown();
             ticker.state = StratagemState.COOLDOWN;
-            LOGGER.info("{} stratagem has no remaining use, nextUseCooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.nextUseCooldown));
+            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.cooldown));
         }
 
         if (ticker.state == StratagemState.COOLDOWN)
         {
-            if (ticker.nextUseCooldown > 0)
+            if (ticker.cooldown > 0)
             {
-                ticker.nextUseCooldown--;
+                ticker.cooldown--;
 
-                if (ticker.nextUseCooldown % 20 == 0)
+                if (ticker.cooldown % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has nextUseCooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.nextUseCooldown));
+                    LOGGER.info("{} stratagem has cooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.cooldown));
                 }
             }
 
-            if (ticker.nextUseCooldown == 0)
+            if (ticker.cooldown == 0)
             {
                 LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY, ticker.remainingUse);
                 ticker.state = StratagemState.READY;
