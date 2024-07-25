@@ -8,6 +8,7 @@ import com.stevekung.stratagems.StratagemProperties;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.action.*;
 import com.stevekung.stratagems.rule.DefaultStratagemRule;
+import com.stevekung.stratagems.rule.DepletedStratagemRule;
 import com.stevekung.stratagems.rule.ReinforceStratagemRule;
 import com.stevekung.stratagems.rule.StratagemRule;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -39,7 +40,7 @@ public class Stratagems
         register(context, IRON_SWORD, "saswd", new ItemStack(Items.IRON_SWORD), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_SWORD)), 100, 6000, BLUE_COLOR);
         register(context, IRON_PICKAXE, "saswwd", new ItemStack(Items.IRON_PICKAXE), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_PICKAXE)), 200, 6000, BLUE_COLOR);
         register(context, BLOCK, "wdsd", new ItemStack(Items.STONE), SpawnItemAction.spawnItem(new ItemStack(Items.STONE, 64)), 100, 1200, BLUE_COLOR);
-        register(context, TNT, "swaswdsw", new ItemStack(Items.TNT), SpawnBombAction.spawnBomb(40), DefaultStratagemRule.defaultRule(), 400, 12000, 3, RED_COLOR, Optional.of(true));
+        register(context, TNT, "swaswdsw", new ItemStack(Items.TNT), SpawnBombAction.spawnBomb(40), DepletedStratagemRule.defaultRule(), 40, 60, 3, RED_COLOR, Optional.of(true));
     }
 
     static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, StratagemRule.Builder rule, int incomingDuration, int cooldown, int remainingUse, int beamColor, Optional<Boolean> canDepleted)

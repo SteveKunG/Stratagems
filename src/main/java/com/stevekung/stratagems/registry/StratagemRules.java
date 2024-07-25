@@ -3,10 +3,7 @@ package com.stevekung.stratagems.registry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemsMod;
-import com.stevekung.stratagems.rule.DefaultStratagemRule;
-import com.stevekung.stratagems.rule.ReinforceStratagemRule;
-import com.stevekung.stratagems.rule.StratagemRule;
-import com.stevekung.stratagems.rule.StratagemRuleType;
+import com.stevekung.stratagems.rule.*;
 import net.minecraft.core.Registry;
 
 public class StratagemRules
@@ -16,6 +13,7 @@ public class StratagemRules
 
     public static final StratagemRuleType DEFAULT = register("default", DefaultStratagemRule.CODEC);
     public static final StratagemRuleType REINFORCE = register("reinforce", ReinforceStratagemRule.CODEC);
+    public static final StratagemRuleType DEPLETED = register("depleted", DepletedStratagemRule.CODEC);
 
     private static StratagemRuleType register(String name, MapCodec<? extends StratagemRule> codec)
     {
