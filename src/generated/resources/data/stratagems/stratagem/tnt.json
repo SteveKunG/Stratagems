@@ -12,6 +12,7 @@
   },
   "properties": {
     "beam_color": -50116,
+    "can_depleted": true,
     "cooldown": 12000,
     "incoming_duration": 400,
     "remaining_use": 3
