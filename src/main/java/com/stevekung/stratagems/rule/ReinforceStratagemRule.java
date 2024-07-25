@@ -3,9 +3,9 @@ package com.stevekung.stratagems.rule;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.StratagemsTicker;
 import com.stevekung.stratagems.registry.StratagemRules;
-import net.minecraft.util.StringUtil;
 
 public class ReinforceStratagemRule implements StratagemRule
 {
@@ -23,7 +23,7 @@ public class ReinforceStratagemRule implements StratagemRule
     {
         if (ticker.remainingUse == 0)
         {
-            LOGGER.info("Cannot use this stratagem! {}", ticker.getStratagem().getRegisteredName());
+            LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
         }
         return ticker.remainingUse > 0;
     }
@@ -33,22 +33,22 @@ public class ReinforceStratagemRule implements StratagemRule
     {
         if (ticker.remainingUse > 0)
         {
+            LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
             ticker.remainingUse--;
-            LOGGER.info("{}, remainingUse:{}", ticker.getStratagem().getRegisteredName(), ticker.remainingUse);
         }
     }
 
     @Override
     public void tick(StratagemsTicker ticker)
     {
-        if (ticker.state != StratagemsTicker.State.COOLDOWN && ticker.remainingUse == 0)
+        if (ticker.state != StratagemState.COOLDOWN && ticker.remainingUse == 0)
         {
             ticker.nextUseCooldown = ticker.stratagem().properties().nextUseCooldown();
-            ticker.state = StratagemsTicker.State.COOLDOWN;
-            LOGGER.info("{}, no remaining use, state:{}, nextUseCooldown:{}", ticker.getStratagem().getRegisteredName(), ticker.state, StringUtil.formatTickDuration(ticker.nextUseCooldown, ticker.level.tickRateManager().tickrate()));
+            ticker.state = StratagemState.COOLDOWN;
+            LOGGER.info("{} stratagem has no remaining use, nextUseCooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.nextUseCooldown));
         }
 
-        if (ticker.state == StratagemsTicker.State.COOLDOWN)
+        if (ticker.state == StratagemState.COOLDOWN)
         {
             if (ticker.nextUseCooldown > 0)
             {
@@ -56,15 +56,15 @@ public class ReinforceStratagemRule implements StratagemRule
 
                 if (ticker.nextUseCooldown % 20 == 0)
                 {
-                    LOGGER.info("{}, state:{}, nextUseCooldown:{}", ticker.getStratagem().getRegisteredName(), ticker.state, StringUtil.formatTickDuration(ticker.nextUseCooldown, ticker.level.tickRateManager().tickrate()));
+                    LOGGER.info("{} stratagem has nextUseCooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.nextUseCooldown));
                 }
             }
 
             if (ticker.nextUseCooldown == 0)
             {
-                ticker.state = StratagemsTicker.State.READY;
+                LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY, ticker.remainingUse);
+                ticker.state = StratagemState.READY;
                 ticker.remainingUse++;
-                LOGGER.info("{}, switch to state:{}, remainingUse:{}", ticker.getStratagem().getRegisteredName(), ticker.state, ticker.remainingUse);
             }
         }
     }

@@ -1,7 +1,7 @@
 {
   "code": "wdsd",
   "name": {
-    "translate": "block.minecraft.stone"
+    "translate": "stratagem.stratagems.block"
   },
   "action": {
     "type": "stratagems:spawn_item",

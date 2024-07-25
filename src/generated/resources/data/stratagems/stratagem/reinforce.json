@@ -1,7 +1,7 @@
 {
   "code": "wsdaw",
   "name": {
-    "translate": "block.minecraft.respawn_anchor"
+    "translate": "stratagem.stratagems.reinforce"
   },
   "action": {
     "type": "stratagems:reinforce"

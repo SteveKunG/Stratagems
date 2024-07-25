@@ -1,7 +1,7 @@
 {
   "code": "saswwd",
   "name": {
-    "translate": "item.minecraft.iron_pickaxe"
+    "translate": "stratagem.stratagems.iron_pickaxe"
   },
   "action": {
     "type": "stratagems:spawn_item",

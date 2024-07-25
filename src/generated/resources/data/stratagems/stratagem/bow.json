@@ -1,7 +1,7 @@
 {
   "code": "ssawd",
   "name": {
-    "translate": "item.minecraft.bow"
+    "translate": "stratagem.stratagems.bow"
   },
   "action": {
     "type": "stratagems:spawn_item",

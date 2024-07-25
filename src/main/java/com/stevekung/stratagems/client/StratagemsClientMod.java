@@ -1,16 +1,16 @@
 package com.stevekung.stratagems.client;
 
 import org.slf4j.Logger;
-
+import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
-import com.stevekung.stratagems.StratagemManager;
+import com.stevekung.stratagems.StratagemMenuManager;
+import com.stevekung.stratagems.StratagemUtils;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.StratagemSounds;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -43,18 +43,18 @@ public class StratagemsClientMod implements ClientModInitializer
 
     private static void clientTick(Minecraft minecraft)
     {
-        var manager = StratagemManager.getInstance();
+        var manager = StratagemMenuManager.getInstance();
 
         if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
         {
-            manager.setStratagemsMenuOpen(!manager.isStratagemsMenuOpen());
+            manager.setMenuOpen(!manager.isMenuOpen());
             manager.clearStratagemCode();
         }
 
         var arrowKeySound = false;
         var fail = false;
 
-        if (manager.isStratagemsMenuOpen())
+        if (manager.isMenuOpen())
         {
             if (KeyBindings.STRATAGEMS_UP.consumeClick())
             {
@@ -79,27 +79,26 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (manager.hasTempStratagemCode())
             {
-                var stratagemRegistry = StratagemsMod.CLIENT_STRATAGEM_LIST.stream().toList();
                 var tempStratagemCode = manager.getTempStratagemCode();
 
-                if (stratagemRegistry.stream().filter(t -> t.isReady()).noneMatch(s -> s.getStratagem().value().code().startsWith(tempStratagemCode)))
+                if (StratagemUtils.clientNoneMatch(tempStratagemCode))
                 {
                     manager.clearTempStratagemCode();
-                    LOGGER.info("FAIL");
                     fail = true;
+                    LOGGER.info("FAIL");
                 }
-                if (stratagemRegistry.stream().filter(t -> t.isReady()).anyMatch(s -> s.getStratagem().value().code().equals(tempStratagemCode)))
+                if (StratagemUtils.clientFoundMatch(tempStratagemCode))
                 {
-                    LOGGER.info("SELECT");
                     manager.setSelectedStratagemCode(tempStratagemCode);
+                    manager.setSelectedStratagem(StratagemUtils.getStratagemKeyFromCode(tempStratagemCode));
 
-                    manager.setSelectedStratagem(stratagemRegistry.stream().filter(s -> s.getStratagem().value().code().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().get());
-                    LOGGER.info("Select {}", manager.getSelectedStratagem().location().toString());
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
 
                     manager.clearTempStratagemCode();
-                    manager.setStratagemsMenuOpen(false);
+                    manager.setMenuOpen(false);
+
+                    LOGGER.info("Select {}", manager.getSelectedStratagem().location());
                 }
             }
         }
@@ -110,7 +109,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
         {
-            LOGGER.info("Throwing {}", manager.getSelectedStratagem().location().toString());
+            LOGGER.info("Throwing {}", manager.getSelectedStratagem().location());
 
             if (minecraft.hitResult != null)
             {
@@ -135,7 +134,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
     private static void renderHud(GuiGraphics guiGraphics, DeltaTracker deltaTracker)
     {
-        var manager = StratagemManager.getInstance();
+        var manager = StratagemMenuManager.getInstance();
         var minecraft = Minecraft.getInstance();
 
         if (minecraft.level == null)
@@ -147,7 +146,7 @@ public class StratagemsClientMod implements ClientModInitializer
         var gray = FastColor.ARGB32.color(255, 128, 128, 128);
         var grayAlpha = FastColor.ARGB32.color(128, 128, 128, 128);
 
-        guiGraphics.drawString(minecraft.font, "Menu Active: " + manager.isStratagemsMenuOpen(), guiGraphics.guiWidth() / 2 - "Menu Active: ".length(), 10, white);
+        guiGraphics.drawString(minecraft.font, "Menu Active: " + manager.isMenuOpen(), guiGraphics.guiWidth() / 2 - "Menu Active: ".length(), 10, white);
 
         if (manager.hasSelectedStratagemCode())
         {
@@ -171,11 +170,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (equals)
                 {
-                    for (var arrow : codeChar)
-                    {
-                        var arrows = ModConstants.charToArrow(arrow);
-                        combinedArrows.append(arrows);
-                    }
+                    Chars.asList(codeChar).forEach(character -> combinedArrows.append(ModConstants.charToArrow(character)));
                     guiGraphics.drawString(minecraft.font, "Activating", 32, 32 + index * 30, white);
                 }
 
@@ -187,7 +182,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     //max = arrowWidth + 60;
                     max = arrowWidth - 20;
                 }
-                if (max < textWidth)
+                if (arrowWidth < textWidth)
                 {
                     max = textWidth;
                 }
@@ -217,7 +212,7 @@ public class StratagemsClientMod implements ClientModInitializer
             }
         }
 
-        if (manager.isStratagemsMenuOpen())
+        if (manager.isMenuOpen())
         {
             var tempStratagemCode = manager.getTempStratagemCode();
             var index = 0;
@@ -244,7 +239,7 @@ public class StratagemsClientMod implements ClientModInitializer
                         guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, hasCode ? white : gray);
                     }
                 }
-                
+
                 if (!stratagemTicker.isReady())
                 {
                     if (stratagemTicker.incomingDuration > 0)
@@ -265,7 +260,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     //max = arrowWidth + 60;
                     max = arrowWidth - 20;
                 }
-                if (max < textWidth)
+                if (arrowWidth < textWidth)
                 {
                     max = textWidth;
                 }

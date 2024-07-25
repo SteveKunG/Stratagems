@@ -2,5 +2,8 @@ package com.stevekung.stratagems;
 
 public interface StratagemsDataAccessor
 {
-    StratagemsData getStratagemData();
+    default StratagemsData getStratagemData()
+    {
+        throw new AssertionError("Implemented via mixin");
+    }
 }

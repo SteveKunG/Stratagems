@@ -1,7 +1,7 @@
 {
   "code": "sswd",
   "name": {
-    "translate": "block.minecraft.chest"
+    "translate": "stratagem.stratagems.supply_chest"
   },
   "action": {
     "type": "stratagems:spawn_supply",

@@ -3,9 +3,9 @@ package com.stevekung.stratagems.rule;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.StratagemsTicker;
 import com.stevekung.stratagems.registry.StratagemRules;
-import net.minecraft.util.StringUtil;
 
 public class DefaultStratagemRule implements StratagemRule
 {
@@ -27,18 +27,19 @@ public class DefaultStratagemRule implements StratagemRule
     @Override
     public void onUse(StratagemsTicker ticker)
     {
-        if (ticker.remainingUse == 0)
+        if (ticker.remainingUse != null && ticker.remainingUse == 0)
         {
-            LOGGER.info("Cannot use this stratagem! {}", ticker.getStratagem().getRegisteredName());
+            LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
             return;
         }
 
-        ticker.state = StratagemsTicker.State.IN_USE;
+        // Set state from READY to IN_USE
+        ticker.state = StratagemState.IN_USE;
 
-        if (ticker.remainingUse > 0)
+        if (ticker.remainingUse != null && ticker.remainingUse > 0)
         {
             ticker.remainingUse--;
-            LOGGER.info("{}, remainingUse:{}", ticker.getStratagem().getRegisteredName(), ticker.remainingUse);
+            LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
         }
     }
 
@@ -47,42 +48,42 @@ public class DefaultStratagemRule implements StratagemRule
     {
         if (!ticker.isReady())
         {
-            if (ticker.state == StratagemsTicker.State.IN_USE)
+            if (ticker.state == StratagemState.IN_USE)
             {
-                if (ticker.duration > 0)
+                if (ticker.duration != null && ticker.duration > 0)
                 {
                     ticker.duration--;
 
                     if (ticker.duration % 20 == 0)
                     {
-                        LOGGER.info("{}, duration:{}", ticker.getStratagem().getRegisteredName(), StringUtil.formatTickDuration(ticker.duration, ticker.level.tickRateManager().tickrate()));
+                        LOGGER.info("{} stratagem has duration: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.duration));
                     }
                 }
                 else
                 {
-                    ticker.state = StratagemsTicker.State.INCOMING;
-                    LOGGER.info("{}, switch to state:{}", ticker.getStratagem().getRegisteredName(), ticker.state);
+                    LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.INCOMING);
+                    ticker.state = StratagemState.INCOMING;
                 }
             }
 
-            if (ticker.state == StratagemsTicker.State.INCOMING && ticker.incomingDuration > 0)
+            if (ticker.state == StratagemState.INCOMING && ticker.incomingDuration > 0)
             {
                 ticker.incomingDuration--;
 
                 if (ticker.incomingDuration % 20 == 0)
                 {
-                    LOGGER.info("{}, incomingDuration:{}", ticker.getStratagem().getRegisteredName(), StringUtil.formatTickDuration(ticker.incomingDuration, ticker.level.tickRateManager().tickrate()));
+                    LOGGER.info("{} stratagem has incomingDuration: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.incomingDuration));
                 }
             }
 
-            if (ticker.state != StratagemsTicker.State.COOLDOWN && ticker.incomingDuration == 0)
+            if (ticker.state != StratagemState.COOLDOWN && ticker.incomingDuration == 0)
             {
-                ticker.state = StratagemsTicker.State.COOLDOWN;
+                LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.COOLDOWN);
+                ticker.state = StratagemState.COOLDOWN;
                 ticker.nextUseCooldown = ticker.stratagem().properties().nextUseCooldown();
-                LOGGER.info("{}, switch to state:{}", ticker.getStratagem().getRegisteredName(), ticker.state);
             }
 
-            if (ticker.state == StratagemsTicker.State.COOLDOWN)
+            if (ticker.state == StratagemState.COOLDOWN)
             {
                 if (ticker.nextUseCooldown > 0)
                 {
@@ -90,15 +91,15 @@ public class DefaultStratagemRule implements StratagemRule
 
                     if (ticker.nextUseCooldown % 20 == 0)
                     {
-                        LOGGER.info("{}, state:{}, nextUseCooldown:{}", ticker.getStratagem().getRegisteredName(), ticker.state, StringUtil.formatTickDuration(ticker.nextUseCooldown, ticker.level.tickRateManager().tickrate()));
+                        LOGGER.info("{} stratagem has nextUseCooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.nextUseCooldown));
                     }
                 }
 
                 if (ticker.nextUseCooldown == 0)
                 {
-                    ticker.state = StratagemsTicker.State.READY;
-                    ticker.setDefaultStratagemTicks(ticker.stratagem().properties());
-                    LOGGER.info("{}, switch to state:{}", ticker.getStratagem().getRegisteredName(), ticker.state);
+                    LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY);
+                    ticker.state = StratagemState.READY;
+                    ticker.resetStratagemTicks(ticker.stratagem().properties());
                 }
             }
         }

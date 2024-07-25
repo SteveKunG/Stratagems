@@ -8,9 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 
-public class StratagemManager
+public class StratagemMenuManager
 {
-    private static final StratagemManager INSTANCE = new StratagemManager();
+    private static final StratagemMenuManager INSTANCE = new StratagemMenuManager();
 
     private boolean stratagemsMenuOpen;
     private String tempStratagemCode = "";
@@ -19,22 +19,22 @@ public class StratagemManager
 
     private final Minecraft minecraft;
 
-    private StratagemManager()
+    private StratagemMenuManager()
     {
         this.minecraft = Minecraft.getInstance();
     }
 
-    public static StratagemManager getInstance()
+    public static StratagemMenuManager getInstance()
     {
         return INSTANCE;
     }
 
-    public boolean isStratagemsMenuOpen()
+    public boolean isMenuOpen()
     {
         return this.stratagemsMenuOpen;
     }
 
-    public void setStratagemsMenuOpen(boolean stratagemsMenuOpen)
+    public void setMenuOpen(boolean stratagemsMenuOpen)
     {
         this.stratagemsMenuOpen = stratagemsMenuOpen;
     }

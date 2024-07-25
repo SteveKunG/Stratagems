@@ -1,7 +1,7 @@
 {
   "code": "saswd",
   "name": {
-    "translate": "item.minecraft.iron_sword"
+    "translate": "stratagem.stratagems.iron_sword"
   },
   "action": {
     "type": "stratagems:spawn_item",

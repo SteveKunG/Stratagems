@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -57,9 +58,9 @@ public class StratagemsData extends SavedData
         }
     }
 
-    public void useStratagem(ResourceKey<Stratagem> resourceKey)
+    public void use(ResourceKey<Stratagem> resourceKey)
     {
-        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey) && ticker.canUse()).forEach(StratagemsTicker::useStratagem);
+        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey) && ticker.canUse()).forEach(StratagemsTicker::use);
         this.setDirty();
     }
 
@@ -101,19 +102,25 @@ public class StratagemsData extends SavedData
         return tag;
     }
 
-    public void addDefaultStratagems(HolderLookup.Provider provider)
+    private void addDefaultStratagems(HolderLookup.Provider provider)
     {
-        DEFAULT_STRATAGEMS.forEach(resourceKey ->
-        {
-            var compoundTag = new CompoundTag();
-            var stratagem = provider.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey).value().properties();
-            compoundTag.putInt(ModConstants.Tag.INCOMING_DURATION, stratagem.incomingDuration());
-            compoundTag.putInt(ModConstants.Tag.DURATION, stratagem.duration().orElse(0));
-            compoundTag.putInt(ModConstants.Tag.NEXT_USE_COOLDOWN, stratagem.nextUseCooldown());
-            compoundTag.putInt(ModConstants.Tag.REMAINING_USE, stratagem.remainingUse().orElse(-1));
-            compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString());
-            this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
-        });
+        DEFAULT_STRATAGEMS.forEach(resourceKey -> this.stratagemList.add(new StratagemsTicker(this.level, StratagemUtils.createCompoundTagWithDefaultValue(provider.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)))));
+    }
+
+    public void add(CompoundTag compoundTag)
+    {
+        this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
+    }
+
+    public void remove(Holder<Stratagem> stratagemHolder)
+    {
+        this.stratagemList.removeIf(ticker -> ticker.getStratagem() == stratagemHolder);
+    }
+
+    public void clear()
+    {
+        this.stratagemList.clear();
+        this.addDefaultStratagems(this.level.registryAccess());
     }
 
     public List<StratagemsTicker> getStratagemList()

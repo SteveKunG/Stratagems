@@ -1,7 +1,7 @@
 {
   "code": "swaswdsw",
   "name": {
-    "translate": "block.minecraft.tnt"
+    "translate": "stratagem.stratagems.tnt"
   },
   "action": {
     "type": "stratagems:spawn_bomb",

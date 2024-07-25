@@ -1,81 +1,115 @@
 package com.stevekung.stratagems;
 
-import java.util.Locale;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.rule.StratagemRule;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.StringUtil;
 
-public class StratagemsTicker
+public final class StratagemsTicker
 {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    public final ServerLevel level;
+    private final ServerLevel level;
     private final Holder<Stratagem> stratagem;
     public int incomingDuration;
-    public int duration;
+    public Integer duration;
     public int nextUseCooldown;
-    public int remainingUse = -1;
-    public State state;
+    public Integer remainingUse;
+    public StratagemState state;
 
     public StratagemsTicker(ServerLevel level, CompoundTag compoundTag)
     {
         this.level = level;
         this.stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
-        this.incomingDuration = compoundTag.getInt(ModConstants.Tag.INCOMING_DURATION);
-        this.duration = compoundTag.getInt(ModConstants.Tag.DURATION);
+
+        if (compoundTag.contains(ModConstants.Tag.INCOMING_DURATION, Tag.TAG_INT))
+        {
+            this.incomingDuration = compoundTag.getInt(ModConstants.Tag.INCOMING_DURATION);
+        }
+
+        if (compoundTag.contains(ModConstants.Tag.DURATION, Tag.TAG_INT))
+        {
+            this.duration = compoundTag.getInt(ModConstants.Tag.DURATION);
+        }
+
         this.nextUseCooldown = compoundTag.getInt(ModConstants.Tag.NEXT_USE_COOLDOWN);
-        this.remainingUse = compoundTag.getInt(ModConstants.Tag.REMAINING_USE);
-        this.state = State.byName(compoundTag.getString(ModConstants.Tag.STATE));
+
+        if (compoundTag.contains(ModConstants.Tag.REMAINING_USE, Tag.TAG_INT))
+        {
+            this.remainingUse = compoundTag.getInt(ModConstants.Tag.REMAINING_USE);
+        }
+
+        this.state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
     }
 
     public void tick()
     {
-        this.stratagem().rule().tick(this);
+        this.getRule().tick(this);
     }
 
-    public void useStratagem()
+    public void use()
     {
-        this.stratagem().rule().onUse(this);
+        this.getRule().onUse(this);
     }
 
-    public void setDefaultStratagemTicks(StratagemProperties properties)
+    public void resetStratagemTicks(StratagemProperties properties)
     {
         this.incomingDuration = properties.incomingDuration();
-        this.duration = properties.duration().orElse(0);
+
+        if (properties.duration().isPresent())
+        {
+            this.duration = properties.duration().get();
+        }
+
         this.nextUseCooldown = properties.nextUseCooldown();
-        this.remainingUse = properties.remainingUse().orElse(-1);
+
+        if (properties.remainingUse().isPresent())
+        {
+            this.remainingUse = properties.remainingUse().get();
+        }
     }
 
     public void save(CompoundTag compoundTag)
     {
-        compoundTag.putInt(ModConstants.Tag.INCOMING_DURATION, this.incomingDuration);
-        compoundTag.putInt(ModConstants.Tag.DURATION, this.duration);
+        if (this.incomingDuration > 0)
+        {
+            compoundTag.putInt(ModConstants.Tag.INCOMING_DURATION, this.incomingDuration);
+        }
+
+        if (this.duration != null)
+        {
+            compoundTag.putInt(ModConstants.Tag.DURATION, this.duration);
+        }
+
         compoundTag.putInt(ModConstants.Tag.NEXT_USE_COOLDOWN, this.nextUseCooldown);
-        compoundTag.putInt(ModConstants.Tag.REMAINING_USE, this.remainingUse);
+
+        if (this.remainingUse != null)
+        {
+            compoundTag.putInt(ModConstants.Tag.REMAINING_USE, this.remainingUse);
+        }
+
         this.stratagem.unwrapKey().ifPresent(resourceKey -> compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString()));
         compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
     }
 
     public boolean canUse()
     {
-        return this.stratagem().rule().canUse(this);
+        return this.getRule().canUse(this);
     }
 
-    public boolean isReady()
+    public String getCode()
     {
-        return this.state == State.READY;
+        return this.stratagem().code();
     }
 
-    public Holder<Stratagem> getStratagem()
+    public StratagemRule getRule()
     {
-        return this.stratagem;
+        return this.stratagem().rule();
     }
 
     public Stratagem stratagem()
@@ -83,31 +117,28 @@ public class StratagemsTicker
         return this.stratagem.value();
     }
 
-    public enum State
+    public ResourceKey<Stratagem> getResourceKey()
     {
-        READY,
-        IN_USE,
-        INCOMING,
-        COOLDOWN,
-        BLOCKED;
+        return this.stratagem.unwrapKey().orElseThrow();
+    }
 
-        private static final State[] VALUES = values();
+    public ServerLevel level()
+    {
+        return this.level;
+    }
 
-        static State byName(String name)
-        {
-            for (var state : VALUES)
-            {
-                if (name.equalsIgnoreCase(state.name()))
-                {
-                    return state;
-                }
-            }
-            return READY;
-        }
+    public String formatTickDuration(int duration)
+    {
+        return StringUtil.formatTickDuration(duration, this.level().tickRateManager().tickrate());
+    }
 
-        public String getName()
-        {
-            return this.name().toLowerCase(Locale.ROOT);
-        }
+    public boolean isReady()
+    {
+        return this.state == StratagemState.READY;
+    }
+
+    public Holder<Stratagem> getStratagem()
+    {
+        return this.stratagem;
     }
 }

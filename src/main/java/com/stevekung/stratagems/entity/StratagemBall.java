@@ -103,9 +103,9 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             stratagemPod.setVariant(this.getVariant());
             stratagemPod.moveTo(this.blockPosition(), 0.0f, 0.0f);
             this.level().addFreshEntity(stratagemPod);
-            var stratagemContext = new StratagemActionContext((ServerLevel)this.level(), this.blockPosition(), this.random);
+            var stratagemContext = new StratagemActionContext((ServerLevel) this.level(), this.blockPosition(), this.random);
             this.getVariant().value().action().action(stratagemContext);
-            ((ServerLevel)this.level()).getServer().overworld().getStratagemData().useStratagem(this.getVariant().unwrapKey().get());
+            ((ServerLevel) this.level()).getServer().overworld().getStratagemData().use(this.getVariant().unwrapKey().get());
             this.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             this.discard();
         }

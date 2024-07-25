@@ -3,7 +3,6 @@ package com.stevekung.stratagems;
 import java.util.List;
 
 import org.slf4j.Logger;
-
 import com.google.common.collect.Lists;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
@@ -58,14 +57,13 @@ public class StratagemsMod implements ModInitializer
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(stratagemBall);
         });
-        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) ->
-        {
-            StratagemCommands.register(dispatcher, context);
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> StratagemCommands.register(dispatcher, context));
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
+            var stratagemData = server.overworld().getStratagemData();
+            stratagemData.setDirty();
             server.overworld().getDataStorage().save();
-            System.out.println(((StratagemsDataAccessor)server.overworld()).getStratagemData().getStratagemList());
+            LOGGER.info("This world has stratagem(s): {}", stratagemData.getStratagemList().stream().map(ticker -> ticker.getResourceKey().location()).toList());
         });
         ServerTickEvents.START_SERVER_TICK.register(server ->
         {
@@ -73,7 +71,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                ((StratagemsDataAccessor)server.overworld()).getStratagemData().tick();
+                server.overworld().getStratagemData().tick();
             }
 
             server.getProfiler().pop();

@@ -46,7 +46,7 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
         var registry = registryAccess.registryOrThrow(ModRegistries.STRATAGEM);
         builder.define(DATA_STRATAGEM, registry.getHolder(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
     }
-    
+
     @Override
     public Holder<Stratagem> getVariant()
     {

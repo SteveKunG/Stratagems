@@ -1,0 +1,17 @@
+{
+  "stratagem.stratagems.reinforce": "Reinforce",
+  "stratagem.stratagems.bow": "Bow and Arrows",
+  "stratagem.stratagems.supply_chest": "Supply Chest",
+  "stratagem.stratagems.iron_sword": "Iron Sword",
+  "stratagem.stratagems.iron_pickaxe": "Iron Pickaxe",
+  "stratagem.stratagems.block": "Block",
+  "stratagem.stratagems.tnt": "TNT",
+  "commands.stratagem.add.success": "Add %s stratagem successfully",
+  "commands.stratagem.add.failed": "Failed to add Stratagem because already exists!",
+  "commands.stratagem.list": "Stratagem list: %s",
+  "commands.stratagem.reset": "Stratagem reset successfully",
+  "commands.stratagem.remove.everything.success": "All stratagems has been removed",
+  "commands.stratagem.remove.contains_default.failed": "Failed to clear stratagems because it contains only default stratagems!",
+  "commands.stratagem.remove.specific.success": "Remove %s stratagem successfully",
+  "commands.stratagem.remove.specific.failed": "Failed to clear specific stratagem!"
+}
