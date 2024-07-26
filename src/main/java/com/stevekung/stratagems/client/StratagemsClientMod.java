@@ -6,6 +6,7 @@ import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.StratagemMenuManager;
+import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.StratagemUtils;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
@@ -242,10 +243,11 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 var combinedArrows = new StringBuilder();
 
-                if (stratagementry.remainingUse != null && stratagementry.remainingUse == 0)
+                if (stratagementry.state == StratagemState.DEPLETED && stratagementry.remainingUse != null && stratagementry.remainingUse == 0)
                 {
                     guiGraphics.drawString(minecraft.font, "Unavailable", 32, 32 + index * 30, hasCode ? white : gray);
                 }
+
                 for (var i = 0; i < codeChar.length && stratagementry.canUse(); i++)
                 {
                     var arrows = ModConstants.charToArrow(codeChar[i]);
@@ -259,11 +261,11 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (!stratagementry.isReady())
                 {
-                    if (stratagementry.incomingDuration > 0)
+                    if (stratagementry.state == StratagemState.INCOMING && stratagementry.incomingDuration > 0)
                     {
                         guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.incomingDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
-                    else if (stratagementry.cooldown > 0)
+                    if (stratagementry.state == StratagemState.COOLDOWN && stratagementry.cooldown > 0)
                     {
                         guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.cooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
@@ -306,7 +308,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     if (stratagementry.remainingUse != null)
                     {
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagementry.remainingUse), 8, 24 + finalIndex * 30);
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagementry.remainingUse), 8, 24 + finalIndex * 30, String.valueOf(itemStack.getCount()));
                     }
                 });
                 guiGraphics.pose().popPose();
