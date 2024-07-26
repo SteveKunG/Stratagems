@@ -23,9 +23,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
-import net.minecraft.util.StringUtil;
 
 public class StratagemsClientMod implements ClientModInitializer
 {
@@ -185,7 +185,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 if (equals)
                 {
                     Chars.asList(codeChar).forEach(character -> combinedArrows.append(ModConstants.charToArrow(character)));
-                    guiGraphics.drawString(minecraft.font, "Activating", 32, 32 + index * 30, white);
+                    guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.activating"), 32, 32 + index * 30, white);
                 }
 
                 var arrowWidth = minecraft.font.width(combinedArrows.toString()) + 10;
@@ -245,7 +245,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (stratagementry.state == StratagemState.DEPLETED && stratagementry.remainingUse != null && stratagementry.remainingUse == 0)
                 {
-                    guiGraphics.drawString(minecraft.font, "Unavailable", 32, 32 + index * 30, hasCode ? white : gray);
+                    guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.unavailable"), 32, 32 + index * 30, hasCode ? white : gray);
                 }
 
                 for (var i = 0; i < codeChar.length && stratagementry.canUse(); i++)
@@ -263,11 +263,11 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     if (stratagementry.state == StratagemState.INBOUND && stratagementry.inboundDuration > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.inboundDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.inbound").getString() + " " + stratagementry.formatTickDuration(stratagementry.inboundDuration), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                     if (stratagementry.state == StratagemState.COOLDOWN && stratagementry.cooldown > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.cooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.cooldown").getString() + " " + stratagementry.formatTickDuration(stratagementry.cooldown), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                 }
 

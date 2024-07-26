@@ -7,6 +7,7 @@ import com.stevekung.stratagems.rule.StratagemRule;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -134,7 +135,7 @@ public final class StratagemEntry
 
     public String formatTickDuration(int duration)
     {
-        return StringUtil.formatTickDuration(duration, this.level().tickRateManager().tickrate());
+        return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, this.level().tickRateManager().tickrate());
     }
 
     public boolean isReady()
