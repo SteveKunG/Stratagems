@@ -24,7 +24,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 
 public class StratagemsClientMod implements ClientModInitializer
@@ -141,7 +140,8 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             if (arrowKeySound)
             {
-                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f);
+                // this is a little detail in HD2 when you typing stratagem code and pitch increased
+                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + (0.025f * manager.getTempStratagemCode().length()));
             }
         }
     }
