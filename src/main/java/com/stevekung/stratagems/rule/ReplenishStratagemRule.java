@@ -8,7 +8,6 @@ import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
 
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 
 public class ReplenishStratagemRule implements StratagemRule
@@ -64,11 +63,11 @@ public class ReplenishStratagemRule implements StratagemRule
                 LOGGER.info("Remove {} replenisher stratagem!", entry.stratagem().name().getString());
                 count++;
             }
-        }
 
-        if (count > 0)
-        {
-            player.playSound(SoundEvents.BEACON_ACTIVATE, 1.0f, 1.0f);
+            if (rearmProperties.replenish().get().replenishSound().isPresent() && count > 0)
+            {
+                player.playSound(rearmProperties.replenish().get().replenishSound().get(), 1.0f, 1.0f);
+            }
         }
     }
 

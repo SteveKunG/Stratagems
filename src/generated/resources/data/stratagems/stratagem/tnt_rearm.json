@@ -15,6 +15,7 @@
     "inbound_duration": 0,
     "need_throw": false,
     "replenish": {
+      "replenish_sound": "minecraft:block.beacon.activate",
       "to_replenish": "#stratagems:tnt_replenish"
     }
   },
