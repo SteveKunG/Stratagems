@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.rule.StratagemRule;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -12,6 +13,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringUtil;
+import net.minecraft.world.entity.player.Player;
 
 public final class StratagemEntry
 {
@@ -53,9 +55,9 @@ public final class StratagemEntry
         this.getRule().tick(this);
     }
 
-    public void use()
+    public void use(Player player)
     {
-        this.getRule().onUse(this);
+        this.getRule().onUse(this, player);
     }
 
     public void reset()

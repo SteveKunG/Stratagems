@@ -95,7 +95,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     if (holder.value().properties().needThrow().isPresent() && !holder.value().properties().needThrow().get())
                     {
-                        StratagemUtils.useStratagemImmediately(holder);
+                        StratagemUtils.useStratagemImmediately(holder, minecraft.player);
                         LOGGER.info("Select {}", holder.unwrapKey().orElseThrow().location());
                         manager.clearTempStratagemCode();
                         manager.clearStratagemCode();

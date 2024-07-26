@@ -1,13 +1,16 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.StratagemEntry;
+import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.StratagemUtils;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemRules;
+
+import net.minecraft.world.entity.player.Player;
 
 public class DepletedStratagemRule implements StratagemRule
 {
@@ -27,7 +30,7 @@ public class DepletedStratagemRule implements StratagemRule
     }
 
     @Override
-    public void onUse(StratagemEntry entry)
+    public void onUse(StratagemEntry entry, Player player)
     {
         if (entry.remainingUse > 0)
         {

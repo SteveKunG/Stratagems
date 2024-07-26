@@ -69,7 +69,7 @@ public class StratagemCommands
         //stratagem use stratagems:tnt_rearm
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
-        stratagemData.use(stratagemHolder.unwrapKey().orElseThrow());
+        stratagemData.use(stratagemHolder.unwrapKey().orElseThrow(), source.getPlayer());
         return 1;
     }
 

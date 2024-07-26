@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
@@ -18,6 +19,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
 
 public class StratagemsData extends SavedData
@@ -57,13 +59,13 @@ public class StratagemsData extends SavedData
         }
     }
 
-    public void use(ResourceKey<Stratagem> resourceKey)
+    public void use(ResourceKey<Stratagem> resourceKey, Player player)
     {
         this.stratagemEntries.stream().filter(entry -> entry.getStratagem().is(resourceKey)).findFirst().ifPresent(entry ->
         {
             if (entry.canUse())
             {
-                entry.use();
+                entry.use(player);
                 this.setDirty();
             }
             else

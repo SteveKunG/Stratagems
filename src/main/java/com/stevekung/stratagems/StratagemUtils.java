@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 
 public class StratagemUtils
 {
@@ -26,9 +27,9 @@ public class StratagemUtils
         return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse() && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
     }
     
-    public static void useStratagemImmediately(Holder<Stratagem> holder)
+    public static void useStratagemImmediately(Holder<Stratagem> holder, Player player)
     {
-        CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use();
+        CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(player);
     }
 
     public static boolean anyMatchHolder(List<StratagemEntry> list, Holder<Stratagem> stratagemHolder)

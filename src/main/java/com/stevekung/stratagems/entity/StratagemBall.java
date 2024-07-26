@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.VariantHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -105,7 +106,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             this.level().addFreshEntity(stratagemPod);
             var stratagemContext = new StratagemActionContext((ServerLevel) this.level(), this.blockPosition(), this.random);
             this.getVariant().value().action().action(stratagemContext);
-            ((ServerLevel) this.level()).getServer().overworld().getStratagemData().use(this.getVariant().unwrapKey().get());
+            ((ServerLevel) this.level()).getServer().overworld().getStratagemData().use(this.getVariant().unwrapKey().get(), (Player)this.getOwner());
             this.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             this.discard();
         }

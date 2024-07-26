@@ -1,11 +1,15 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
+
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Player;
 
 public class ReplenishStratagemRule implements StratagemRule
 {
@@ -25,10 +29,11 @@ public class ReplenishStratagemRule implements StratagemRule
     }
 
     @Override
-    public void onUse(StratagemEntry entry)
+    public void onUse(StratagemEntry entry, Player player)
     {
         var stratagemData = entry.level().getStratagemData();
         var rearmProperties = entry.stratagem().properties();
+        var count = 0;
 
         if (rearmProperties.replenish().isPresent() && rearmProperties.replenish().get().toReplenish().isPresent())
         {
@@ -57,7 +62,13 @@ public class ReplenishStratagemRule implements StratagemRule
                 // Remove this rearm stratagem
                 stratagemData.remove(entry.getStratagem());
                 LOGGER.info("Remove {} replenisher stratagem!", entry.stratagem().name().getString());
+                count++;
             }
+        }
+
+        if (count > 0)
+        {
+            player.playSound(SoundEvents.BEACON_ACTIVATE, 1.0f, 1.0f);
         }
     }
 
