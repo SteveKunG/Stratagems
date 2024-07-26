@@ -21,7 +21,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 public class StratagemsData extends SavedData
 {
     private static final String STRATAGEM_FILE_ID = "stratagems";
-    private final List<StratagemsTicker> stratagemList = Lists.newArrayList();
+    private final List<StratagemEntry> stratagemEntries = Lists.newArrayList();
     private final ServerLevel level;
     private int tick;
 
@@ -46,7 +46,7 @@ public class StratagemsData extends SavedData
     public void tick()
     {
         this.tick++;
-        this.stratagemList.forEach(StratagemsTicker::tick);
+        this.stratagemEntries.forEach(StratagemEntry::tick);
 
         if (this.tick % 100 == 0)
         {
@@ -56,7 +56,7 @@ public class StratagemsData extends SavedData
 
     public void use(ResourceKey<Stratagem> resourceKey)
     {
-        this.stratagemList.stream().filter(ticker -> ticker.getStratagem().is(resourceKey) && ticker.canUse()).forEach(StratagemsTicker::use);
+        this.stratagemEntries.stream().filter(entry -> entry.getStratagem().is(resourceKey) && entry.canUse()).forEach(StratagemEntry::use);
         this.setDirty();
     }
 
@@ -70,7 +70,7 @@ public class StratagemsData extends SavedData
         for (var i = 0; i < listTag.size(); i++)
         {
             var compoundTag = listTag.getCompound(i);
-            stratagems.stratagemList.add(new StratagemsTicker(level, compoundTag));
+            stratagems.stratagemEntries.add(new StratagemEntry(level, compoundTag));
         }
 
         return stratagems;
@@ -81,12 +81,12 @@ public class StratagemsData extends SavedData
     {
         var listTag = new ListTag();
 
-        if (this.stratagemList.isEmpty())
+        if (this.stratagemEntries.isEmpty())
         {
             this.addDefaultStratagems(provider);
         }
 
-        for (var stratagem : this.stratagemList)
+        for (var stratagem : this.stratagemEntries)
         {
             var compoundTag = new CompoundTag();
             stratagem.save(compoundTag);
@@ -100,37 +100,37 @@ public class StratagemsData extends SavedData
 
     private void addDefaultStratagems(HolderLookup.Provider provider)
     {
-        DEFAULT_STRATAGEMS.forEach(resourceKey -> this.stratagemList.add(new StratagemsTicker(this.level, StratagemUtils.createCompoundTagWithDefaultValue(provider.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)))));
+        DEFAULT_STRATAGEMS.forEach(resourceKey -> this.stratagemEntries.add(new StratagemEntry(this.level, StratagemUtils.createCompoundTagWithDefaultValue(provider.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)))));
     }
 
     public void add(CompoundTag compoundTag)
     {
-        this.stratagemList.add(new StratagemsTicker(this.level, compoundTag));
+        this.stratagemEntries.add(new StratagemEntry(this.level, compoundTag));
     }
 
     public void remove(Holder<Stratagem> stratagemHolder)
     {
-        this.stratagemList.removeIf(ticker -> ticker.getStratagem() == stratagemHolder);
+        this.stratagemEntries.removeIf(entry -> entry.getStratagem() == stratagemHolder);
     }
 
     public void reset()
     {
-        this.stratagemList.forEach(ticker ->
+        this.stratagemEntries.forEach(entry ->
         {
-            ticker.state = StratagemState.READY;
-            ticker.resetStratagemTicks(ticker.stratagem().properties());
+            entry.state = StratagemState.READY;
+            entry.resetStratagemTicks(entry.stratagem().properties());
         });
     }
 
     public void clear()
     {
-        this.stratagemList.clear();
+        this.stratagemEntries.clear();
         this.addDefaultStratagems(this.level.registryAccess());
     }
 
-    public List<StratagemsTicker> getStratagemList()
+    public List<StratagemEntry> getStratagemEntries()
     {
-        return this.stratagemList;
+        return this.stratagemEntries;
     }
 
     public static String getFileId()

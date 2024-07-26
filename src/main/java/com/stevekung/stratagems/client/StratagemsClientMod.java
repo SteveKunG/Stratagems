@@ -154,9 +154,9 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagemTicker : StratagemUtils.CLIENT_STRATAGEM_LIST)
+            for (var stratagementry : StratagemUtils.CLIENT_STRATAGEM_LIST)
             {
-                var stratagem = stratagemTicker.stratagem();
+                var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
                 var hasCode = code.startsWith(manager.getSelectedStratagemCode());
@@ -195,9 +195,9 @@ public class StratagemsClientMod implements ClientModInitializer
                     var finalIndex = index;
                     stratagem.icon().ifLeft(itemStack ->
                     {
-                        if (stratagemTicker.remainingUse != null && stratagemTicker.remainingUse > 0)
+                        if (stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
                         {
-                            itemStack.setCount(stratagemTicker.remainingUse);
+                            itemStack.setCount(stratagementry.remainingUse);
                         }
                         guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
                         guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 24 + finalIndex * 30);
@@ -219,41 +219,41 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagemTicker : StratagemUtils.CLIENT_STRATAGEM_LIST)
+            for (var stratagementry : StratagemUtils.CLIENT_STRATAGEM_LIST)
             {
-                var stratagem = stratagemTicker.stratagem();
+                var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var hasCode = code.startsWith(tempStratagemCode) && stratagemTicker.canUse();
+                var hasCode = code.startsWith(tempStratagemCode) && stratagementry.canUse();
 
                 guiGraphics.drawString(minecraft.font, stratagem.name(), 32, 20 + index * 30, hasCode ? white : gray);
 
                 var combinedArrows = new StringBuilder();
 
-                if (stratagemTicker.remainingUse != null && stratagemTicker.remainingUse == 0)
+                if (stratagementry.remainingUse != null && stratagementry.remainingUse == 0)
                 {
                     guiGraphics.drawString(minecraft.font, "Unavailable", 32, 32 + index * 30, hasCode ? white : gray);
                 }
-                for (var i = 0; i < codeChar.length && stratagemTicker.canUse(); i++)
+                for (var i = 0; i < codeChar.length && stratagementry.canUse(); i++)
                 {
                     var arrows = ModConstants.charToArrow(codeChar[i]);
                     combinedArrows.append(arrows);
 
-                    if (stratagemTicker.isReady())
+                    if (stratagementry.isReady())
                     {
                         guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, hasCode ? white : gray);
                     }
                 }
 
-                if (!stratagemTicker.isReady())
+                if (!stratagementry.isReady())
                 {
-                    if (stratagemTicker.incomingDuration > 0)
+                    if (stratagementry.incomingDuration > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.incomingDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.incomingDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
-                    else if (stratagemTicker.cooldown > 0)
+                    else if (stratagementry.cooldown > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagemTicker.cooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.cooldown, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                 }
 
@@ -285,16 +285,16 @@ public class StratagemsClientMod implements ClientModInitializer
                 var finalIndex = index;
                 stratagem.icon().ifLeft(itemStack ->
                 {
-                    if (stratagemTicker.remainingUse != null && stratagemTicker.remainingUse > 0)
+                    if (stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
                     {
-                        itemStack.setCount(stratagemTicker.remainingUse);
+                        itemStack.setCount(stratagementry.remainingUse);
                     }
 
                     guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
 
-                    if (stratagemTicker.remainingUse != null)
+                    if (stratagementry.remainingUse != null)
                     {
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagemTicker.remainingUse), 8, 24 + finalIndex * 30);
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagementry.remainingUse), 8, 24 + finalIndex * 30);
                     }
                 });
                 guiGraphics.pose().popPose();

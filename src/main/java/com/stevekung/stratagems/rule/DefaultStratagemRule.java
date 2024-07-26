@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemState;
-import com.stevekung.stratagems.StratagemsTicker;
+import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.registry.StratagemRules;
 
 public class DefaultStratagemRule implements StratagemRule
@@ -19,87 +19,87 @@ public class DefaultStratagemRule implements StratagemRule
     }
 
     @Override
-    public boolean canUse(StratagemsTicker ticker)
+    public boolean canUse(StratagemEntry entry)
     {
-        return ticker.isReady();
+        return entry.isReady();
     }
 
     @Override
-    public void onUse(StratagemsTicker ticker)
+    public void onUse(StratagemEntry entry)
     {
-        if (ticker.remainingUse != null && ticker.remainingUse == 0)
+        if (entry.remainingUse != null && entry.remainingUse == 0)
         {
-            LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
+            LOGGER.info("Cannot use {} stratagem!", entry.stratagem().name().getString());
             return;
         }
 
         // Set state from READY to IN_USE
-        ticker.state = StratagemState.IN_USE;
+        entry.state = StratagemState.IN_USE;
 
-        if (ticker.remainingUse != null && ticker.remainingUse > 0)
+        if (entry.remainingUse != null && entry.remainingUse > 0)
         {
-            ticker.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
+            entry.remainingUse--;
+            LOGGER.info("{} stratagem has remainingUse: {}", entry.stratagem().name().getString(), entry.remainingUse);
         }
     }
 
     @Override
-    public void tick(StratagemsTicker ticker)
+    public void tick(StratagemEntry entry)
     {
-        if (!ticker.isReady())
+        if (!entry.isReady())
         {
-            if (ticker.state == StratagemState.IN_USE)
+            if (entry.state == StratagemState.IN_USE)
             {
-                if (ticker.duration != null && ticker.duration > 0)
+                if (entry.duration != null && entry.duration > 0)
                 {
-                    ticker.duration--;
+                    entry.duration--;
 
-                    if (ticker.duration % 20 == 0)
+                    if (entry.duration % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has duration: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.duration));
+                        LOGGER.info("{} stratagem has duration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.duration));
                     }
                 }
                 else
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.INCOMING);
-                    ticker.state = StratagemState.INCOMING;
+                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.INCOMING);
+                    entry.state = StratagemState.INCOMING;
                 }
             }
 
-            if (ticker.state == StratagemState.INCOMING && ticker.incomingDuration > 0)
+            if (entry.state == StratagemState.INCOMING && entry.incomingDuration > 0)
             {
-                ticker.incomingDuration--;
+                entry.incomingDuration--;
 
-                if (ticker.incomingDuration % 20 == 0)
+                if (entry.incomingDuration % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has incomingDuration: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.incomingDuration));
+                    LOGGER.info("{} stratagem has incomingDuration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.incomingDuration));
                 }
             }
 
-            if (ticker.state != StratagemState.COOLDOWN && ticker.incomingDuration == 0)
+            if (entry.state != StratagemState.COOLDOWN && entry.incomingDuration == 0)
             {
-                LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.COOLDOWN);
-                ticker.state = StratagemState.COOLDOWN;
-                ticker.cooldown = ticker.stratagem().properties().cooldown();
+                LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.COOLDOWN);
+                entry.state = StratagemState.COOLDOWN;
+                entry.cooldown = entry.stratagem().properties().cooldown();
             }
 
-            if (ticker.state == StratagemState.COOLDOWN)
+            if (entry.state == StratagemState.COOLDOWN)
             {
-                if (ticker.cooldown > 0)
+                if (entry.cooldown > 0)
                 {
-                    ticker.cooldown--;
+                    entry.cooldown--;
 
-                    if (ticker.cooldown % 20 == 0)
+                    if (entry.cooldown % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has cooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.cooldown));
+                        LOGGER.info("{} stratagem has cooldown: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.cooldown));
                     }
                 }
 
-                if (ticker.cooldown == 0)
+                if (entry.cooldown == 0)
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY);
-                    ticker.state = StratagemState.READY;
-                    ticker.resetStratagemTicks(ticker.stratagem().properties());
+                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.READY);
+                    entry.state = StratagemState.READY;
+                    entry.resetStratagemTicks(entry.stratagem().properties());
                 }
             }
         }

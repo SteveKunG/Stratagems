@@ -6,7 +6,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemUtils;
 import com.stevekung.stratagems.StratagemsData;
-import com.stevekung.stratagems.StratagemsTicker;
+import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.registry.ModRegistries;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -57,7 +57,7 @@ public class StratagemCommands
     {
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
-        source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemList().stream().map(ticker -> ticker.getResourceKey().location()).toList()), true);
+        source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()).toList()), true);
         return 1;
     }
 
@@ -81,7 +81,7 @@ public class StratagemCommands
         var stratagemData = server.overworld().getStratagemData();
         var stratagem = stratagemHolder.value();
 
-        if (StratagemUtils.anyMatchHolder(stratagemData.getStratagemList(), stratagemHolder))
+        if (StratagemUtils.anyMatchHolder(stratagemData.getStratagemEntries(), stratagemHolder))
         {
             throw ERROR_ADD_FAILED.create();
         }
@@ -98,7 +98,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
 
-        if (stratagemData.getStratagemList().stream().map(StratagemsTicker::getResourceKey).allMatch(StratagemsData.DEFAULT_STRATAGEMS::contains))
+        if (stratagemData.getStratagemEntries().stream().map(StratagemEntry::getResourceKey).allMatch(StratagemsData.DEFAULT_STRATAGEMS::contains))
         {
             throw ERROR_REMOVE_CONTAINS_DEFAULT_FAILED.create();
         }
@@ -119,7 +119,7 @@ public class StratagemCommands
             throw ERROR_REMOVE_CONTAINS_DEFAULT_FAILED.create();
         }
 
-        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemList(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemEntries(), stratagemHolder))
         {
             throw ERROR_REMOVE_SPECIFIC_FAILED.create();
         }

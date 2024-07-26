@@ -1,16 +1,16 @@
 package com.stevekung.stratagems.rule;
 
-import com.stevekung.stratagems.StratagemsTicker;
+import com.stevekung.stratagems.StratagemEntry;
 
 public interface StratagemRule
 {
     StratagemRuleType getType();
 
-    boolean canUse(StratagemsTicker ticker);
+    boolean canUse(StratagemEntry entry);
 
-    void onUse(StratagemsTicker ticker);
+    void onUse(StratagemEntry entry);
 
-    void tick(StratagemsTicker ticker);
+    void tick(StratagemEntry entry);
 
     @FunctionalInterface
     interface Builder

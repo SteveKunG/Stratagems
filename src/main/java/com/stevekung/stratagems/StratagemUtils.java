@@ -9,31 +9,31 @@ import net.minecraft.resources.ResourceKey;
 
 public class StratagemUtils
 {
-    public static List<StratagemsTicker> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
+    public static List<StratagemEntry> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
 
     public static boolean clientNoneMatch(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemsTicker::canUse).noneMatch(ticker -> ticker.getCode().startsWith(tempStratagemCode));
+        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemEntry::canUse).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
     }
 
     public static boolean clientFoundMatch(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemsTicker::canUse).anyMatch(ticker -> ticker.getCode().equals(tempStratagemCode));
+        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemEntry::canUse).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
     public static ResourceKey<Stratagem> getStratagemKeyFromCode(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(ticker -> ticker.canUse() && ticker.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().orElseThrow();
+        return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse() && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().orElseThrow();
     }
 
-    public static boolean anyMatchHolder(List<StratagemsTicker> list, Holder<Stratagem> stratagemHolder)
+    public static boolean anyMatchHolder(List<StratagemEntry> list, Holder<Stratagem> stratagemHolder)
     {
-        return list.stream().map(StratagemsTicker::getStratagem).anyMatch(holder -> holder == stratagemHolder);
+        return list.stream().map(StratagemEntry::getStratagem).anyMatch(holder -> holder == stratagemHolder);
     }
 
-    public static boolean noneMatchHolder(List<StratagemsTicker> list, Holder<Stratagem> stratagemHolder)
+    public static boolean noneMatchHolder(List<StratagemEntry> list, Holder<Stratagem> stratagemHolder)
     {
-        return list.stream().map(StratagemsTicker::getStratagem).noneMatch(holder -> holder == stratagemHolder);
+        return list.stream().map(StratagemEntry::getStratagem).noneMatch(holder -> holder == stratagemHolder);
     }
 
     public static CompoundTag createCompoundTagWithDefaultValue(Holder<Stratagem> stratagemHolder)

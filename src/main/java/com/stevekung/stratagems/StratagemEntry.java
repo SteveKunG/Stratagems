@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringUtil;
 
-public final class StratagemsTicker
+public final class StratagemEntry
 {
     private final ServerLevel level;
     private final Holder<Stratagem> stratagem;
@@ -22,7 +22,7 @@ public final class StratagemsTicker
     public Integer remainingUse;
     public StratagemState state;
 
-    public StratagemsTicker(ServerLevel level, CompoundTag compoundTag)
+    public StratagemEntry(ServerLevel level, CompoundTag compoundTag)
     {
         this.level = level;
         this.stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();

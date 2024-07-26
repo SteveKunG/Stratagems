@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemState;
-import com.stevekung.stratagems.StratagemsTicker;
+import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.registry.StratagemRules;
 
 public class ReinforceStratagemRule implements StratagemRule
@@ -19,52 +19,52 @@ public class ReinforceStratagemRule implements StratagemRule
     }
 
     @Override
-    public boolean canUse(StratagemsTicker ticker)
+    public boolean canUse(StratagemEntry entry)
     {
-        if (ticker.remainingUse == 0)
+        if (entry.remainingUse == 0)
         {
-            LOGGER.info("Cannot use {} stratagem!", ticker.stratagem().name().getString());
+            LOGGER.info("Cannot use {} stratagem!", entry.stratagem().name().getString());
         }
-        return ticker.remainingUse > 0;
+        return entry.remainingUse > 0;
     }
 
     @Override
-    public void onUse(StratagemsTicker ticker)
+    public void onUse(StratagemEntry entry)
     {
-        if (ticker.remainingUse > 0)
+        if (entry.remainingUse > 0)
         {
-            ticker.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", ticker.stratagem().name().getString(), ticker.remainingUse);
+            entry.remainingUse--;
+            LOGGER.info("{} stratagem has remainingUse: {}", entry.stratagem().name().getString(), entry.remainingUse);
         }
     }
 
     @Override
-    public void tick(StratagemsTicker ticker)
+    public void tick(StratagemEntry entry)
     {
-        if (ticker.state != StratagemState.COOLDOWN && ticker.remainingUse == 0)
+        if (entry.state != StratagemState.COOLDOWN && entry.remainingUse == 0)
         {
-            ticker.cooldown = ticker.stratagem().properties().cooldown();
-            ticker.state = StratagemState.COOLDOWN;
-            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.cooldown));
+            entry.cooldown = entry.stratagem().properties().cooldown();
+            entry.state = StratagemState.COOLDOWN;
+            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.cooldown));
         }
 
-        if (ticker.state == StratagemState.COOLDOWN)
+        if (entry.state == StratagemState.COOLDOWN)
         {
-            if (ticker.cooldown > 0)
+            if (entry.cooldown > 0)
             {
-                ticker.cooldown--;
+                entry.cooldown--;
 
-                if (ticker.cooldown % 20 == 0)
+                if (entry.cooldown % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has cooldown: {}", ticker.stratagem().name().getString(), ticker.formatTickDuration(ticker.cooldown));
+                    LOGGER.info("{} stratagem has cooldown: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.cooldown));
                 }
             }
 
-            if (ticker.cooldown == 0)
+            if (entry.cooldown == 0)
             {
-                LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", ticker.stratagem().name().getString(), ticker.state, StratagemState.READY, ticker.remainingUse);
-                ticker.state = StratagemState.READY;
-                ticker.remainingUse++;
+                LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", entry.stratagem().name().getString(), entry.state, StratagemState.READY, entry.remainingUse);
+                entry.state = StratagemState.READY;
+                entry.remainingUse++;
             }
         }
     }
