@@ -66,6 +66,7 @@ public class StratagemCommands
         //stratagem use stratagems:reinforce
         //stratagem use stratagems:block
         //stratagem use stratagems:tnt
+        //stratagem use stratagems:tnt_rearm
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
         stratagemData.use(stratagemHolder.unwrapKey().orElseThrow());
@@ -77,6 +78,7 @@ public class StratagemCommands
         //stratagem add stratagems:block
         //stratagem add stratagems:bow
         //stratagem add stratagems:tnt
+        //stratagem add stratagems:tnt_rearm
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
         var stratagem = stratagemHolder.value();

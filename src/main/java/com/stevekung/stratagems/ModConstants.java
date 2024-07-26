@@ -3,9 +3,10 @@ package com.stevekung.stratagems;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-
+import com.stevekung.stratagems.registry.ModRegistries;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 
 public interface ModConstants
 {
@@ -36,6 +37,11 @@ public interface ModConstants
     interface Packets
     {
         ResourceLocation SPAWN_STRATAGEM = StratagemsMod.id("spawn_stratagem");
+    }
+
+    interface StratagemTag
+    {
+        TagKey<Stratagem> TNT_REPLENISH = TagKey.create(ModRegistries.STRATAGEM, StratagemsMod.id("tnt_replenish"));
     }
 
     interface Tag

@@ -1,0 +1,24 @@
+{
+  "code": "wwawd",
+  "name": {
+    "translate": "stratagem.stratagems.tnt_rearm"
+  },
+  "action": {
+    "type": "stratagems:reinforce"
+  },
+  "rule": {
+    "type": "stratagems:replenish"
+  },
+  "properties": {
+    "beam_color": 0,
+    "cooldown": 1200,
+    "incoming_duration": 0,
+    "replenish": {
+      "to_replenish": "#stratagems:tnt_replenish"
+    }
+  },
+  "icon": {
+    "count": 1,
+    "id": "minecraft:redstone_block"
+  }
+}

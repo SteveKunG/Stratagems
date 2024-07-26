@@ -57,6 +57,11 @@ public final class StratagemEntry
         this.getRule().onUse(this);
     }
 
+    public void reset()
+    {
+        this.getRule().onReset(this);
+    }
+
     public void resetStratagemTicks(StratagemProperties properties)
     {
         this.incomingDuration = properties.incomingDuration();

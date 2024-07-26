@@ -6,6 +6,7 @@
   "stratagem.stratagems.iron_pickaxe": "Iron Pickaxe",
   "stratagem.stratagems.block": "Block",
   "stratagem.stratagems.tnt": "TNT",
+  "stratagem.stratagems.tnt_rearm": "TNT Rearm",
   "commands.stratagem.add.success": "Add %s stratagem successfully",
   "commands.stratagem.add.failed": "Failed to add Stratagem because already exists!",
   "commands.stratagem.list": "Stratagem list: %s",

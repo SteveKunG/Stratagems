@@ -24,7 +24,7 @@ public class StratagemsData extends SavedData
 {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "stratagems";
-    private final List<StratagemEntry> stratagemEntries = Lists.newArrayList();
+    private final List<StratagemEntry> stratagemEntries = Lists.newCopyOnWriteArrayList();
     private final ServerLevel level;
     private int tick;
 
@@ -128,11 +128,7 @@ public class StratagemsData extends SavedData
 
     public void reset()
     {
-        this.stratagemEntries.forEach(entry ->
-        {
-            entry.state = StratagemState.READY;
-            entry.resetStratagemTicks(entry.stratagem().properties());
-        });
+        this.stratagemEntries.forEach(StratagemEntry::reset);
     }
 
     public void clear()

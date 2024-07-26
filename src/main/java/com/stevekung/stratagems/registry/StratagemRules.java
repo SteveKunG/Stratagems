@@ -14,6 +14,7 @@ public class StratagemRules
     public static final StratagemRuleType DEFAULT = register("default", DefaultStratagemRule.CODEC);
     public static final StratagemRuleType REINFORCE = register("reinforce", ReinforceStratagemRule.CODEC);
     public static final StratagemRuleType DEPLETED = register("depleted", DepletedStratagemRule.CODEC);
+    public static final StratagemRuleType REPLENISH = register("replenish", ReplenishStratagemRule.CODEC);
 
     private static StratagemRuleType register(String name, MapCodec<? extends StratagemRule> codec)
     {

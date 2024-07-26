@@ -1,6 +1,7 @@
 package com.stevekung.stratagems.rule;
 
 import com.stevekung.stratagems.StratagemEntry;
+import com.stevekung.stratagems.StratagemState;
 
 public interface StratagemRule
 {
@@ -9,6 +10,12 @@ public interface StratagemRule
     boolean canUse(StratagemEntry entry);
 
     void onUse(StratagemEntry entry);
+
+    default void onReset(StratagemEntry entry)
+    {
+        entry.state = StratagemState.READY;
+        entry.resetStratagemTicks(entry.stratagem().properties());
+    }
 
     void tick(StratagemEntry entry);
 

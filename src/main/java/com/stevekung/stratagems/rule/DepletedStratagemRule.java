@@ -5,6 +5,8 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.StratagemEntry;
+import com.stevekung.stratagems.StratagemUtils;
+import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemRules;
 
 public class DepletedStratagemRule implements StratagemRule
@@ -21,7 +23,7 @@ public class DepletedStratagemRule implements StratagemRule
     @Override
     public boolean canUse(StratagemEntry entry)
     {
-        return entry.remainingUse > 0;
+        return entry.isReady() && entry.remainingUse > 0;
     }
 
     @Override
@@ -73,6 +75,14 @@ public class DepletedStratagemRule implements StratagemRule
                     {
                         entry.state = StratagemState.DEPLETED;
                         LOGGER.info("{} stratagem is now depleted!", entry.stratagem().name().getString());
+
+                        // Add replenisher stratagem when remaining use is 0
+                        if (entry.stratagem().properties().replenish().isPresent() && entry.stratagem().properties().replenish().get().replenisher().isPresent())
+                        {
+                            var replenisher = entry.level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(entry.stratagem().properties().replenish().get().replenisher().get());
+                            entry.level().getStratagemData().add(StratagemUtils.createCompoundTagWithDefaultValue(replenisher));
+                            LOGGER.info("Add {} replenisher stratagem", replenisher.value().name().getString());
+                        }
                         return;
                     }
                     LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.COOLDOWN);
