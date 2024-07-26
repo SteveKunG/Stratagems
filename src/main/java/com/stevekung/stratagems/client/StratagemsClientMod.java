@@ -135,7 +135,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (fail)
         {
-            minecraft.player.playSound(SoundEvents.NOTE_BLOCK_BASS.value(), 1f, 0.8f);
+            minecraft.player.playSound(StratagemSounds.STRATAGEM_FAIL, 1f, 1f);
         }
         else
         {

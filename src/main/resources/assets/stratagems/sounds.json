@@ -18,5 +18,10 @@
     "sounds": [
       "stratagems:stratagem/loop"
     ]
+  },
+  "player.stratagem.fail": {
+    "sounds": [
+      "stratagems:stratagem/fail"
+    ]
   }
 }

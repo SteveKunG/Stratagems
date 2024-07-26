@@ -11,6 +11,7 @@ public class StratagemSounds
     public static final SoundEvent STRATAGEM_SELECT = register("player.stratagem.select");
     public static final SoundEvent STRATAGEM_LAND = register("player.stratagem.land");
     public static final SoundEvent STRATAGEM_LOOP = register("player.stratagem.loop");
+    public static final SoundEvent STRATAGEM_FAIL = register("player.stratagem.fail");
 
     public static void init()
     {
