@@ -261,9 +261,9 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (!stratagementry.isReady())
                 {
-                    if (stratagementry.state == StratagemState.INCOMING && stratagementry.incomingDuration > 0)
+                    if (stratagementry.state == StratagemState.INBOUND && stratagementry.inboundDuration > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.incomingDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, StringUtil.formatTickDuration(stratagementry.inboundDuration, minecraft.level.tickRateManager().tickrate()), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                     if (stratagementry.state == StratagemState.COOLDOWN && stratagementry.cooldown > 0)
                     {

@@ -47,7 +47,7 @@ public class StratagemUtils
         var stratagem = stratagemHolder.value();
         var properties = stratagem.properties();
         compoundTag.putString(ModConstants.Tag.STRATAGEM, stratagemHolder.unwrapKey().orElseThrow().location().toString());
-        compoundTag.putInt(ModConstants.Tag.INCOMING_DURATION, properties.incomingDuration());
+        compoundTag.putInt(ModConstants.Tag.INBOUND_DURATION, properties.inboundDuration());
 
         if (properties.duration().isPresent())
         {

@@ -56,20 +56,20 @@ public class DepletedStratagemRule implements StratagemRule
                 }
                 else
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.INCOMING);
-                    entry.state = StratagemState.INCOMING;
+                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.INBOUND);
+                    entry.state = StratagemState.INBOUND;
                 }
             }
 
-            if (entry.state == StratagemState.INCOMING && entry.incomingDuration > 0)
+            if (entry.state == StratagemState.INBOUND && entry.inboundDuration > 0)
             {
-                entry.incomingDuration--;
+                entry.inboundDuration--;
 
-                if (entry.incomingDuration % 20 == 0)
+                if (entry.inboundDuration % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has incomingDuration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.incomingDuration));
+                    LOGGER.info("{} stratagem has inboundDuration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.inboundDuration));
                 }
-                if (entry.incomingDuration == 0)
+                if (entry.inboundDuration == 0)
                 {
                     if (entry.remainingUse == 0)
                     {
@@ -109,7 +109,7 @@ public class DepletedStratagemRule implements StratagemRule
                     entry.state = StratagemState.READY;
 
                     var properties = entry.stratagem().properties();
-                    entry.incomingDuration = properties.incomingDuration();
+                    entry.inboundDuration = properties.inboundDuration();
 
                     if (properties.duration().isPresent())
                     {

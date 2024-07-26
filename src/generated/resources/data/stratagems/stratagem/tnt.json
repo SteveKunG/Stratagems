@@ -14,7 +14,7 @@
     "beam_color": -50116,
     "can_depleted": true,
     "cooldown": 60,
-    "incoming_duration": 40,
+    "inbound_duration": 40,
     "remaining_use": 3,
     "replenish": {
       "replenisher": "stratagems:tnt_rearm"

@@ -37,7 +37,7 @@ public class ReplenishStratagemRule implements StratagemRule
                 toReplenishEntry.state = StratagemState.COOLDOWN;
 
                 var replenishedProperties = toReplenishEntry.stratagem().properties();
-                toReplenishEntry.incomingDuration = replenishedProperties.incomingDuration();
+                toReplenishEntry.inboundDuration = replenishedProperties.inboundDuration();
 
                 if (replenishedProperties.duration().isPresent())
                 {

@@ -16,7 +16,7 @@ public final class StratagemEntry
 {
     private final ServerLevel level;
     private final Holder<Stratagem> stratagem;
-    public int incomingDuration;
+    public int inboundDuration;
     public Integer duration;
     public int cooldown;
     public Integer remainingUse;
@@ -27,9 +27,9 @@ public final class StratagemEntry
         this.level = level;
         this.stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
 
-        if (compoundTag.contains(ModConstants.Tag.INCOMING_DURATION, Tag.TAG_INT))
+        if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
         {
-            this.incomingDuration = compoundTag.getInt(ModConstants.Tag.INCOMING_DURATION);
+            this.inboundDuration = compoundTag.getInt(ModConstants.Tag.INBOUND_DURATION);
         }
 
         if (compoundTag.contains(ModConstants.Tag.DURATION, Tag.TAG_INT))
@@ -64,7 +64,7 @@ public final class StratagemEntry
 
     public void resetStratagemTicks(StratagemProperties properties)
     {
-        this.incomingDuration = properties.incomingDuration();
+        this.inboundDuration = properties.inboundDuration();
 
         if (properties.duration().isPresent())
         {
@@ -81,9 +81,9 @@ public final class StratagemEntry
 
     public void save(CompoundTag compoundTag)
     {
-        if (this.incomingDuration > 0)
+        if (this.inboundDuration > 0)
         {
-            compoundTag.putInt(ModConstants.Tag.INCOMING_DURATION, this.incomingDuration);
+            compoundTag.putInt(ModConstants.Tag.INBOUND_DURATION, this.inboundDuration);
         }
 
         if (this.duration != null)

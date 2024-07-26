@@ -49,7 +49,7 @@ public interface ModConstants
         String STRATAGEM = "stratagem";
         String STRATAGEMS = "stratagems";
         String TICK = "tick";
-        String INCOMING_DURATION = "incoming_duration";
+        String INBOUND_DURATION = "inbound_duration";
         String DURATION = "duration";
         String COOLDOWN = "cooldown";
         String REMAINING_USE = "remaining_use";

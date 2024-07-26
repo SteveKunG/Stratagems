@@ -6,7 +6,7 @@ public enum StratagemState
 {
     READY,
     IN_USE,
-    INCOMING,
+    INBOUND,
     COOLDOWN,
     IMPACT,
     DEPLETED,
