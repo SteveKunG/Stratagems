@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemUtils;
 import com.stevekung.stratagems.StratagemsData;
+import com.stevekung.stratagems.command.argument.StratagemArgument;
 import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.registry.ModRegistries;
 import net.minecraft.commands.CommandBuildContext;
@@ -27,14 +28,14 @@ public class StratagemCommands
         dispatcher.register(Commands.literal("stratagem")
                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("use")
-                        .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                        .then(Commands.argument("stratagem", StratagemArgument.resource(context, ModRegistries.STRATAGEM))
                                 .executes(commandContext -> useStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM)))))
                 .then(Commands.literal("add")
                         .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
                                 .executes(commandContext -> addStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM)))))
                 .then(Commands.literal("remove")
                         .executes(commandContext -> removeAllStratagem(commandContext.getSource()))
-                        .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                        .then(Commands.argument("stratagem", StratagemArgument.resource(context, ModRegistries.STRATAGEM))
                                 .executes(commandContext -> removeStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM)))))
                 .then(Commands.literal("list")
                         .executes(commandContext -> listStratagem(commandContext.getSource())))
@@ -57,7 +58,7 @@ public class StratagemCommands
     {
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
-        source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()).toList()), true);
+        source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()).toList().toString()), true);
         return 1;
     }
 

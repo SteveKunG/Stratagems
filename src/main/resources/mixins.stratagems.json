@@ -4,6 +4,7 @@
     "package": "com.stevekung.stratagems.mixin",
     "compatibilityLevel": "JAVA_17",
     "mixins": [
+        "MixinArgumentTypeInfos",
         "MixinDataFixTypes",
         "MixinServerLevel"
     ],
