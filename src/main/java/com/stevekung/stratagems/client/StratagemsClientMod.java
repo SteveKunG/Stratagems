@@ -90,8 +90,20 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
                 if (StratagemUtils.clientFoundMatch(tempStratagemCode))
                 {
+                    var holder = StratagemUtils.getStratagemFromCode(tempStratagemCode);
+
+                    if (holder.value().properties().needThrow().isPresent() && !holder.value().properties().needThrow().get())
+                    {
+                        StratagemUtils.useStratagemImmediately(holder);
+                        LOGGER.info("Select {}", holder.unwrapKey().orElseThrow().location());
+                        manager.clearTempStratagemCode();
+                        manager.clearStratagemCode();
+                        manager.setMenuOpen(false);
+                        return;
+                    }
+
                     manager.setSelectedStratagemCode(tempStratagemCode);
-                    manager.setSelectedStratagem(StratagemUtils.getStratagemKeyFromCode(tempStratagemCode));
+                    manager.setSelectedStratagem(holder.unwrapKey().orElseThrow());
 
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));

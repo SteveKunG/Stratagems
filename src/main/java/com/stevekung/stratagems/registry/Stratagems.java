@@ -37,7 +37,7 @@ public class Stratagems
         register(context, IRON_PICKAXE, "saswwd", new ItemStack(Items.IRON_PICKAXE), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_PICKAXE)), StratagemProperties.simple(200, 6000, BLUE_COLOR));
         register(context, BLOCK, "wdsd", new ItemStack(Items.STONE), SpawnItemAction.spawnItem(new ItemStack(Items.STONE, 64)), StratagemProperties.simple(100, 1200, BLUE_COLOR));
         register(context, TNT, "swaswdsw", new ItemStack(Items.TNT), SpawnBombAction.spawnBomb(40), DepletedStratagemRule.defaultRule(), StratagemProperties.withReplenish(40, 60, 3, RED_COLOR, new StratagemReplenish(Optional.of(TNT_REARM), Optional.empty())));
-        register(context, TNT_REARM, "wwawd", new ItemStack(Items.REDSTONE_BLOCK), EmptyAction.empty(), ReplenishStratagemRule.defaultRule(), new StratagemProperties(0, Optional.empty(), 1200, Optional.empty(), 0, Optional.empty(), Optional.of(new StratagemReplenish(Optional.empty(), Optional.of(context.lookup(ModRegistries.STRATAGEM).getOrThrow(ModConstants.StratagemTag.TNT_REPLENISH))))));
+        register(context, TNT_REARM, "wwawd", new ItemStack(Items.REDSTONE_BLOCK), EmptyAction.empty(), ReplenishStratagemRule.defaultRule(), new StratagemProperties(0, Optional.empty(), 1200, Optional.empty(), 0, Optional.empty(), Optional.of(false), Optional.of(new StratagemReplenish(Optional.empty(), Optional.of(context.lookup(ModRegistries.STRATAGEM).getOrThrow(ModConstants.StratagemTag.TNT_REPLENISH))))));
     }
 
     static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, StratagemRule.Builder rule, StratagemProperties properties)

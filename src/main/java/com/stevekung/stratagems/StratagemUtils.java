@@ -3,9 +3,9 @@ package com.stevekung.stratagems;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
 
 public class StratagemUtils
 {
@@ -21,9 +21,14 @@ public class StratagemUtils
         return CLIENT_STRATAGEM_LIST.stream().filter(StratagemEntry::canUse).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
-    public static ResourceKey<Stratagem> getStratagemKeyFromCode(String tempStratagemCode)
+    public static Holder<Stratagem> getStratagemFromCode(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse() && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem().unwrapKey().orElseThrow();
+        return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse() && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
+    }
+    
+    public static void useStratagemImmediately(Holder<Stratagem> holder)
+    {
+        CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use();
     }
 
     public static boolean anyMatchHolder(List<StratagemEntry> list, Holder<Stratagem> stratagemHolder)

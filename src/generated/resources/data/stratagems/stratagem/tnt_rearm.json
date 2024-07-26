@@ -13,6 +13,7 @@
     "beam_color": 0,
     "cooldown": 1200,
     "incoming_duration": 0,
+    "need_throw": false,
     "replenish": {
       "to_replenish": "#stratagems:tnt_replenish"
     }
