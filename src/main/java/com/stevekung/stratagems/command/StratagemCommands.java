@@ -45,9 +45,10 @@ public class StratagemCommands
 
     private static int resetStratagem(CommandSourceStack source)
     {
+        //stratagem reset
         var server = source.getServer();
         var stratagemData = server.overworld().getStratagemData();
-        stratagemData.clear();
+        stratagemData.reset();
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset"), true);
         return 1;
     }

@@ -113,6 +113,15 @@ public class StratagemsData extends SavedData
         this.stratagemList.removeIf(ticker -> ticker.getStratagem() == stratagemHolder);
     }
 
+    public void reset()
+    {
+        this.stratagemList.forEach(ticker ->
+        {
+            ticker.state = StratagemState.READY;
+            ticker.resetStratagemTicks(ticker.stratagem().properties());
+        });
+    }
+
     public void clear()
     {
         this.stratagemList.clear();
