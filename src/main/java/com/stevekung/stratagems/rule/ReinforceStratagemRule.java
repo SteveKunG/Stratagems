@@ -21,10 +21,6 @@ public class ReinforceStratagemRule implements StratagemRule
     @Override
     public boolean canUse(StratagemEntry entry)
     {
-        if (entry.remainingUse == 0)
-        {
-            LOGGER.info("Cannot use {} stratagem!", entry.stratagem().name().getString());
-        }
         return entry.remainingUse > 0;
     }
 
@@ -62,9 +58,9 @@ public class ReinforceStratagemRule implements StratagemRule
 
             if (entry.cooldown == 0)
             {
+                entry.remainingUse++;
                 LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", entry.stratagem().name().getString(), entry.state, StratagemState.READY, entry.remainingUse);
                 entry.state = StratagemState.READY;
-                entry.remainingUse++;
             }
         }
     }

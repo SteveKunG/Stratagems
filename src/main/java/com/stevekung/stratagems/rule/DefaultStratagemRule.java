@@ -27,20 +27,8 @@ public class DefaultStratagemRule implements StratagemRule
     @Override
     public void onUse(StratagemEntry entry)
     {
-        if (entry.remainingUse != null && entry.remainingUse == 0)
-        {
-            LOGGER.info("Cannot use {} stratagem!", entry.stratagem().name().getString());
-            return;
-        }
-
         // Set state from READY to IN_USE
         entry.state = StratagemState.IN_USE;
-
-        if (entry.remainingUse != null && entry.remainingUse > 0)
-        {
-            entry.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", entry.stratagem().name().getString(), entry.remainingUse);
-        }
     }
 
     @Override

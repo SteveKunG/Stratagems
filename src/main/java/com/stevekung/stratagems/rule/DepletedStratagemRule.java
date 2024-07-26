@@ -21,25 +21,13 @@ public class DepletedStratagemRule implements StratagemRule
     @Override
     public boolean canUse(StratagemEntry entry)
     {
-        if (entry.remainingUse == 0)
-        {
-//            LOGGER.info("Cannot use {} stratagem!", entry.stratagem().name().getString());
-            return false;
-        }
         return entry.remainingUse > 0;
     }
 
     @Override
     public void onUse(StratagemEntry entry)
     {
-        System.out.println(entry.remainingUse);
-        if (entry.remainingUse != null && entry.remainingUse == 0)
-        {
-            entry.state = StratagemState.DEPLETED;
-            LOGGER.info("Cannot use {} stratagem!", entry.stratagem().name().getString());
-            return;
-        }
-        if (entry.remainingUse != null && entry.remainingUse > 0)
+        if (entry.remainingUse > 0)
         {
             // Set state from READY to IN_USE
             entry.state = StratagemState.IN_USE;
@@ -79,13 +67,18 @@ public class DepletedStratagemRule implements StratagemRule
                 {
                     LOGGER.info("{} stratagem has incomingDuration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.incomingDuration));
                 }
-            }
-
-            if (entry.state != StratagemState.COOLDOWN && entry.incomingDuration == 0)
-            {
-                LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.COOLDOWN);
-                entry.state = StratagemState.COOLDOWN;
-                entry.cooldown = entry.stratagem().properties().cooldown();
+                if (entry.incomingDuration == 0)
+                {
+                    if (entry.remainingUse == 0)
+                    {
+                        entry.state = StratagemState.DEPLETED;
+                        LOGGER.info("{} stratagem is now depleted!", entry.stratagem().name().getString());
+                        return;
+                    }
+                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.COOLDOWN);
+                    entry.state = StratagemState.COOLDOWN;
+                    entry.cooldown = entry.stratagem().properties().cooldown();
+                }
             }
 
             if (entry.state == StratagemState.COOLDOWN)
@@ -104,6 +97,7 @@ public class DepletedStratagemRule implements StratagemRule
                 {
                     LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.READY);
                     entry.state = StratagemState.READY;
+
                     var properties = entry.stratagem().properties();
                     entry.incomingDuration = properties.incomingDuration();
 
