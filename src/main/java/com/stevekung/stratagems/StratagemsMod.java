@@ -1,7 +1,6 @@
 package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
@@ -10,7 +9,7 @@ import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
-
+import com.stevekung.stratagems.util.StratagemUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -57,7 +56,7 @@ public class StratagemsMod implements ModInitializer
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> StratagemCommands.register(dispatcher, context));
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
-            var stratagemData = server.overworld().getStratagemData();
+            var stratagemData = server.overworld().getServerStratagemData();
             stratagemData.setDirty();
             server.overworld().getDataStorage().save();
             StratagemUtils.CLIENT_STRATAGEM_LIST = stratagemData.getStratagemEntries();
@@ -69,7 +68,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                server.overworld().getStratagemData().tick();
+                server.overworld().getServerStratagemData().tick();
             }
 
             server.getProfiler().pop();

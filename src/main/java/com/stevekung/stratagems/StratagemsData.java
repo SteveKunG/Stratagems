@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
-
+import com.stevekung.stratagems.util.CustomDataFixTypes;
+import com.stevekung.stratagems.util.StratagemUtils;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;

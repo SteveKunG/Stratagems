@@ -2,7 +2,6 @@ package com.stevekung.stratagems.rule;
 
 import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.StratagemState;
-
 import net.minecraft.world.entity.player.Player;
 
 public interface StratagemRule

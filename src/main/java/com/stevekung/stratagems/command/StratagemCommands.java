@@ -4,11 +4,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.StratagemUtils;
+import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.StratagemsData;
 import com.stevekung.stratagems.command.argument.StratagemArgument;
-import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.util.StratagemUtils;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -48,7 +48,7 @@ public class StratagemCommands
     {
         //stratagem reset
         var server = source.getServer();
-        var stratagemData = server.overworld().getStratagemData();
+        var stratagemData = server.overworld().getServerStratagemData();
         stratagemData.reset();
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset"), true);
         return 1;
@@ -57,7 +57,7 @@ public class StratagemCommands
     private static int listStratagem(CommandSourceStack source)
     {
         var server = source.getServer();
-        var stratagemData = server.overworld().getStratagemData();
+        var stratagemData = server.overworld().getServerStratagemData();
         source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()).toList().toString()), true);
         return 1;
     }
@@ -69,7 +69,7 @@ public class StratagemCommands
         //stratagem use stratagems:tnt
         //stratagem use stratagems:tnt_rearm
         var server = source.getServer();
-        var stratagemData = server.overworld().getStratagemData();
+        var stratagemData = server.overworld().getServerStratagemData();
         stratagemData.use(stratagemHolder.unwrapKey().orElseThrow(), source.getPlayer());
         return 1;
     }
@@ -81,7 +81,7 @@ public class StratagemCommands
         //stratagem add stratagems:tnt
         //stratagem add stratagems:tnt_rearm
         var server = source.getServer();
-        var stratagemData = server.overworld().getStratagemData();
+        var stratagemData = server.overworld().getServerStratagemData();
         var stratagem = stratagemHolder.value();
 
         if (StratagemUtils.anyMatchHolder(stratagemData.getStratagemEntries(), stratagemHolder))
@@ -99,7 +99,7 @@ public class StratagemCommands
     private static int removeAllStratagem(CommandSourceStack source) throws CommandSyntaxException
     {
         var server = source.getServer();
-        var stratagemData = server.overworld().getStratagemData();
+        var stratagemData = server.overworld().getServerStratagemData();
 
         if (stratagemData.getStratagemEntries().stream().map(StratagemEntry::getResourceKey).allMatch(StratagemsData.DEFAULT_STRATAGEMS::contains))
         {
@@ -115,7 +115,7 @@ public class StratagemCommands
     {
         var stratagem = stratagemHolder.value();
         var server = source.getServer();
-        var stratagemData = server.overworld().getStratagemData();
+        var stratagemData = server.overworld().getServerStratagemData();
 
         if (StratagemsData.DEFAULT_STRATAGEMS.contains(stratagemHolder.unwrapKey().orElseThrow()))
         {

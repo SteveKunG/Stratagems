@@ -14,7 +14,7 @@ public enum StratagemState
 
     private static final StratagemState[] VALUES = values();
 
-    static StratagemState byName(String name)
+    public static StratagemState byName(String name)
     {
         for (var state : VALUES)
         {

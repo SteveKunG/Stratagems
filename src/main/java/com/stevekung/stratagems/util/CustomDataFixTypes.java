@@ -1,4 +1,4 @@
-package com.stevekung.stratagems;
+package com.stevekung.stratagems.util;
 
 import net.minecraft.util.datafix.DataFixTypes;
 

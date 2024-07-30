@@ -1,9 +1,7 @@
 package com.stevekung.stratagems;
 
 import org.apache.commons.lang3.StringUtils;
-
 import com.stevekung.stratagems.registry.StratagemSounds;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;

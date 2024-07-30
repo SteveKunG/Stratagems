@@ -1,15 +1,13 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.StratagemState;
-import com.stevekung.stratagems.StratagemUtils;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemRules;
-
+import com.stevekung.stratagems.util.StratagemUtils;
 import net.minecraft.world.entity.player.Player;
 
 public class DepletedStratagemRule implements StratagemRule
@@ -83,7 +81,7 @@ public class DepletedStratagemRule implements StratagemRule
                         if (entry.stratagem().properties().replenish().isPresent() && entry.stratagem().properties().replenish().get().replenisher().isPresent())
                         {
                             var replenisher = entry.level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(entry.stratagem().properties().replenish().get().replenisher().get());
-                            entry.level().getStratagemData().add(StratagemUtils.createCompoundTagWithDefaultValue(replenisher));
+                            entry.level().getServerStratagemData().add(StratagemUtils.createCompoundTagWithDefaultValue(replenisher));
                             LOGGER.info("Add {} replenisher stratagem", replenisher.value().name().getString());
                         }
                         return;

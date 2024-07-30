@@ -5,7 +5,6 @@ import java.util.Optional;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.action.StratagemActionContext;
 import com.stevekung.stratagems.registry.*;
-
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -106,7 +105,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             this.level().addFreshEntity(stratagemPod);
             var stratagemContext = new StratagemActionContext((ServerLevel) this.level(), this.blockPosition(), this.random);
             this.getVariant().value().action().action(stratagemContext);
-            ((ServerLevel) this.level()).getServer().overworld().getStratagemData().use(this.getVariant().unwrapKey().get(), (Player)this.getOwner());
+            ((ServerLevel) this.level()).getServer().overworld().getServerStratagemData().use(this.getVariant().unwrapKey().get(), (Player)this.getOwner());
             this.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             this.discard();
         }

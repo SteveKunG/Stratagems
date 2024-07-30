@@ -5,7 +5,6 @@ import java.util.Optional;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.registry.StratagemActions;
-
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 

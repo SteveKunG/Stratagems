@@ -1,7 +1,6 @@
 package com.stevekung.stratagems.packet;
 
 import com.stevekung.stratagems.ModConstants;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

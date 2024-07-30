@@ -1,13 +1,11 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
-
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemEntry;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
-
 import net.minecraft.world.entity.player.Player;
 
 public class ReplenishStratagemRule implements StratagemRule
@@ -30,7 +28,7 @@ public class ReplenishStratagemRule implements StratagemRule
     @Override
     public void onUse(StratagemEntry entry, Player player)
     {
-        var stratagemData = entry.level().getStratagemData();
+        var stratagemData = entry.level().getServerStratagemData();
         var rearmProperties = entry.stratagem().properties();
         var count = 0;
 
@@ -74,7 +72,7 @@ public class ReplenishStratagemRule implements StratagemRule
     @Override
     public void onReset(StratagemEntry entry)
     {
-        entry.level().getStratagemData().remove(entry.getStratagem());
+        entry.level().getServerStratagemData().remove(entry.getStratagem());
         LOGGER.info("Remove {} replenisher stratagem on reset!", entry.stratagem().name().getString());
     }
 

@@ -1,7 +1,6 @@
 package com.stevekung.stratagems.registry;
 
 import com.stevekung.stratagems.Stratagem;
-
 import net.minecraft.core.Holder;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
