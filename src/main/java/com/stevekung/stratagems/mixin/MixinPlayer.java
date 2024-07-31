@@ -7,22 +7,33 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import com.google.common.collect.Maps;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.PlayerStratagemsAccessor;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.registry.Stratagems;
+import com.stevekung.stratagems.util.StratagemUtils;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 @Mixin(Player.class)
-public abstract class MixinPlayer implements PlayerStratagemsAccessor
+public abstract class MixinPlayer extends LivingEntity implements PlayerStratagemsAccessor
 {
     @Unique
     private final Map<Holder<Stratagem>, StratagemInstance> stratagems = Maps.newHashMap();
+
+    MixinPlayer()
+    {
+        super(null, null);
+    }
 
     @Override
     public Map<Holder<Stratagem>, StratagemInstance> getPlayerStratagems()
@@ -33,6 +44,11 @@ public abstract class MixinPlayer implements PlayerStratagemsAccessor
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void addStratagemSaveData(CompoundTag compound, CallbackInfo info)
     {
+        if (this.stratagems.isEmpty())//TODO
+        {
+            var holder = this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(Stratagems.TNT);
+            this.stratagems.put(holder, StratagemUtils.createInstanceWithDefaultValue(holder));
+        }
         if (!this.stratagems.isEmpty())
         {
             var listTag = new ListTag();

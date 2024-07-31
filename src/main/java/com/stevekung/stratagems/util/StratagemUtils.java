@@ -2,37 +2,40 @@ package com.stevekung.stratagems.util;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemState;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
 public class StratagemUtils
 {
-    public static List<StratagemInstance> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
+    public static List<StratagemInstance> CLIENT_STRATAGEM_LIST = Lists.newCopyOnWriteArrayList();
 
-    public static boolean clientNoneMatch(String tempStratagemCode)
+    public static boolean clientNoneMatch(String tempStratagemCode, Player player)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(instance -> instance.canUse(null)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
     }
 
-    public static boolean clientFoundMatch(String tempStratagemCode)
+    public static boolean clientFoundMatch(String tempStratagemCode, Player player)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(instance -> instance.canUse(null)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
-    public static Holder<Stratagem> getStratagemFromCode(String tempStratagemCode)
+    public static Holder<Stratagem> getStratagemFromCode(String tempStratagemCode, Player player)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse(null) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(player) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
     }
-    
+
     public static void useStratagemImmediately(Holder<Stratagem> holder, Player player)
     {
-        CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(player);
+        player.getPlayerStratagems().values().stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(player);
     }
 
     public static boolean anyMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)

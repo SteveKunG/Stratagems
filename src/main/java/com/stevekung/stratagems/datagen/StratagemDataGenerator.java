@@ -25,11 +25,12 @@ public class StratagemDataGenerator implements DataGeneratorEntrypoint
     @Override
     public void addJsonKeySortOrders(JsonKeySortOrderCallback callback)
     {
-        callback.add("code", 0);
-        callback.add("name", 1);
-        callback.add("action", 2);
-        callback.add("properties", 3);
-        callback.add("icon", 4);
+        callback.add("stratagem_id", 0);
+        callback.add("code", 1);
+        callback.add("name", 2);
+        callback.add("action", 3);
+        callback.add("properties", 4);
+        callback.add("icon", 5);
     }
 
     @Override

@@ -1,11 +1,14 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
+
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class ReinforceStratagemRule implements StratagemRule
@@ -30,8 +33,11 @@ public class ReinforceStratagemRule implements StratagemRule
     {
         if (instance.remainingUse > 0)
         {
-            instance.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", instance.stratagem().name().getString(), instance.remainingUse);
+            if (player instanceof ServerPlayer serverPlayer && serverPlayer.serverLevel().players().stream().filter(playerx -> playerx.isDeadOrDying()).count() > 0)
+            {
+                instance.remainingUse--;
+                LOGGER.info("{} stratagem has remainingUse: {}", instance.stratagem().name().getString(), instance.remainingUse);
+            }
         }
     }
 

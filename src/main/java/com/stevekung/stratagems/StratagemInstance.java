@@ -29,6 +29,7 @@ public class StratagemInstance
     ).apply(instance, StratagemInstance::new));
 
     private final Holder<Stratagem> stratagem;
+    private final ResourceKey<Stratagem> stratagemResourceKey;
     public int inboundDuration;
     public Integer duration;
     public int cooldown;
@@ -38,6 +39,7 @@ public class StratagemInstance
     public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state)
     {
         this.stratagem = stratagem;
+        this.stratagemResourceKey = stratagem.value().id();
         this.inboundDuration = inboundDuration;
         this.duration = duration;
         this.cooldown = cooldown;
@@ -131,7 +133,7 @@ public class StratagemInstance
 
     public ResourceKey<Stratagem> getResourceKey()
     {
-        return this.stratagem.unwrapKey().orElseThrow();
+        return this.stratagemResourceKey;
     }
 
     public String formatTickDuration(int duration, Player player)

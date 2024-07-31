@@ -1,6 +1,8 @@
 package com.stevekung.stratagems.client;
 
 import org.slf4j.Logger;
+
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
@@ -11,6 +13,7 @@ import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import com.stevekung.stratagems.util.StratagemUtils;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -42,6 +45,13 @@ public class StratagemsClientMod implements ClientModInitializer
 
     private static void clientTick(Minecraft minecraft)
     {
+        var player = minecraft.player;
+        
+        if (player == null)
+        {
+            return;
+        }
+        
         var manager = StratagemMenuManager.getInstance();
 
         if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
@@ -80,20 +90,20 @@ public class StratagemsClientMod implements ClientModInitializer
             {
                 var tempStratagemCode = manager.getTempStratagemCode();
 
-                if (StratagemUtils.clientNoneMatch(tempStratagemCode))
+                if (StratagemUtils.clientNoneMatch(tempStratagemCode, player))
                 {
                     manager.clearTempStratagemCode();
                     fail = true;
                     LOGGER.info("FAIL");
                 }
-                if (StratagemUtils.clientFoundMatch(tempStratagemCode))
+                if (StratagemUtils.clientFoundMatch(tempStratagemCode, player))
                 {
-                    var holder = StratagemUtils.getStratagemFromCode(tempStratagemCode);
+                    var holder = StratagemUtils.getStratagemFromCode(tempStratagemCode, player);
 
                     if (holder.value().properties().needThrow().isPresent() && !holder.value().properties().needThrow().get())
                     {
                         StratagemUtils.useStratagemImmediately(holder, minecraft.player);
-                        LOGGER.info("Select {}", holder.unwrapKey().orElseThrow().location());
+                        LOGGER.info("Select {}", holder.value().id().location());
                         manager.clearTempStratagemCode();
                         manager.clearStratagemCode();
                         manager.setMenuOpen(false);
@@ -101,7 +111,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     }
 
                     manager.setSelectedStratagemCode(tempStratagemCode);
-                    manager.setSelectedStratagem(holder.unwrapKey().orElseThrow());
+                    manager.setSelectedStratagem(holder.value().id());
 
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
@@ -167,7 +177,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagementry : StratagemUtils.CLIENT_STRATAGEM_LIST)
+            for (var stratagementry : Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST))
             {
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
@@ -232,7 +242,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagementry : StratagemUtils.CLIENT_STRATAGEM_LIST)
+            for (var stratagementry : Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST))
             {
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
