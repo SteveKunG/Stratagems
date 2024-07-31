@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.StratagemEntry;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemState;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -13,21 +13,21 @@ import net.minecraft.world.entity.player.Player;
 
 public class StratagemUtils
 {
-    public static List<StratagemEntry> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
+    public static List<StratagemInstance> CLIENT_STRATAGEM_LIST = Lists.newArrayList();
 
     public static boolean clientNoneMatch(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemEntry::canUse).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
+        return CLIENT_STRATAGEM_LIST.stream().filter(instance -> instance.canUse(null)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
     }
 
     public static boolean clientFoundMatch(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(StratagemEntry::canUse).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
+        return CLIENT_STRATAGEM_LIST.stream().filter(instance -> instance.canUse(null)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
     public static Holder<Stratagem> getStratagemFromCode(String tempStratagemCode)
     {
-        return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse() && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
+        return CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.canUse(null) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
     }
     
     public static void useStratagemImmediately(Holder<Stratagem> holder, Player player)
@@ -35,14 +35,14 @@ public class StratagemUtils
         CLIENT_STRATAGEM_LIST.stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(player);
     }
 
-    public static boolean anyMatchHolder(List<StratagemEntry> list, Holder<Stratagem> stratagemHolder)
+    public static boolean anyMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
     {
-        return list.stream().map(StratagemEntry::getStratagem).anyMatch(holder -> holder == stratagemHolder);
+        return list.stream().map(StratagemInstance::getStratagem).anyMatch(holder -> holder == stratagemHolder);
     }
 
-    public static boolean noneMatchHolder(List<StratagemEntry> list, Holder<Stratagem> stratagemHolder)
+    public static boolean noneMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
     {
-        return list.stream().map(StratagemEntry::getStratagem).noneMatch(holder -> holder == stratagemHolder);
+        return list.stream().map(StratagemInstance::getStratagem).noneMatch(holder -> holder == stratagemHolder);
     }
 
     public static CompoundTag createCompoundTagWithDefaultValue(Holder<Stratagem> stratagemHolder)
@@ -67,5 +67,11 @@ public class StratagemUtils
 
         compoundTag.putString(ModConstants.Tag.STATE, StratagemState.READY.getName());
         return compoundTag;
+    }
+
+    public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> stratagemHolder)
+    {
+        var properties = stratagemHolder.value().properties();
+        return new StratagemInstance(stratagemHolder, properties.inboundDuration(), properties.duration().orElse(-1), properties.cooldown(), properties.remainingUse().orElse(-1), StratagemState.READY);
     }
 }

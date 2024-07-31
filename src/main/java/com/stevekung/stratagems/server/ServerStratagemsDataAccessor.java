@@ -1,10 +1,10 @@
 package com.stevekung.stratagems.server;
 
-import com.stevekung.stratagems.StratagemsData;
+import com.stevekung.stratagems.ServerStratagemsData;
 
 public interface ServerStratagemsDataAccessor
 {
-    default StratagemsData getServerStratagemData()
+    default ServerStratagemsData getServerStratagemData()
     {
         throw new AssertionError("Implemented via mixin");
     }

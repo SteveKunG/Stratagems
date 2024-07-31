@@ -37,10 +37,10 @@ public abstract class MixinPlayer implements PlayerStratagemsAccessor
         {
             var listTag = new ListTag();
 
-//            for (MobEffectInstance mobEffectInstance : this.activeEffects.values())
-//            {
-//                listTag.add(mobEffectInstance.save());
-//            }
+            for (var stratagemInstance : this.stratagems.values())
+            {
+                listTag.add(stratagemInstance.save());
+            }
 
             compound.put(ModConstants.Tag.STRATAGEMS, listTag);
         }
@@ -55,12 +55,13 @@ public abstract class MixinPlayer implements PlayerStratagemsAccessor
 
             for (var i = 0; i < listTag.size(); i++)
             {
-//                CompoundTag compoundTag = listTag.getCompound(i);
-//                MobEffectInstance mobEffectInstance = MobEffectInstance.load(compoundTag);
-//                if (mobEffectInstance != null)
-//                {
-//                    this.activeEffects.put(mobEffectInstance.getEffect(), mobEffectInstance);
-//                }
+                var compoundTag = listTag.getCompound(i);
+                var stratagemInstance = StratagemInstance.load(compoundTag);
+
+                if (stratagemInstance != null)
+                {
+                    this.stratagems.put(stratagemInstance.getStratagem(), stratagemInstance);
+                }
             }
         }
     }

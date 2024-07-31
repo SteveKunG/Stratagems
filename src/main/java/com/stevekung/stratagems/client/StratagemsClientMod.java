@@ -148,8 +148,10 @@ public class StratagemsClientMod implements ClientModInitializer
     {
         var manager = StratagemMenuManager.getInstance();
         var minecraft = Minecraft.getInstance();
+        var level = minecraft.level;
+        var player = minecraft.player;
 
-        if (minecraft.level == null)
+        if (level == null || player == null)
         {
             return;
         }
@@ -235,7 +237,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var hasCode = code.startsWith(tempStratagemCode) && stratagementry.canUse();
+                var hasCode = code.startsWith(tempStratagemCode) && stratagementry.canUse(player);
 
                 guiGraphics.drawString(minecraft.font, stratagem.name(), 32, 20 + index * 30, hasCode ? white : gray);
 
@@ -246,7 +248,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.unavailable"), 32, 32 + index * 30, hasCode ? white : gray);
                 }
 
-                for (var i = 0; i < codeChar.length && stratagementry.canUse(); i++)
+                for (var i = 0; i < codeChar.length && stratagementry.canUse(player); i++)
                 {
                     var arrows = ModConstants.charToArrow(codeChar[i]);
                     combinedArrows.append(arrows);
@@ -261,11 +263,11 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     if (stratagementry.state == StratagemState.INBOUND && stratagementry.inboundDuration > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.inbound").getString() + " " + stratagementry.formatTickDuration(stratagementry.inboundDuration), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.inbound").getString() + " " + stratagementry.formatTickDuration(stratagementry.inboundDuration, level), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                     if (stratagementry.state == StratagemState.COOLDOWN && stratagementry.cooldown > 0)
                     {
-                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.cooldown").getString() + " " + stratagementry.formatTickDuration(stratagementry.cooldown), 32, 32 + index * 30, hasCode ? white : gray);
+                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.cooldown").getString() + " " + stratagementry.formatTickDuration(stratagementry.cooldown, level), 32, 32 + index * 30, hasCode ? white : gray);
                     }
                 }
 

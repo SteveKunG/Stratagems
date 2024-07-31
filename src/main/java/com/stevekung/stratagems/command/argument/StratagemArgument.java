@@ -55,7 +55,7 @@ public class StratagemArgument<T> implements ArgumentType<Holder.Reference<T>>
 
         if (object instanceof CommandSourceStack commandSourceStack)
         {
-            return SharedSuggestionProvider.suggestResource(commandSourceStack.getServer().overworld().getServerStratagemData().getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()), suggestionsBuilder);
+            return SharedSuggestionProvider.suggestResource(commandSourceStack.getServer().overworld().getServerStratagemData().getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()), suggestionsBuilder);
         }
         else
         {

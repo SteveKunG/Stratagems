@@ -3,7 +3,7 @@ package com.stevekung.stratagems.rule;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.StratagemEntry;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
 import net.minecraft.world.entity.player.Player;
@@ -20,75 +20,75 @@ public class DefaultStratagemRule implements StratagemRule
     }
 
     @Override
-    public boolean canUse(StratagemEntry entry)
+    public boolean canUse(StratagemInstance instance, Player player)
     {
-        return entry.isReady();
+        return instance.isReady();
     }
 
     @Override
-    public void onUse(StratagemEntry entry, Player player)
+    public void onUse(StratagemInstance instance, Player player)
     {
         // Set state from READY to IN_USE
-        entry.state = StratagemState.IN_USE;
+        instance.state = StratagemState.IN_USE;
     }
 
     @Override
-    public void tick(StratagemEntry entry)
+    public void tick(StratagemInstance instance, Player player)
     {
-        if (!entry.isReady())
+        if (!instance.isReady())
         {
-            if (entry.state == StratagemState.IN_USE)
+            if (instance.state == StratagemState.IN_USE)
             {
-                if (entry.duration != null && entry.duration > 0)
+                if (instance.duration != null && instance.duration > 0)
                 {
-                    entry.duration--;
+                    instance.duration--;
 
-                    if (entry.duration % 20 == 0)
+                    if (instance.duration % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has duration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.duration));
+                        LOGGER.info("{} stratagem has duration: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.duration, player));
                     }
                 }
                 else
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.INBOUND);
-                    entry.state = StratagemState.INBOUND;
+                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.INBOUND);
+                    instance.state = StratagemState.INBOUND;
                 }
             }
 
-            if (entry.state == StratagemState.INBOUND && entry.inboundDuration > 0)
+            if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
             {
-                entry.inboundDuration--;
+                instance.inboundDuration--;
 
-                if (entry.inboundDuration % 20 == 0)
+                if (instance.inboundDuration % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has inboundDuration: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.inboundDuration));
+                    LOGGER.info("{} stratagem has inboundDuration: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.inboundDuration, player));
                 }
             }
 
-            if (entry.state != StratagemState.COOLDOWN && entry.inboundDuration == 0)
+            if (instance.state != StratagemState.COOLDOWN && instance.inboundDuration == 0)
             {
-                LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.COOLDOWN);
-                entry.state = StratagemState.COOLDOWN;
-                entry.cooldown = entry.stratagem().properties().cooldown();
+                LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.COOLDOWN);
+                instance.state = StratagemState.COOLDOWN;
+                instance.cooldown = instance.stratagem().properties().cooldown();
             }
 
-            if (entry.state == StratagemState.COOLDOWN)
+            if (instance.state == StratagemState.COOLDOWN)
             {
-                if (entry.cooldown > 0)
+                if (instance.cooldown > 0)
                 {
-                    entry.cooldown--;
+                    instance.cooldown--;
 
-                    if (entry.cooldown % 20 == 0)
+                    if (instance.cooldown % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has cooldown: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.cooldown));
+                        LOGGER.info("{} stratagem has cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
                     }
                 }
 
-                if (entry.cooldown == 0)
+                if (instance.cooldown == 0)
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", entry.stratagem().name().getString(), entry.state, StratagemState.READY);
-                    entry.state = StratagemState.READY;
-                    entry.resetStratagemTicks(entry.stratagem().properties());
+                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.READY);
+                    instance.state = StratagemState.READY;
+                    instance.resetStratagemTicks(instance.stratagem().properties());
                 }
             }
         }

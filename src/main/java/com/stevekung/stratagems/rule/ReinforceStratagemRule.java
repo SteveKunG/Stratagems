@@ -3,7 +3,7 @@ package com.stevekung.stratagems.rule;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.StratagemEntry;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
 import net.minecraft.world.entity.player.Player;
@@ -20,48 +20,48 @@ public class ReinforceStratagemRule implements StratagemRule
     }
 
     @Override
-    public boolean canUse(StratagemEntry entry)
+    public boolean canUse(StratagemInstance instance, Player player)
     {
-        return entry.remainingUse > 0;
+        return instance.remainingUse > 0;
     }
 
     @Override
-    public void onUse(StratagemEntry entry, Player player)
+    public void onUse(StratagemInstance instance, Player player)
     {
-        if (entry.remainingUse > 0)
+        if (instance.remainingUse > 0)
         {
-            entry.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", entry.stratagem().name().getString(), entry.remainingUse);
+            instance.remainingUse--;
+            LOGGER.info("{} stratagem has remainingUse: {}", instance.stratagem().name().getString(), instance.remainingUse);
         }
     }
 
     @Override
-    public void tick(StratagemEntry entry)
+    public void tick(StratagemInstance instance, Player player)
     {
-        if (entry.state != StratagemState.COOLDOWN && entry.remainingUse == 0)
+        if (instance.state != StratagemState.COOLDOWN && instance.remainingUse == 0)
         {
-            entry.cooldown = entry.stratagem().properties().cooldown();
-            entry.state = StratagemState.COOLDOWN;
-            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.cooldown));
+            instance.cooldown = instance.stratagem().properties().cooldown();
+            instance.state = StratagemState.COOLDOWN;
+            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
         }
 
-        if (entry.state == StratagemState.COOLDOWN)
+        if (instance.state == StratagemState.COOLDOWN)
         {
-            if (entry.cooldown > 0)
+            if (instance.cooldown > 0)
             {
-                entry.cooldown--;
+                instance.cooldown--;
 
-                if (entry.cooldown % 20 == 0)
+                if (instance.cooldown % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has cooldown: {}", entry.stratagem().name().getString(), entry.formatTickDuration(entry.cooldown));
+                    LOGGER.info("{} stratagem has cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
                 }
             }
 
-            if (entry.cooldown == 0)
+            if (instance.cooldown == 0)
             {
-                entry.remainingUse++;
-                LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", entry.stratagem().name().getString(), entry.state, StratagemState.READY, entry.remainingUse);
-                entry.state = StratagemState.READY;
+                instance.remainingUse++;
+                LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", instance.stratagem().name().getString(), instance.state, StratagemState.READY, instance.remainingUse);
+                instance.state = StratagemState.READY;
             }
         }
     }

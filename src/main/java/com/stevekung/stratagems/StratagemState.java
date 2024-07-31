@@ -2,7 +2,10 @@ package com.stevekung.stratagems;
 
 import java.util.Locale;
 
-public enum StratagemState
+import com.mojang.serialization.Codec;
+import net.minecraft.util.StringRepresentable;
+
+public enum StratagemState implements StringRepresentable
 {
     READY,
     IN_USE,
@@ -12,6 +15,7 @@ public enum StratagemState
     DEPLETED,
     BLOCKED;
 
+    public static final Codec<StratagemState> CODEC = StringRepresentable.fromValues(StratagemState::values);
     private static final StratagemState[] VALUES = values();
 
     public static StratagemState byName(String name)
@@ -29,5 +33,11 @@ public enum StratagemState
     public String getName()
     {
         return this.name().toLowerCase(Locale.ROOT);
+    }
+
+    @Override
+    public String getSerializedName()
+    {
+        return this.getName();
     }
 }

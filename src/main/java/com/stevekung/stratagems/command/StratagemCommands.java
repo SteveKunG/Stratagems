@@ -3,9 +3,9 @@ package com.stevekung.stratagems.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.stevekung.stratagems.ServerStratagemsData;
 import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.StratagemEntry;
-import com.stevekung.stratagems.StratagemsData;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.command.argument.StratagemArgument;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.util.StratagemUtils;
@@ -58,7 +58,7 @@ public class StratagemCommands
     {
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
-        source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()).toList().toString()), true);
+        source.sendSuccess(() -> Component.translatable("commands.stratagem.list", stratagemData.getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()).toList().toString()), true);
         return 1;
     }
 
@@ -84,13 +84,13 @@ public class StratagemCommands
         var stratagemData = server.overworld().getServerStratagemData();
         var stratagem = stratagemHolder.value();
 
-        if (StratagemUtils.anyMatchHolder(stratagemData.getStratagemEntries(), stratagemHolder))
+        if (StratagemUtils.anyMatchHolder(stratagemData.getStratagemInstances(), stratagemHolder))
         {
             throw ERROR_ADD_FAILED.create();
         }
         else
         {
-            stratagemData.add(StratagemUtils.createCompoundTagWithDefaultValue(stratagemHolder));
+            stratagemData.add(StratagemUtils.createInstanceWithDefaultValue(stratagemHolder));
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.success", stratagem.name()), true);
             return 1;
         }
@@ -101,7 +101,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
 
-        if (stratagemData.getStratagemEntries().stream().map(StratagemEntry::getResourceKey).allMatch(StratagemsData.DEFAULT_STRATAGEMS::contains))
+        if (stratagemData.getStratagemInstances().stream().map(StratagemInstance::getResourceKey).allMatch(ServerStratagemsData.DEFAULT_STRATAGEMS::contains))
         {
             throw ERROR_REMOVE_CONTAINS_DEFAULT_FAILED.create();
         }
@@ -117,12 +117,12 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
 
-        if (StratagemsData.DEFAULT_STRATAGEMS.contains(stratagemHolder.unwrapKey().orElseThrow()))
+        if (ServerStratagemsData.DEFAULT_STRATAGEMS.contains(stratagemHolder.unwrapKey().orElseThrow()))
         {
             throw ERROR_REMOVE_CONTAINS_DEFAULT_FAILED.create();
         }
 
-        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemEntries(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemInstances(), stratagemHolder))
         {
             throw ERROR_REMOVE_SPECIFIC_FAILED.create();
         }

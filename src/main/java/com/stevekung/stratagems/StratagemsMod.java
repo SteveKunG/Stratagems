@@ -59,8 +59,8 @@ public class StratagemsMod implements ModInitializer
             var stratagemData = server.overworld().getServerStratagemData();
             stratagemData.setDirty();
             server.overworld().getDataStorage().save();
-            StratagemUtils.CLIENT_STRATAGEM_LIST = stratagemData.getStratagemEntries();
-            LOGGER.info("This world has stratagem(s): {}", stratagemData.getStratagemEntries().stream().map(entry -> entry.getResourceKey().location()).toList());
+            StratagemUtils.CLIENT_STRATAGEM_LIST = stratagemData.getStratagemInstances();
+            LOGGER.info("This world has stratagem(s): {}", stratagemData.getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()).toList());
         });
         ServerTickEvents.START_SERVER_TICK.register(server ->
         {
