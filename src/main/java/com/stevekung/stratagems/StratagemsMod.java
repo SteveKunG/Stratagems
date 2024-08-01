@@ -8,12 +8,13 @@ import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket.StratagemEntryData;
 import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
-import com.stevekung.stratagems.util.StratagemUtils;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -47,6 +49,7 @@ public class StratagemsMod implements ModInitializer
 
         PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(UseReplenishStratagemPacket.TYPE, UseReplenishStratagemPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(UpdateStratagemsPacket.TYPE, UpdateStratagemsPacket.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
@@ -66,6 +69,11 @@ public class StratagemsMod implements ModInitializer
             var player = context.server().getPlayerList().getPlayer(payload.uuid());
             var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()));
             ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), context.server().overworld().getServerStratagemData().getStratagemInstances())).stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(context.server(), player);
+
+            for (var entry : ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), context.server().overworld().getServerStratagemData().getStratagemInstances())))
+            {
+                System.out.println(entry);
+            }
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> StratagemCommands.register(dispatcher, context));
@@ -74,12 +82,16 @@ public class StratagemsMod implements ModInitializer
             var stratagemData = server.overworld().getServerStratagemData();
             stratagemData.setDirty();
             server.overworld().getDataStorage().save();
-            StratagemUtils.CLIENT_STRATAGEM_LIST = stratagemData.getStratagemInstances();
             LOGGER.info("This world has stratagem(s): {}", stratagemData.getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()).toList());
+        });
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+        {
+            System.out.println(handler.getPlayer());
+            ServerPlayNetworking.send(handler.getPlayer(), new UpdateStratagemsPacket(server.overworld().getServerStratagemData().getStratagemInstances().stream().map(t -> new StratagemEntryData(t.getStratagem().value().id(), t.inboundDuration, t.duration, t.cooldown, t.remainingUse, t.state)).toList()));
         });
         ServerTickEvents.START_SERVER_TICK.register(server ->
         {
-            server.getProfiler().push("stratagem");
+            server.getProfiler().push("stratagemServer");
 
             if (server.tickRateManager().runsNormally())
             {

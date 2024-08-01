@@ -4,7 +4,11 @@ import java.util.Optional;
 
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.action.StratagemActionContext;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket.StratagemEntryData;
 import com.stevekung.stratagems.registry.*;
+
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -12,6 +16,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.VariantHolder;
@@ -106,6 +111,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             var stratagemContext = new StratagemActionContext((ServerLevel) this.level(), this.blockPosition(), this.random);
             this.getVariant().value().action().action(stratagemContext);
             ((ServerLevel) this.level()).getServer().overworld().getServerStratagemData().use(this.getVariant().unwrapKey().get(), (Player)this.getOwner());
+            ServerPlayNetworking.send((ServerPlayer)this.getOwner(), new UpdateStratagemsPacket(((ServerLevel) this.level()).getServer().overworld().getServerStratagemData().getStratagemInstances().stream().map(t -> new StratagemEntryData(t.getStratagem().value().id(), t.inboundDuration, t.duration, t.cooldown, t.remainingUse, t.state)).toList()));
             this.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             this.discard();
         }

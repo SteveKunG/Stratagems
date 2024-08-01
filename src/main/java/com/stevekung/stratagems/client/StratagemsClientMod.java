@@ -6,12 +6,15 @@ import com.google.common.collect.Iterables;
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.ModConstants;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemMenuManager;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
 import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
+import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import com.stevekung.stratagems.util.StratagemUtils;
 
@@ -41,16 +44,31 @@ public class StratagemsClientMod implements ClientModInitializer
 
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
         HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
+        ClientPlayNetworking.registerGlobalReceiver(UpdateStratagemsPacket.TYPE, (payload, context) ->
+        {
+            //            System.out.println("MUHA");
+            StratagemUtils.CLIENT_STRATAGEM_LIST = payload.entries().stream().map(t -> new StratagemInstance(context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(t.stratagem()), t.inboundDuration(), t.duration(), t.cooldown(), t.remainingUse(), t.state())).toList();
+        });
     }
 
     private static void clientTick(Minecraft minecraft)
     {
         var player = minecraft.player;
+        var level = minecraft.level;
 
-        if (player == null)
+        if (level == null || player == null)
         {
             return;
         }
+
+        minecraft.getProfiler().push("stratagemClient");
+
+        if (level.tickRateManager().runsNormally())
+        {
+            StratagemUtils.CLIENT_STRATAGEM_LIST.forEach(t -> t.tick(null, null));
+        }
+
+        minecraft.getProfiler().pop();
 
         var manager = StratagemMenuManager.getInstance();
 

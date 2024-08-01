@@ -6,8 +6,12 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.ServerStratagemsData;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket.StratagemEntryData;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.util.StratagemUtils;
+
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -89,27 +93,29 @@ public class StratagemCommands
                                         .executes(commandContext -> listPlayerStratagems(commandContext.getSource(), EntityArgument.getPlayer(commandContext, "player")))))
                         .then(Commands.literal("server")
                                 .executes(commandContext -> listServerStratagems(commandContext.getSource()))))
-        );
+                );
         //@formatter:on
     }
 
-    private static int resetAllStratagem(CommandSourceStack source)
+    private static int resetAllStratagem(CommandSourceStack source) throws CommandSyntaxException
     {
         //stratagem reset
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
-        stratagemData.getStratagemInstances().forEach(instance -> instance.reset(server, null));
+        stratagemData.getStratagemInstances().forEach(instance -> instance.reset(server, source.getPlayer()));
         server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().values().forEach(instance -> instance.reset(server, serverPlayer)));
+        sendPacket(source.getPlayer());
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.everything.success"), true);
         return 1;
     }
 
-    private static int resetServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder)
+    private static int resetServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
     {
         //stratagem reset
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
         stratagemData.reset(stratagemHolder);
+        sendPacket(source.getPlayer());
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.server.success", stratagemHolder.value().name()), true);
         return 1;
     }
@@ -119,6 +125,7 @@ public class StratagemCommands
         //stratagem reset
         var stratagemData = serverPlayer.getPlayerStratagems().get(stratagemHolder);
         stratagemData.reset(source.getServer(), serverPlayer);
+        sendPacket(serverPlayer);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.success", serverPlayer.getName()), true);
         return 1;
     }
@@ -138,7 +145,7 @@ public class StratagemCommands
         return 1;
     }
 
-    private static int useServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder)
+    private static int useServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
     {
         //stratagem use stratagems:reinforce
         //stratagem use stratagems:block
@@ -147,6 +154,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
         stratagemData.use(stratagemHolder.unwrapKey().orElseThrow(), source.getPlayer());
+        sendPacket(source.getPlayer());
         source.sendSuccess(() -> Component.translatable("commands.stratagem.use.server.success", stratagemHolder.value().name()), true);
         return 1;
     }
@@ -159,6 +167,7 @@ public class StratagemCommands
         //stratagem use stratagems:tnt_rearm
         var stratagemData = serverPlayer.getPlayerStratagems().get(stratagemHolder);
         stratagemData.use(source.getServer(), serverPlayer);
+        sendPacket(serverPlayer);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.use.player.success", stratagemHolder.value().name(), serverPlayer.getName()), true);
         return 1;
     }
@@ -180,6 +189,7 @@ public class StratagemCommands
         else
         {
             stratagemData.add(StratagemUtils.createInstanceWithDefaultValue(stratagemHolder));
+            sendPacket(source.getPlayer());
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.server.success", stratagem.name()), true);
             return 1;
         }
@@ -201,6 +211,7 @@ public class StratagemCommands
         else
         {
             stratagemData.put(stratagemHolder, StratagemUtils.createInstanceWithDefaultValue(stratagemHolder));
+            sendPacket(serverPlayer);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.player.success", serverPlayer.getName(), stratagem.name()), true);
             return 1;
         }
@@ -218,6 +229,7 @@ public class StratagemCommands
 
         stratagemData.clear();
         server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().clear());
+        sendPacket(source.getPlayer());
         source.sendSuccess(() -> Component.literal("commands.stratagem.remove.everything.success"), true);
         return 1;
     }
@@ -240,6 +252,7 @@ public class StratagemCommands
         else
         {
             stratagemData.remove(stratagemHolder);
+            sendPacket(source.getPlayer());
             source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.server.specific.success", stratagem.name()), true);
             return 1;
         }
@@ -257,8 +270,14 @@ public class StratagemCommands
         else
         {
             stratagemData.remove(stratagemHolder);
+            sendPacket(serverPlayer);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.player.specific.success", serverPlayer.getName(), stratagem.name()), true);
             return 1;
         }
+    }
+
+    private static void sendPacket(ServerPlayer serverPlayer)
+    {
+        ServerPlayNetworking.send(serverPlayer, new UpdateStratagemsPacket(serverPlayer.serverLevel().getServerStratagemData().getStratagemInstances().stream().map(t -> new StratagemEntryData(t.getStratagem().value().id(), t.inboundDuration, t.duration, t.cooldown, t.remainingUse, t.state)).toList()));
     }
 }

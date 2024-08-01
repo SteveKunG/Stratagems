@@ -13,9 +13,6 @@ import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.PlayerStratagemsAccessor;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
-import com.stevekung.stratagems.registry.ModRegistries;
-import com.stevekung.stratagems.registry.Stratagems;
-import com.stevekung.stratagems.util.StratagemUtils;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -44,11 +41,6 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void addStratagemSaveData(CompoundTag compound, CallbackInfo info)
     {
-        if (this.stratagems.isEmpty())//TODO
-        {
-            var holder = this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(Stratagems.TNT);
-            this.stratagems.put(holder, StratagemUtils.createInstanceWithDefaultValue(holder));
-        }
         if (!this.stratagems.isEmpty())
         {
             var listTag = new ListTag();
