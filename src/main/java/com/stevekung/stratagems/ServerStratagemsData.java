@@ -61,7 +61,7 @@ public class ServerStratagemsData extends SavedData
 
     public void use(ResourceKey<Stratagem> resourceKey, Player player)
     {
-        this.stratagemInstances.stream().filter(entry -> entry.getStratagem().is(resourceKey)).findFirst().ifPresent(entry ->
+        this.stratagemInstances.stream().filter(entry -> entry.getStratagem().value().id().equals(resourceKey)).findFirst().ifPresent(entry ->
         {
             if (entry.canUse(player))
             {
@@ -134,9 +134,9 @@ public class ServerStratagemsData extends SavedData
         this.stratagemInstances.removeIf(entry -> entry.getStratagem() == stratagemHolder);
     }
 
-    public void reset()
+    public void reset(Holder<Stratagem> stratagemHolder)
     {
-        this.stratagemInstances.forEach(instance -> instance.reset(null));
+        this.stratagemInstances.stream().filter(entry -> entry.getStratagem() == stratagemHolder).forEach(instance -> instance.reset(null));
     }
 
     public void clear()

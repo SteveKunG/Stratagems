@@ -38,6 +38,10 @@ public class ReinforceStratagemRule implements StratagemRule
                 instance.remainingUse--;
                 LOGGER.info("{} stratagem has remainingUse: {}", instance.stratagem().name().getString(), instance.remainingUse);
             }
+            else
+            {
+                LOGGER.info("No player dead");
+            }
         }
     }
 
