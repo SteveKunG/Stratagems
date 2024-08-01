@@ -37,6 +37,7 @@ public interface ModConstants
     interface Packets
     {
         ResourceLocation SPAWN_STRATAGEM = StratagemsMod.id("spawn_stratagem");
+        ResourceLocation USE_REPLENISH_STRATAGEM = StratagemsMod.id("use_replenish_stratagem");
     }
 
     interface StratagemTag

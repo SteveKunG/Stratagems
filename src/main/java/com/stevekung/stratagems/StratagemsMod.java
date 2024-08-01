@@ -1,15 +1,20 @@
 package com.stevekung.stratagems;
 
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import com.stevekung.stratagems.util.StratagemUtils;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -41,6 +46,8 @@ public class StratagemsMod implements ModInitializer
         DynamicRegistrySetupCallback.EVENT.register(registryView -> addListenerForDynamic(registryView, ModRegistries.STRATAGEM));
 
         PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(UseReplenishStratagemPacket.TYPE, UseReplenishStratagemPacket.CODEC);
+
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
             var player = context.player();
@@ -53,6 +60,14 @@ public class StratagemsMod implements ModInitializer
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(stratagemBall);
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(UseReplenishStratagemPacket.TYPE, (payload, context) ->
+        {
+            var player = context.server().getPlayerList().getPlayer(payload.uuid());
+            var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()));
+            ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), context.server().overworld().getServerStratagemData().getStratagemInstances())).stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(context.server(), player);
+        });
+
         CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> StratagemCommands.register(dispatcher, context));
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {

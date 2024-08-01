@@ -10,6 +10,7 @@ import com.stevekung.stratagems.StratagemMenuManager;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import com.stevekung.stratagems.util.StratagemUtils;
@@ -23,7 +24,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 
@@ -46,12 +46,12 @@ public class StratagemsClientMod implements ClientModInitializer
     private static void clientTick(Minecraft minecraft)
     {
         var player = minecraft.player;
-        
+
         if (player == null)
         {
             return;
         }
-        
+
         var manager = StratagemMenuManager.getInstance();
 
         if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
@@ -100,18 +100,18 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     var holder = StratagemUtils.getStratagemFromCode(tempStratagemCode, player);
 
+                    manager.setSelectedStratagemCode(tempStratagemCode);
+                    manager.setSelectedStratagem(holder.value().id());
+
                     if (holder.value().properties().needThrow().isPresent() && !holder.value().properties().needThrow().get())
                     {
-                        StratagemUtils.useStratagemImmediately(holder, minecraft.player);
-                        LOGGER.info("Select {}", holder.value().id().location());
+                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelectedStratagem().location(), player.getUUID()));
+                        LOGGER.info("Select replenish {}", holder.value().id().location());
                         manager.clearTempStratagemCode();
                         manager.clearStratagemCode();
                         manager.setMenuOpen(false);
                         return;
                     }
-
-                    manager.setSelectedStratagemCode(tempStratagemCode);
-                    manager.setSelectedStratagem(holder.value().id());
 
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
@@ -131,12 +131,7 @@ public class StratagemsClientMod implements ClientModInitializer
         if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
         {
             LOGGER.info("Throwing {}", manager.getSelectedStratagem().location());
-
-            if (minecraft.hitResult != null)
-            {
-                ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelectedStratagem().location(), BlockPos.containing(minecraft.hitResult.getLocation())));
-            }
-
+            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelectedStratagem().location()));
             manager.clearStratagemCode();
         }
 

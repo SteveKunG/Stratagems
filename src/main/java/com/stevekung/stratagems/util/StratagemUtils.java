@@ -33,11 +33,6 @@ public class StratagemUtils
         return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
     }
 
-    public static void useStratagemImmediately(Holder<Stratagem> holder, Player player)
-    {
-        player.getPlayerStratagems().values().stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(null, player);
-    }
-
     public static boolean anyMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
     {
         return list.stream().map(StratagemInstance::getStratagem).anyMatch(holder -> holder == stratagemHolder);
