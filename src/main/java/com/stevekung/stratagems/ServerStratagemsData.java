@@ -51,7 +51,7 @@ public class ServerStratagemsData extends SavedData
     public void tick()
     {
         this.tick++;
-        this.stratagemInstances.forEach(instance -> instance.tick(null));
+        this.stratagemInstances.forEach(instance -> instance.tick(this.level.getServer(), null));
 
         if (this.tick % 100 == 0)
         {
@@ -63,9 +63,9 @@ public class ServerStratagemsData extends SavedData
     {
         this.stratagemInstances.stream().filter(entry -> entry.getStratagem().value().id().equals(resourceKey)).findFirst().ifPresent(entry ->
         {
-            if (entry.canUse(player))
+            if (entry.canUse(this.level.getServer(), player))
             {
-                entry.use(player);
+                entry.use(this.level.getServer(), player);
                 this.setDirty();
             }
             else
@@ -136,7 +136,7 @@ public class ServerStratagemsData extends SavedData
 
     public void reset(Holder<Stratagem> stratagemHolder)
     {
-        this.stratagemInstances.stream().filter(entry -> entry.getStratagem() == stratagemHolder).forEach(instance -> instance.reset(null));
+        this.stratagemInstances.stream().filter(entry -> entry.getStratagem() == stratagemHolder).forEach(instance -> instance.reset(this.level.getServer(), null));
     }
 
     public void clear()

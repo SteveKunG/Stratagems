@@ -247,7 +247,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var hasCode = code.startsWith(tempStratagemCode) && stratagementry.canUse(player);
+                var hasCode = code.startsWith(tempStratagemCode) && stratagementry.canUse(null, player);
 
                 guiGraphics.drawString(minecraft.font, stratagem.name(), 32, 20 + index * 30, hasCode ? white : gray);
 
@@ -258,7 +258,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.unavailable"), 32, 32 + index * 30, hasCode ? white : gray);
                 }
 
-                for (var i = 0; i < codeChar.length && stratagementry.canUse(player); i++)
+                for (var i = 0; i < codeChar.length && stratagementry.canUse(null, player); i++)
                 {
                     var arrows = ModConstants.charToArrow(codeChar[i]);
                     combinedArrows.append(arrows);

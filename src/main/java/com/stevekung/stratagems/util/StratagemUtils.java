@@ -20,22 +20,22 @@ public class StratagemUtils
 
     public static boolean clientNoneMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(null, player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
     }
 
     public static boolean clientFoundMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(null, player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
     public static Holder<Stratagem> getStratagemFromCode(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(player) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
     }
 
     public static void useStratagemImmediately(Holder<Stratagem> holder, Player player)
     {
-        player.getPlayerStratagems().values().stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(player);
+        player.getPlayerStratagems().values().stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(null, player);
     }
 
     public static boolean anyMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)

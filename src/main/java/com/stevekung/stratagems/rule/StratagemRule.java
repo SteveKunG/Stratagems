@@ -1,24 +1,23 @@
 package com.stevekung.stratagems.rule;
 
-import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
-import net.minecraft.world.entity.player.Player;
 
 public interface StratagemRule
 {
     StratagemRuleType getType();
 
-    boolean canUse(StratagemInstance instance, Player player);
+    boolean canUse(StratagemInstanceContext context);
 
-    void onUse(StratagemInstance instance, Player player);
+    void onUse(StratagemInstanceContext context);
 
-    default void onReset(StratagemInstance instance, Player player)
+    default void onReset(StratagemInstanceContext context)
     {
-        instance.state = StratagemState.READY;
-        instance.resetStratagemTicks(instance.stratagem().properties());
+        context.instance().state = StratagemState.READY;
+        context.instance().resetStratagemTicks(context.instance().stratagem().properties());
     }
 
-    void tick(StratagemInstance instance, Player player);
+    void tick(StratagemInstanceContext context);
 
     @FunctionalInterface
     interface Builder

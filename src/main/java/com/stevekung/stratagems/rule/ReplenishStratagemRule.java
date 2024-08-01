@@ -3,10 +3,9 @@ package com.stevekung.stratagems.rule;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
-import net.minecraft.world.entity.player.Player;
 
 public class ReplenishStratagemRule implements StratagemRule
 {
@@ -20,14 +19,16 @@ public class ReplenishStratagemRule implements StratagemRule
     }
 
     @Override
-    public boolean canUse(StratagemInstance instance, Player player)
+    public boolean canUse(StratagemInstanceContext context)
     {
-        return instance.isReady();
+        return context.instance().isReady();
     }
 
     @Override
-    public void onUse(StratagemInstance instance, Player player)
+    public void onUse(StratagemInstanceContext context)
     {
+        var instance = context.instance();
+        var player = context.player().orElse(null);
         var stratagemData = player.getPlayerStratagems();
         var rearmProperties = instance.stratagem().properties();
         var count = 0;
@@ -70,14 +71,14 @@ public class ReplenishStratagemRule implements StratagemRule
     }
 
     @Override
-    public void onReset(StratagemInstance instance, Player player)
+    public void onReset(StratagemInstanceContext context)
     {
-        player.getPlayerStratagems().remove(instance.getStratagem());
-        LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
+        context.player().get().getPlayerStratagems().remove(context.instance().getStratagem());
+        LOGGER.info("Remove {} replenisher stratagem on reset!", context.instance().stratagem().name().getString());
     }
 
     @Override
-    public void tick(StratagemInstance instance, Player player)
+    public void tick(StratagemInstanceContext context)
     {
     }
 

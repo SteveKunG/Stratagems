@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -96,24 +97,24 @@ public class StratagemInstance
         return this.state;
     }
 
-    public void tick(Player player)
+    public void tick(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
     {
-        this.getRule().tick(this, player);
+        this.getRule().tick(StratagemInstanceContext.create(this, minecraftServer, player));
     }
 
-    public void use(Player player)
+    public void use(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
     {
-        this.getRule().onUse(this, player);
+        this.getRule().onUse(StratagemInstanceContext.create(this, minecraftServer, player));
     }
 
-    public void reset(Player player)
+    public void reset(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
     {
-        this.getRule().onReset(this, player);
+        this.getRule().onReset(StratagemInstanceContext.create(this, minecraftServer, player));
     }
 
-    public boolean canUse(Player player)
+    public boolean canUse(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
     {
-        return this.getRule().canUse(this, player);
+        return this.getRule().canUse(StratagemInstanceContext.create(this, minecraftServer, player));
     }
 
     public String getCode()

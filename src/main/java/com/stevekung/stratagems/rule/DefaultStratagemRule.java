@@ -3,10 +3,9 @@ package com.stevekung.stratagems.rule;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
-import net.minecraft.world.entity.player.Player;
 
 public class DefaultStratagemRule implements StratagemRule
 {
@@ -20,21 +19,24 @@ public class DefaultStratagemRule implements StratagemRule
     }
 
     @Override
-    public boolean canUse(StratagemInstance instance, Player player)
+    public boolean canUse(StratagemInstanceContext context)
     {
-        return instance.isReady();
+        return context.instance().isReady();
     }
 
     @Override
-    public void onUse(StratagemInstance instance, Player player)
+    public void onUse(StratagemInstanceContext context)
     {
         // Set state from READY to IN_USE
-        instance.state = StratagemState.IN_USE;
+        context.instance().state = StratagemState.IN_USE;
     }
 
     @Override
-    public void tick(StratagemInstance instance, Player player)
+    public void tick(StratagemInstanceContext context)
     {
+        var instance = context.instance();
+        var player = context.player().orElse(null);
+
         if (!instance.isReady())
         {
             if (instance.state == StratagemState.IN_USE)

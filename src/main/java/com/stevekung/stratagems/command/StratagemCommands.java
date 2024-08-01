@@ -98,8 +98,8 @@ public class StratagemCommands
         //stratagem reset
         var server = source.getServer();
         var stratagemData = server.overworld().getServerStratagemData();
-        stratagemData.getStratagemInstances().forEach(instance -> instance.reset(null));
-        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().values().forEach(instance -> instance.reset(serverPlayer)));
+        stratagemData.getStratagemInstances().forEach(instance -> instance.reset(server, null));
+        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().values().forEach(instance -> instance.reset(server, serverPlayer)));
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.everything.success"), true);
         return 1;
     }
@@ -118,7 +118,7 @@ public class StratagemCommands
     {
         //stratagem reset
         var stratagemData = serverPlayer.getPlayerStratagems().get(stratagemHolder);
-        stratagemData.reset(serverPlayer);
+        stratagemData.reset(source.getServer(), serverPlayer);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.success", serverPlayer.getName()), true);
         return 1;
     }
@@ -158,7 +158,7 @@ public class StratagemCommands
         //stratagem use stratagems:tnt
         //stratagem use stratagems:tnt_rearm
         var stratagemData = serverPlayer.getPlayerStratagems().get(stratagemHolder);
-        stratagemData.use(serverPlayer);
+        stratagemData.use(source.getServer(), serverPlayer);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.use.player.success", stratagemHolder.value().name(), serverPlayer.getName()), true);
         return 1;
     }
