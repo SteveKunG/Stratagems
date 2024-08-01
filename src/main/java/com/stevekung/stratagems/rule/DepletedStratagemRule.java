@@ -1,6 +1,7 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemInstanceContext;
@@ -29,12 +30,31 @@ public class DepletedStratagemRule implements StratagemRule
     @Override
     public void onUse(StratagemInstanceContext context)
     {
-        if (context.instance().remainingUse > 0)
+        var instance = context.instance();
+
+        if (instance.remainingUse > 0)
         {
             // Set state from READY to IN_USE
-            context.instance().state = StratagemState.IN_USE;
-            context.instance().remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", context.instance().stratagem().name().getString(), context.instance().remainingUse);
+            instance.state = StratagemState.IN_USE;
+            instance.remainingUse--;
+            LOGGER.info("{} stratagem has remainingUse: {}", instance.stratagem().name().getString(), instance.remainingUse);
+        }
+
+        // Add replenisher stratagem when remaining use is 0
+        if (instance.remainingUse < instance.stratagem().properties().remainingUse().get() && instance.stratagem().properties().replenish().isPresent() && instance.stratagem().properties().replenish().get().replenisher().isPresent())
+        {
+            if (context.player().isPresent())
+            {
+                var replenisher = context.player().get().level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
+                context.player().get().getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher));
+                LOGGER.info("Add {} replenisher stratagem to {}", replenisher.value().name().getString(), context.player().get().getName().getString());
+            }
+            if (context.minecraftServer().isPresent())
+            {
+                var replenisher = context.minecraftServer().get().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
+                context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher));
+                LOGGER.info("Add {} server replenisher stratagem", replenisher.value().name().getString());
+            }
         }
     }
 
@@ -78,23 +98,6 @@ public class DepletedStratagemRule implements StratagemRule
                     {
                         instance.state = StratagemState.DEPLETED;
                         LOGGER.info("{} stratagem is now depleted!", instance.stratagem().name().getString());
-
-                        // Add replenisher stratagem when remaining use is 0
-                        if (instance.stratagem().properties().replenish().isPresent() && instance.stratagem().properties().replenish().get().replenisher().isPresent())
-                        {
-                            if (context.player().isPresent())
-                            {
-                                var replenisher = player.level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
-                                player.getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher));
-                                LOGGER.info("Add {} replenisher stratagem to {}", replenisher.value().name().getString(), player.getName().getString());
-                            }
-                            if (context.minecraftServer().isPresent())
-                            {
-                                var replenisher = context.minecraftServer().get().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
-                                context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher));
-                                LOGGER.info("Add {} server replenisher stratagem", replenisher.value().name().getString());
-                            }
-                        }
                         return;
                     }
                     LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.COOLDOWN);
