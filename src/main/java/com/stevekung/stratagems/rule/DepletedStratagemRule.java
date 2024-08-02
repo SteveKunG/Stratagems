@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.StratagemInstance.Side;
 import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.ModRegistries;
@@ -44,13 +45,13 @@ public class DepletedStratagemRule implements StratagemRule
         // Add replenisher stratagem when remaining use is 0
         if (instance.remainingUse < instance.stratagem().properties().remainingUse().get() && instance.stratagem().properties().replenish().isPresent() && instance.stratagem().properties().replenish().get().replenisher().isPresent())
         {
-            if (context.player().isPresent())
+            if (instance.side == Side.PLAYER && context.player().isPresent())
             {
                 var replenisher = context.player().get().level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
                 context.player().get().getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.PLAYER));
                 LOGGER.info("Add {} replenisher stratagem to {}", replenisher.value().name().getString(), context.player().get().getName().getString());
             }
-            if (context.minecraftServer().isPresent())
+            if (instance.side == Side.SERVER && context.minecraftServer().isPresent())
             {
                 var replenisher = context.minecraftServer().get().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
                 context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.SERVER));

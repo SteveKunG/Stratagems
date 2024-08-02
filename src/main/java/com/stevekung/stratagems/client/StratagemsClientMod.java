@@ -65,20 +65,14 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (player.getUUID().equals(payload.uuid()))
             {
-                if (playerStratagem.isEmpty())
-                {
-                    player.getPlayerStratagems().clear();
-                }
-                else
-                {
-                    LOGGER.info("Add stratagem from packet to {}", context.client().level.getPlayerByUUID(payload.uuid()).getName().getString());
+                LOGGER.info("Add stratagem from packet to {}", context.client().level.getPlayerByUUID(payload.uuid()).getName().getString());
 
-                    playerStratagem.forEach(entry ->
-                    {
-                        var holder = context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
-                        context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
-                    });
-                }
+                player.getPlayerStratagems().clear();
+                playerStratagem.forEach(entry ->
+                {
+                    var holder = context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
+                    context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
+                });
             }
         });
     }
@@ -157,7 +151,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     if (holder.value().properties().needThrow().isPresent() && !holder.value().properties().needThrow().get())
                     {
-                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelectedStratagem().location(), player.getUUID()));
+                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelectedStratagem().location(), instance.side, player.getUUID()));
                         LOGGER.info("Select replenish {}", holder.unwrapKey().orElseThrow().location());
                         manager.clearTempStratagemCode();
                         manager.clearStratagemCode();

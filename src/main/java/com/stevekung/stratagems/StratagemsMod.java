@@ -4,9 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.mojang.logging.LogUtils;
+import com.stevekung.stratagems.StratagemInstance.Side;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
@@ -25,6 +24,7 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Registry;
@@ -70,15 +70,19 @@ public class StratagemsMod implements ModInitializer
         {
             var player = context.server().getPlayerList().getPlayer(payload.uuid());
             var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()));
-            ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), context.server().overworld().getServerStratagemData().getStratagemInstances())).stream().filter(entry -> entry.getStratagem() == holder).findFirst().get().use(context.server(), player);
 
-            for (var entry : ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), context.server().overworld().getServerStratagemData().getStratagemInstances())))
+            if (payload.side() == Side.PLAYER)
             {
-                if (entry.getStratagem() == holder)
-                {
-                    entry.use(context.server(), player);
-                    System.out.println(entry.getStratagem());
-                }
+                player.getPlayerStratagems().get(holder).use(context.server(), player);
+            }
+            else
+            {
+                context.server().overworld().getServerStratagemData().use(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()), player);
+            }
+
+            for (var serverPlayer : PlayerLookup.all(context.server()))
+            {
+                ServerPlayNetworking.send(serverPlayer, UpdateStratagemsPacket.create(context.server().overworld().getServerStratagemData().getStratagemInstances(), List.copyOf(serverPlayer.getPlayerStratagems().values()), serverPlayer.getUUID()));
             }
         });
 

@@ -1,8 +1,10 @@
 package com.stevekung.stratagems.rule;
 
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import com.stevekung.stratagems.StratagemInstance.Side;
 import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
@@ -29,13 +31,13 @@ public class ReplenishStratagemRule implements StratagemRule
     {
         var instance = context.instance();
         var player = context.player().orElse(null);
-        var stratagemData = player.getPlayerStratagems();
+        var stratagemData = instance.side == Side.PLAYER ? player.getPlayerStratagems().values() : context.minecraftServer().get().overworld().getServerStratagemData().getStratagemInstances();
         var rearmProperties = instance.stratagem().properties();
         var count = 0;
 
         if (rearmProperties.replenish().isPresent() && rearmProperties.replenish().get().toReplenish().isPresent())
         {
-            for (var toReplenishinstance : stratagemData.values().stream().filter(toReplenishinstance -> rearmProperties.replenish().get().toReplenish().get().contains(toReplenishinstance.getStratagem())).toList())
+            for (var toReplenishinstance : stratagemData.stream().filter(toReplenishinstance -> rearmProperties.replenish().get().toReplenish().get().contains(toReplenishinstance.getStratagem())).toList())
             {
                 toReplenishinstance.state = StratagemState.COOLDOWN;
 
@@ -58,7 +60,15 @@ public class ReplenishStratagemRule implements StratagemRule
                 LOGGER.info("Replenished {} stratagem!", toReplenishinstance.stratagem().name().getString());
 
                 // Remove this rearm stratagem
-                stratagemData.remove(instance.getStratagem());
+                if (instance.side == Side.PLAYER)
+                {
+                    player.getPlayerStratagems().remove(instance.getStratagem());
+                }
+                else
+                {
+                    context.minecraftServer().get().overworld().getServerStratagemData().remove(instance.getStratagem());
+                }
+
                 LOGGER.info("Remove {} replenisher stratagem!", instance.stratagem().name().getString());
                 count++;
             }
@@ -79,8 +89,7 @@ public class ReplenishStratagemRule implements StratagemRule
 
     @Override
     public void tick(StratagemInstanceContext context)
-    {
-    }
+    {}
 
     public static Builder defaultRule()
     {
