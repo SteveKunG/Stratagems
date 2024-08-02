@@ -43,12 +43,12 @@ public class Stratagems
 
     static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, StratagemRule.Builder rule, StratagemProperties properties)
     {
-        context.register(key, new Stratagem(key, code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), rule.build(), properties));
+        context.register(key, new Stratagem(code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), rule.build(), properties));
     }
 
     static void register(BootstrapContext<Stratagem> context, ResourceKey<Stratagem> key, String code, ItemStack icon, StratagemAction.Builder action, StratagemProperties properties)
     {
-        context.register(key, new Stratagem(key, code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), DefaultStratagemRule.defaultRule().build(), properties));
+        context.register(key, new Stratagem(code, Component.translatable(key.location().toLanguageKey("stratagem")), Either.left(icon), action.build(), DefaultStratagemRule.defaultRule().build(), properties));
     }
 
     private static ResourceKey<Stratagem> createKey(String name)

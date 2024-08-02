@@ -1,19 +1,33 @@
 package com.stevekung.stratagems.datagen;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.common.collect.Lists;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
+
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.JsonKeySortOrderCallback;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
+import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 
 public class StratagemDataGenerator implements DataGeneratorEntrypoint
 {
+    private static final List<String> SORT_ORDERS = Util.make(Lists.newLinkedList(), list ->
+    {
+        list.add("code");
+        list.add("name");
+        list.add("action");
+        list.add("rule");
+        list.add("properties");
+        list.add("icon");
+    });
+
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator dataGenerator)
     {
@@ -25,12 +39,10 @@ public class StratagemDataGenerator implements DataGeneratorEntrypoint
     @Override
     public void addJsonKeySortOrders(JsonKeySortOrderCallback callback)
     {
-        callback.add("stratagem_id", 0);
-        callback.add("code", 1);
-        callback.add("name", 2);
-        callback.add("action", 3);
-        callback.add("properties", 4);
-        callback.add("icon", 5);
+        for (var i = 0; i < SORT_ORDERS.size(); i++)
+        {
+            callback.add(SORT_ORDERS.get(i), i);
+        }
     }
 
     @Override

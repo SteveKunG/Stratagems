@@ -1,11 +1,7 @@
 {
-  "stratagem_id": "stratagems:iron_sword",
   "code": "saswd",
   "name": {
     "translate": "stratagem.stratagems.iron_sword"
-  },
-  "rule": {
-    "type": "stratagems:default"
   },
   "action": {
     "type": "stratagems:spawn_item",
@@ -13,6 +9,9 @@
       "count": 1,
       "id": "minecraft:iron_sword"
     }
+  },
+  "rule": {
+    "type": "stratagems:default"
   },
   "properties": {
     "beam_color": -9185281,

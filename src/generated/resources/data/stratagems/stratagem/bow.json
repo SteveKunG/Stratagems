@@ -1,11 +1,7 @@
 {
-  "stratagem_id": "stratagems:bow",
   "code": "ssawd",
   "name": {
     "translate": "stratagem.stratagems.bow"
-  },
-  "rule": {
-    "type": "stratagems:default"
   },
   "action": {
     "type": "stratagems:spawn_item",
@@ -17,6 +13,9 @@
       "count": 64,
       "id": "minecraft:arrow"
     }
+  },
+  "rule": {
+    "type": "stratagems:default"
   },
   "properties": {
     "beam_color": -9185281,

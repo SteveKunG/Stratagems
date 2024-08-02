@@ -133,12 +133,12 @@ public class StratagemsClientMod implements ClientModInitializer
                     var holder = StratagemUtils.getStratagemFromCode(tempStratagemCode, player);
 
                     manager.setSelectedStratagemCode(tempStratagemCode);
-                    manager.setSelectedStratagem(holder.value().id());
+                    manager.setSelectedStratagem(holder.unwrapKey().orElseThrow());
 
                     if (holder.value().properties().needThrow().isPresent() && !holder.value().properties().needThrow().get())
                     {
                         ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelectedStratagem().location(), player.getUUID()));
-                        LOGGER.info("Select replenish {}", holder.value().id().location());
+                        LOGGER.info("Select replenish {}", holder.unwrapKey().orElseThrow().location());
                         manager.clearTempStratagemCode();
                         manager.clearStratagemCode();
                         manager.setMenuOpen(false);

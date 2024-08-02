@@ -1,17 +1,20 @@
 package com.stevekung.stratagems;
 
+import java.util.Optional;
+
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.rule.StratagemRule;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
@@ -20,27 +23,16 @@ import net.minecraft.world.level.Level;
 public class StratagemInstance
 {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public static final Codec<StratagemInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Stratagem.CODEC.fieldOf(ModConstants.Tag.STRATAGEM).forGetter(StratagemInstance::getStratagem),
-            Codec.INT.fieldOf(ModConstants.Tag.INBOUND_DURATION).forGetter(StratagemInstance::getInboundDuration),
-            Codec.INT.fieldOf(ModConstants.Tag.DURATION).forGetter(StratagemInstance::getDuration),
-            Codec.INT.fieldOf(ModConstants.Tag.COOLDOWN).forGetter(StratagemInstance::getCooldown),
-            Codec.INT.fieldOf(ModConstants.Tag.REMAINING_USE).forGetter(StratagemInstance::getRemainingUse),
-            StratagemState.CODEC.fieldOf(ModConstants.Tag.STATE).forGetter(StratagemInstance::getState)
-    ).apply(instance, StratagemInstance::new));
-
     private final Holder<Stratagem> stratagem;
-    private final ResourceKey<Stratagem> stratagemResourceKey;
     public int inboundDuration;
     public Integer duration;
     public int cooldown;
     public Integer remainingUse;
     public StratagemState state;
 
-    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state)
+    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, Integer duration, int cooldown, Integer remainingUse, StratagemState state)
     {
         this.stratagem = stratagem;
-        this.stratagemResourceKey = stratagem.value().id();
         this.inboundDuration = inboundDuration;
         this.duration = duration;
         this.cooldown = cooldown;
@@ -48,23 +40,64 @@ public class StratagemInstance
         this.state = state;
     }
 
-    public Tag save()
+    public void save(CompoundTag compoundTag)
     {
-        return CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
+        if (this.inboundDuration > 0)
+        {
+            compoundTag.putInt(ModConstants.Tag.INBOUND_DURATION, this.inboundDuration);
+        }
+
+        if (this.duration != null)
+        {
+            compoundTag.putInt(ModConstants.Tag.DURATION, this.duration);
+        }
+
+        compoundTag.putInt(ModConstants.Tag.COOLDOWN, this.cooldown);
+
+        if (this.remainingUse != null)
+        {
+            compoundTag.putInt(ModConstants.Tag.REMAINING_USE, this.remainingUse);
+        }
+
+        this.stratagem.unwrapKey().ifPresent(resourceKey -> compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString()));
+        compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
     }
 
-    @Nullable
-    public static StratagemInstance load(CompoundTag nbt)
+    public static StratagemInstance load(CompoundTag compoundTag, Level level)
     {
-        return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(LOGGER::error).orElse(null);
+        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
+        var inboundDuration = 0;
+        Integer duration = null;
+        var cooldown = 0;
+        Integer remainingUse = null;
+        var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
+
+        if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
+        {
+            inboundDuration = compoundTag.getInt(ModConstants.Tag.INBOUND_DURATION);
+        }
+
+        if (compoundTag.contains(ModConstants.Tag.DURATION, Tag.TAG_INT))
+        {
+            duration = compoundTag.getInt(ModConstants.Tag.DURATION);
+        }
+
+        cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
+
+        if (compoundTag.contains(ModConstants.Tag.REMAINING_USE, Tag.TAG_INT))
+        {
+            remainingUse = compoundTag.getInt(ModConstants.Tag.REMAINING_USE);
+        }
+
+        return new StratagemInstance(stratagem, inboundDuration, duration, cooldown, remainingUse, state);
     }
 
     public void resetStratagemTicks(StratagemProperties properties)
     {
         this.inboundDuration = properties.inboundDuration();
-        this.duration = properties.duration().orElse(-1);
+        this.duration = properties.duration().orElse(null);
         this.cooldown = properties.cooldown();
-        this.remainingUse = properties.remainingUse().orElse(-1);
+        this.remainingUse = properties.remainingUse().orElse(null);
     }
 
     public Holder<Stratagem> getStratagem()
@@ -134,7 +167,7 @@ public class StratagemInstance
 
     public ResourceKey<Stratagem> getResourceKey()
     {
-        return this.stratagemResourceKey;
+        return this.stratagem.unwrapKey().orElseThrow();
     }
 
     public String formatTickDuration(int duration, Player player)

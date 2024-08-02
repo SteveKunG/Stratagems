@@ -1,13 +1,12 @@
 {
-  "stratagem_id": "stratagems:reinforce",
   "code": "wsdaw",
   "name": {
     "translate": "stratagem.stratagems.reinforce"
   },
-  "rule": {
+  "action": {
     "type": "stratagems:reinforce"
   },
-  "action": {
+  "rule": {
     "type": "stratagems:reinforce"
   },
   "properties": {

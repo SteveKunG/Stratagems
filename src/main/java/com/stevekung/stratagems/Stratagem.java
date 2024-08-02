@@ -18,15 +18,13 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFileCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 
-public record Stratagem(ResourceKey<Stratagem> id, String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, StratagemRule rule, StratagemProperties properties)
+public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, StratagemRule rule, StratagemProperties properties)
 {
     public static final Codec<Stratagem> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceKey.codec(ModRegistries.STRATAGEM).fieldOf("stratagem_id").forGetter(Stratagem::id),
             ExtraCodecs.NON_EMPTY_STRING.validate(Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
             ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
             Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),

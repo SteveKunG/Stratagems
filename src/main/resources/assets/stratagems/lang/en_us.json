@@ -14,17 +14,20 @@
   "stratagem.menu.tminus": "T-",
   "commands.stratagem.add.player.success": "Add %s stratagem to %s successfully",
   "commands.stratagem.add.server.success": "Add %s stratagem to server successfully",
-  "commands.stratagem.add.failed": "Failed to add Stratagem because already exists!",
+  "commands.stratagem.add.player.failed": "Failed to add a stratagem to player because it already exists!",
+  "commands.stratagem.add.server.failed": "Failed to add a stratagem to the server because it already exists!",
   "commands.stratagem.list.player": "%s's Stratagems list: %s",
   "commands.stratagem.list.server": "Server Stratagems list: %s",
+  "commands.stratagem.list.server.empty": "Server has empty stratagem!",
   "commands.stratagem.use.server.success": "Used %s Server Stratagem",
   "commands.stratagem.use.player.success": "Used %s %s's Stratagem",
+  "commands.stratagem.use.player.specific.failed": "Cannot use a stratagem from the player because it doesn't exists",
+  "commands.stratagem.use.server.specific.failed": "Cannot use a stratagem from the server because it doesn't exists",
   "commands.stratagem.reset.everything.success": "All Stratagems have been reset",
   "commands.stratagem.reset.server.success": "Server %s Stratagem have been reset",
   "commands.stratagem.reset.player.success": "%s's Stratagems have been reset",
   "commands.stratagem.remove.everything.success": "All stratagems has been removed",
-  "commands.stratagem.remove.contains_default.failed": "Failed to clear stratagems because it contains only default stratagems!",
   "commands.stratagem.remove.player.specific.success": "Remove %s stratagem from %s successfully",
   "commands.stratagem.remove.server.specific.success": "Remove %s stratagem from server successfully",
-  "commands.stratagem.remove.specific.failed": "Failed to clear specific stratagem!"
+  "commands.stratagem.remove.server.specific.failed": "Failed to remove a stratagem from the server!"
 }

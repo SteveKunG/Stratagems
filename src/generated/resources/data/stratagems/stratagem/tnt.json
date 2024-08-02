@@ -1,15 +1,14 @@
 {
-  "stratagem_id": "stratagems:tnt",
   "code": "swaswdsw",
   "name": {
     "translate": "stratagem.stratagems.tnt"
   },
-  "rule": {
-    "type": "stratagems:depleted"
-  },
   "action": {
     "type": "stratagems:spawn_bomb",
     "fuse": 40
+  },
+  "rule": {
+    "type": "stratagems:depleted"
   },
   "properties": {
     "beam_color": -50116,

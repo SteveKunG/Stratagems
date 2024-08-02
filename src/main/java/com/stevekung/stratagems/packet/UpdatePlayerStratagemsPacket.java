@@ -34,6 +34,6 @@ public record UpdatePlayerStratagemsPacket(List<UpdateServerStratagemsPacket.Str
 
     public static UpdatePlayerStratagemsPacket mapInstanceToEntry(List<StratagemInstance> instances, UUID uuid)
     {
-        return new UpdatePlayerStratagemsPacket(instances.stream().map(instance -> new UpdateServerStratagemsPacket.StratagemEntryData(instance.getStratagem().value().id(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state)).toList(), uuid);
+        return new UpdatePlayerStratagemsPacket(instances.stream().map(instance -> new UpdateServerStratagemsPacket.StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state)).toList(), uuid);
     }
 }

@@ -1,17 +1,13 @@
 package com.stevekung.stratagems;
 
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
+
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.registry.ModRegistries;
-import com.stevekung.stratagems.registry.Stratagems;
 import com.stevekung.stratagems.util.CustomDataFixTypes;
-import com.stevekung.stratagems.util.StratagemUtils;
-import net.minecraft.Util;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -29,13 +25,6 @@ public class ServerStratagemsData extends SavedData
     private final List<StratagemInstance> stratagemInstances = Lists.newCopyOnWriteArrayList();
     private final ServerLevel level;
     private int tick;
-
-    public static final Set<ResourceKey<Stratagem>> DEFAULT_STRATAGEMS = Util.make(Sets.newLinkedHashSet(), set ->
-    {
-        set.add(Stratagems.REINFORCE);
-        set.add(Stratagems.SUPPLY_CHEST);
-        set.add(Stratagems.BLOCK);
-    });
 
     public static SavedData.Factory<ServerStratagemsData> factory(ServerLevel level)
     {
@@ -61,7 +50,7 @@ public class ServerStratagemsData extends SavedData
 
     public void use(ResourceKey<Stratagem> resourceKey, Player player)
     {
-        this.stratagemInstances.stream().filter(entry -> entry.getStratagem().value().id().equals(resourceKey)).findFirst().ifPresent(entry ->
+        this.stratagemInstances.stream().filter(entry -> entry.getStratagem().unwrapKey().orElseThrow().equals(resourceKey)).findFirst().ifPresent(entry ->
         {
             if (entry.canUse(this.level.getServer(), player))
             {
@@ -87,12 +76,8 @@ public class ServerStratagemsData extends SavedData
             for (var i = 0; i < listTag.size(); i++)
             {
                 var compoundTag = listTag.getCompound(i);
-                var stratagemInstance = StratagemInstance.load(compoundTag);
-
-                if (stratagemInstance != null)
-                {
-                    stratagems.stratagemInstances.add(stratagemInstance);
-                }
+                var stratagemInstance = StratagemInstance.load(compoundTag, level);
+                stratagems.stratagemInstances.add(stratagemInstance);
             }
         }
 
@@ -104,24 +89,16 @@ public class ServerStratagemsData extends SavedData
     {
         var listTag = new ListTag();
 
-        if (this.stratagemInstances.isEmpty())
-        {
-            this.addDefaultStratagems(provider);
-        }
-
         for (var stratagemInstance : this.stratagemInstances)
         {
-            listTag.add(stratagemInstance.save());
+            var compoundTag = new CompoundTag();
+            stratagemInstance.save(compoundTag);
+            listTag.add(compoundTag);
         }
 
         tag.put(ModConstants.Tag.STRATAGEMS, listTag);
         tag.putInt(ModConstants.Tag.TICK, this.tick);
         return tag;
-    }
-
-    private void addDefaultStratagems(HolderLookup.Provider provider)
-    {
-        DEFAULT_STRATAGEMS.forEach(resourceKey -> this.stratagemInstances.add(StratagemUtils.createInstanceWithDefaultValue(provider.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey))));
     }
 
     public void add(StratagemInstance instance)
@@ -142,7 +119,6 @@ public class ServerStratagemsData extends SavedData
     public void clear()
     {
         this.stratagemInstances.clear();
-        this.addDefaultStratagems(this.level.registryAccess());
     }
 
     public List<StratagemInstance> getStratagemInstances()

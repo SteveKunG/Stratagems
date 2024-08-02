@@ -37,7 +37,7 @@ public record UpdateServerStratagemsPacket(List<StratagemEntryData> entries) imp
 
     public static UpdateServerStratagemsPacket mapInstanceToEntry(List<StratagemInstance> instances)
     {
-        return new UpdateServerStratagemsPacket(instances.stream().map(instance -> new StratagemEntryData(instance.getStratagem().value().id(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state)).toList());
+        return new UpdateServerStratagemsPacket(instances.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state)).toList());
     }
 
     public static List<StratagemInstance> mapEntryToInstance(List<StratagemEntryData> entries, RegistryAccess registryAccess)

@@ -47,7 +47,9 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
 
             for (var stratagemInstance : this.stratagems.values())
             {
-                listTag.add(stratagemInstance.save());
+                var compoundTag = new CompoundTag();
+                stratagemInstance.save(compoundTag);
+                listTag.add(compoundTag);
             }
 
             compound.put(ModConstants.Tag.STRATAGEMS, listTag);
@@ -64,12 +66,8 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
             for (var i = 0; i < listTag.size(); i++)
             {
                 var compoundTag = listTag.getCompound(i);
-                var stratagemInstance = StratagemInstance.load(compoundTag);
-
-                if (stratagemInstance != null)
-                {
-                    this.stratagems.put(stratagemInstance.getStratagem(), stratagemInstance);
-                }
+                var stratagemInstance = StratagemInstance.load(compoundTag, this.level());
+                this.stratagems.put(stratagemInstance.getStratagem(), stratagemInstance);
             }
         }
     }

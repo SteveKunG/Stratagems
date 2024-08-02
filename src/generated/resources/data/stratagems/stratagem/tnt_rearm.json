@@ -1,14 +1,13 @@
 {
-  "stratagem_id": "stratagems:tnt_rearm",
   "code": "wwawd",
   "name": {
     "translate": "stratagem.stratagems.tnt_rearm"
   },
-  "rule": {
-    "type": "stratagems:replenish"
-  },
   "action": {
     "type": "stratagems:reinforce"
+  },
+  "rule": {
+    "type": "stratagems:replenish"
   },
   "properties": {
     "beam_color": 0,
