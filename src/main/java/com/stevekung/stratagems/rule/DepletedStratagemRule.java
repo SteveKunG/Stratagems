@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.ModRegistries;
@@ -46,13 +47,13 @@ public class DepletedStratagemRule implements StratagemRule
             if (context.player().isPresent())
             {
                 var replenisher = context.player().get().level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
-                context.player().get().getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher));
+                context.player().get().getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.PLAYER));
                 LOGGER.info("Add {} replenisher stratagem to {}", replenisher.value().name().getString(), context.player().get().getName().getString());
             }
             if (context.minecraftServer().isPresent())
             {
                 var replenisher = context.minecraftServer().get().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
-                context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher));
+                context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.SERVER));
                 LOGGER.info("Add {} server replenisher stratagem", replenisher.value().name().getString());
             }
         }

@@ -59,7 +59,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 payload.entries().forEach(entry ->
                 {
                     var holder = context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
-                    context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state()));
+                    context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
                 });
             }
         });

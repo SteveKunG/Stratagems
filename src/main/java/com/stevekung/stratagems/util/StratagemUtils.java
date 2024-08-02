@@ -67,9 +67,9 @@ public class StratagemUtils
         return compoundTag;
     }
 
-    public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> stratagemHolder)
+    public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> stratagemHolder, StratagemInstance.Side side)
     {
         var properties = stratagemHolder.value().properties();
-        return new StratagemInstance(stratagemHolder, properties.inboundDuration(), properties.duration().orElse(null), properties.cooldown(), properties.remainingUse().orElse(null), StratagemState.READY);
+        return new StratagemInstance(stratagemHolder, properties.inboundDuration(), properties.duration().orElse(null), properties.cooldown(), properties.remainingUse().orElse(null), StratagemState.READY, side);
     }
 }

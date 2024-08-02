@@ -6,6 +6,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.Stratagem;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.util.StratagemUtils;
@@ -240,7 +241,7 @@ public class StratagemCommands
         }
         else
         {
-            stratagemData.add(StratagemUtils.createInstanceWithDefaultValue(stratagemHolder));
+            stratagemData.add(StratagemUtils.createInstanceWithDefaultValue(stratagemHolder, StratagemInstance.Side.SERVER));
             sendPacket(source);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.server.success", stratagem.name()), true);
             return 1;
@@ -263,7 +264,7 @@ public class StratagemCommands
         }
         else
         {
-            stratagemData.put(stratagemHolder, StratagemUtils.createInstanceWithDefaultValue(stratagemHolder));
+            stratagemData.put(stratagemHolder, StratagemUtils.createInstanceWithDefaultValue(stratagemHolder, StratagemInstance.Side.PLAYER));
             sendPacket(serverPlayer);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.player.success", serverPlayer.getName(), stratagem.name()), true);
             return 1;

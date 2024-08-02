@@ -37,19 +37,19 @@ public record UpdateServerStratagemsPacket(List<StratagemEntryData> entries) imp
 
     public static UpdateServerStratagemsPacket mapInstanceToEntry(List<StratagemInstance> instances)
     {
-        return new UpdateServerStratagemsPacket(instances.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state)).toList());
+        return new UpdateServerStratagemsPacket(instances.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side)).toList());
     }
 
     public static List<StratagemInstance> mapEntryToInstance(List<StratagemEntryData> entries, RegistryAccess registryAccess)
     {
-        return entries.stream().map(entry -> new StratagemInstance(registryAccess.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state())).toList();
+        return entries.stream().map(entry -> new StratagemInstance(registryAccess.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())).toList();
     }
 
-    public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state)
+    public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, StratagemInstance.Side side)
     {
         public StratagemEntryData(FriendlyByteBuf buffer)
         {
-            this(buffer.readResourceKey(ModRegistries.STRATAGEM), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readEnum(StratagemState.class));
+            this(buffer.readResourceKey(ModRegistries.STRATAGEM), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readEnum(StratagemState.class), buffer.readEnum(StratagemInstance.Side.class));
         }
 
         public void write(FriendlyByteBuf buffer)
@@ -60,6 +60,7 @@ public record UpdateServerStratagemsPacket(List<StratagemEntryData> entries) imp
             buffer.writeInt(this.cooldown);
             buffer.writeInt(this.remainingUse);
             buffer.writeEnum(this.state);
+            buffer.writeEnum(this.side);
         }
     }
 }

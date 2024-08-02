@@ -57,5 +57,6 @@ public interface ModConstants
         String COOLDOWN = "cooldown";
         String REMAINING_USE = "remaining_use";
         String STATE = "state";
+        String SIDE = "side";
     }
 }

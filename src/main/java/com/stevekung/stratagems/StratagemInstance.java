@@ -1,5 +1,6 @@
 package com.stevekung.stratagems;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +30,9 @@ public class StratagemInstance
     public int cooldown;
     public Integer remainingUse;
     public StratagemState state;
+    public Side side;
 
-    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, Integer duration, int cooldown, Integer remainingUse, StratagemState state)
+    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, Integer duration, int cooldown, Integer remainingUse, StratagemState state, Side side)
     {
         this.stratagem = stratagem;
         this.inboundDuration = inboundDuration;
@@ -38,6 +40,7 @@ public class StratagemInstance
         this.cooldown = cooldown;
         this.remainingUse = remainingUse;
         this.state = state;
+        this.side = side;
     }
 
     public void save(CompoundTag compoundTag)
@@ -61,6 +64,7 @@ public class StratagemInstance
 
         this.stratagem.unwrapKey().ifPresent(resourceKey -> compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString()));
         compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
+        compoundTag.putString(ModConstants.Tag.SIDE, this.side.getName());
     }
 
     public static StratagemInstance load(CompoundTag compoundTag, Level level)
@@ -71,6 +75,7 @@ public class StratagemInstance
         var cooldown = 0;
         Integer remainingUse = null;
         var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
+        var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
 
         if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
         {
@@ -89,7 +94,7 @@ public class StratagemInstance
             remainingUse = compoundTag.getInt(ModConstants.Tag.REMAINING_USE);
         }
 
-        return new StratagemInstance(stratagem, inboundDuration, duration, cooldown, remainingUse, state);
+        return new StratagemInstance(stratagem, inboundDuration, duration, cooldown, remainingUse, state, side);
     }
 
     public void resetStratagemTicks(StratagemProperties properties)
@@ -187,5 +192,30 @@ public class StratagemInstance
     public boolean isReady()
     {
         return this.state == StratagemState.READY;
+    }
+
+    public enum Side
+    {
+        PLAYER,
+        SERVER;
+
+        private static final Side[] VALUES = values();
+
+        public static Side byName(String name)
+        {
+            for (var state : VALUES)
+            {
+                if (name.equalsIgnoreCase(state.name()))
+                {
+                    return state;
+                }
+            }
+            return SERVER;
+        }
+
+        public String getName()
+        {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 }
