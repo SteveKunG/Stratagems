@@ -6,8 +6,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.ServerStratagemsData;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
-import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateStratagemsPacket.StratagemEntryData;
+import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.util.StratagemUtils;
 
@@ -278,6 +277,6 @@ public class StratagemCommands
 
     private static void sendPacket(ServerPlayer serverPlayer)
     {
-        ServerPlayNetworking.send(serverPlayer, new UpdateStratagemsPacket(serverPlayer.serverLevel().getServerStratagemData().getStratagemInstances().stream().map(t -> new StratagemEntryData(t.getStratagem().value().id(), t.inboundDuration, t.duration, t.cooldown, t.remainingUse, t.state)).toList()));
+        ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.mapInstanceToEntry(serverPlayer.serverLevel().getServerStratagemData().getStratagemInstances()));
     }
 }
