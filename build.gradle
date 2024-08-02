@@ -17,6 +17,14 @@ loom {
                 property "devauth.configDir", "${devauth_dir}"
             }
         }
+        client_mccommanderz {
+            client()
+
+            if (project.hasProperty("devauth_dir")) {
+                property "devauth.configDir", "${devauth_dir}"
+                property "devauth.account", "mccommanderz"
+            }
+        }
         datagen {
             server()
             name "Fabric Data Generation"

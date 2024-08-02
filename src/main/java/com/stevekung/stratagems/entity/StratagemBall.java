@@ -1,13 +1,16 @@
 package com.stevekung.stratagems.entity;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.stevekung.stratagems.Stratagem;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.action.StratagemActionContext;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
 import com.stevekung.stratagems.registry.*;
 
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -30,6 +33,7 @@ import net.minecraft.world.phys.HitResult;
 public class StratagemBall extends ThrowableItemProjectile implements VariantHolder<Holder<Stratagem>>
 {
     private static final EntityDataAccessor<Holder<Stratagem>> DATA_STRATAGEM = SynchedEntityData.defineId(StratagemBall.class, ModEntityDataSerializers.STRATAGEM);
+    private static final EntityDataAccessor<StratagemInstance.Side> DATA_STRATAGEM_SIDE = SynchedEntityData.defineId(StratagemBall.class, ModEntityDataSerializers.STRATAGEM_SIDE);
 
     public StratagemBall(EntityType<? extends StratagemBall> entityType, Level level)
     {
@@ -52,6 +56,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
         super.defineSynchedData(builder);
         var registry = this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM);
         builder.define(DATA_STRATAGEM, registry.getHolder(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
+        builder.define(DATA_STRATAGEM_SIDE, StratagemInstance.Side.SERVER);
     }
 
     @Override
@@ -64,6 +69,16 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
     public void setVariant(Holder<Stratagem> variant)
     {
         this.entityData.set(DATA_STRATAGEM, variant);
+    }
+
+    public StratagemInstance.Side getSide()
+    {
+        return this.entityData.get(DATA_STRATAGEM_SIDE);
+    }
+
+    public void setSide(StratagemInstance.Side state)
+    {
+        this.entityData.set(DATA_STRATAGEM_SIDE, state);
     }
 
     @Override
@@ -110,10 +125,29 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {
                 var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
-                var stratagemsData = serverLevel.getServer().overworld().getServerStratagemData();
-                this.getVariant().value().action().action(stratagemContext);
-                stratagemsData.use(this.getVariant().unwrapKey().orElseThrow(), serverPlayer);
-                ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.mapInstanceToEntry(stratagemsData.getStratagemInstances()));
+                var serverStratagem = serverLevel.getServer().overworld().getServerStratagemData();
+                var playerStratagem = serverPlayer.getPlayerStratagems().get(this.getVariant());
+
+                if (this.getSide() == StratagemInstance.Side.SERVER)
+                {
+                    this.getVariant().value().action().action(stratagemContext);
+                    serverStratagem.use(this.getVariant().unwrapKey().orElseThrow(), serverPlayer);
+                }
+                else
+                {
+                    if (playerStratagem == null)
+                    {
+                        return;
+                    }
+
+                    this.getVariant().value().action().action(stratagemContext);
+                    playerStratagem.use(getServer(), serverPlayer);
+                }
+
+                for (var player : PlayerLookup.all(this.getServer()))
+                {
+                    ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(serverStratagem.getStratagemInstances(), List.copyOf(serverPlayer.getPlayerStratagems().values()), player.getUUID()));
+                }
             }
             else
             {

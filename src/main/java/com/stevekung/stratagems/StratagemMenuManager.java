@@ -14,6 +14,7 @@ public class StratagemMenuManager
     private String tempStratagemCode = "";
     private String selectedStratagemCode;
     private ResourceKey<Stratagem> selectedStratagem;
+    private StratagemInstance.Side side;
 
     private final Minecraft minecraft;
 
@@ -76,6 +77,7 @@ public class StratagemMenuManager
     {
         this.selectedStratagemCode = null;
         this.selectedStratagem = null;
+        this.side = null;
         this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
     }
 
@@ -92,5 +94,15 @@ public class StratagemMenuManager
     public void setSelectedStratagem(ResourceKey<Stratagem> selectedStratagem)
     {
         this.selectedStratagem = selectedStratagem;
+    }
+
+    public StratagemInstance.Side getSide()
+    {
+        return side;
+    }
+
+    public void setSide(StratagemInstance.Side side)
+    {
+        this.side = side;
     }
 }

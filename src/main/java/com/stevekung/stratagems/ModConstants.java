@@ -38,8 +38,7 @@ public interface ModConstants
     {
         ResourceLocation SPAWN_STRATAGEM = StratagemsMod.id("spawn_stratagem");
         ResourceLocation USE_REPLENISH_STRATAGEM = StratagemsMod.id("use_replenish_stratagem");
-        ResourceLocation UPDATE_SERVER_STRATAGEMS = StratagemsMod.id("update_server_stratagems");
-        ResourceLocation UPDATE_PLAYER_STRATAGEMS = StratagemsMod.id("update_player_stratagems");
+        ResourceLocation UPDATE_STRATAGEMS = StratagemsMod.id("update_stratagems");
     }
 
     interface StratagemTag

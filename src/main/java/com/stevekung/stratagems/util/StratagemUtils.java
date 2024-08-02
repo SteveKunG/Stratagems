@@ -5,13 +5,15 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemState;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
 
 public class StratagemUtils
@@ -28,9 +30,9 @@ public class StratagemUtils
         return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(null, player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
-    public static Holder<Stratagem> getStratagemFromCode(String tempStratagemCode, Player player)
+    public static StratagemInstance getStratagemFromCode(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get().getStratagem();
+        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get();
     }
 
     public static boolean anyMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
@@ -43,28 +45,14 @@ public class StratagemUtils
         return list.stream().map(StratagemInstance::getStratagem).noneMatch(holder -> holder == stratagemHolder);
     }
 
-    public static CompoundTag createCompoundTagWithDefaultValue(Holder<Stratagem> stratagemHolder)
+    public static Component decorateStratagemName(Component name, Holder<Stratagem> holder)
     {
-        var compoundTag = new CompoundTag();
-        var stratagem = stratagemHolder.value();
-        var properties = stratagem.properties();
-        compoundTag.putString(ModConstants.Tag.STRATAGEM, stratagemHolder.unwrapKey().orElseThrow().location().toString());
-        compoundTag.putInt(ModConstants.Tag.INBOUND_DURATION, properties.inboundDuration());
+        return name.copy().withStyle(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(holder.getRegisteredName()))));
+    }
 
-        if (properties.duration().isPresent())
-        {
-            compoundTag.putInt(ModConstants.Tag.DURATION, properties.duration().get());
-        }
-
-        compoundTag.putInt(ModConstants.Tag.COOLDOWN, properties.cooldown());
-
-        if (properties.remainingUse().isPresent())
-        {
-            compoundTag.putInt(ModConstants.Tag.REMAINING_USE, properties.remainingUse().get());
-        }
-
-        compoundTag.putString(ModConstants.Tag.STATE, StratagemState.READY.getName());
-        return compoundTag;
+    public static Component decorateStratagemList(List<StratagemInstance> instances)
+    {
+        return ComponentUtils.formatList(instances, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
     }
 
     public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> stratagemHolder, StratagemInstance.Side side)

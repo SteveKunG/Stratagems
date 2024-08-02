@@ -11,8 +11,7 @@ import com.stevekung.stratagems.StratagemMenuManager;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
 import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModRegistries;
@@ -45,22 +44,41 @@ public class StratagemsClientMod implements ClientModInitializer
 
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
         HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
-        ClientPlayNetworking.registerGlobalReceiver(UpdateServerStratagemsPacket.TYPE, (payload, context) ->
-        {
-            LOGGER.info("Received server stratagem packet");
-            StratagemUtils.CLIENT_STRATAGEM_LIST = UpdateServerStratagemsPacket.mapEntryToInstance(payload.entries(), context.client().level.registryAccess());
-        });
-        ClientPlayNetworking.registerGlobalReceiver(UpdatePlayerStratagemsPacket.TYPE, (payload, context) ->
-        {
-            if (context.player().getUUID().equals(payload.uuid()))
-            {
-                LOGGER.info("Received player stratagem packet, update to {}", context.client().level.getPlayerByUUID(payload.uuid()));
 
-                payload.entries().forEach(entry ->
+        ClientPlayNetworking.registerGlobalReceiver(UpdateStratagemsPacket.TYPE, (payload, context) ->
+        {
+            var player = context.player();
+            var serverStratagem = payload.serverEntries();
+            var playerStratagem = payload.playerEntries();
+
+            LOGGER.info("Received server stratagem packet");
+
+            if (serverStratagem.isEmpty())
+            {
+                StratagemUtils.CLIENT_STRATAGEM_LIST.clear();
+                LOGGER.info("Remove all server stratagems");
+            }
+            else
+            {
+                StratagemUtils.CLIENT_STRATAGEM_LIST = UpdateStratagemsPacket.mapEntryToInstance(serverStratagem, context.client().level.registryAccess());
+            }
+
+            if (player.getUUID().equals(payload.uuid()))
+            {
+                if (playerStratagem.isEmpty())
                 {
-                    var holder = context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
-                    context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
-                });
+                    player.getPlayerStratagems().clear();
+                }
+                else
+                {
+                    LOGGER.info("Add stratagem from packet to {}", context.client().level.getPlayerByUUID(payload.uuid()).getName().getString());
+
+                    playerStratagem.forEach(entry ->
+                    {
+                        var holder = context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
+                        context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
+                    });
+                }
             }
         });
     }
@@ -77,7 +95,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         minecraft.getProfiler().push("stratagemClient");
 
-        if (level.tickRateManager().runsNormally())
+        if (!minecraft.isPaused() && level.tickRateManager().runsNormally())
         {
             StratagemUtils.CLIENT_STRATAGEM_LIST.forEach(t -> t.tick(null, player));
         }
@@ -130,8 +148,10 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
                 if (StratagemUtils.clientFoundMatch(tempStratagemCode, player))
                 {
-                    var holder = StratagemUtils.getStratagemFromCode(tempStratagemCode, player);
+                    var instance = StratagemUtils.getStratagemFromCode(tempStratagemCode, player);
+                    var holder = instance.getStratagem();
 
+                    manager.setSide(instance.side);
                     manager.setSelectedStratagemCode(tempStratagemCode);
                     manager.setSelectedStratagem(holder.unwrapKey().orElseThrow());
 
@@ -163,7 +183,7 @@ public class StratagemsClientMod implements ClientModInitializer
         if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
         {
             LOGGER.info("Throwing {}", manager.getSelectedStratagem().location());
-            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelectedStratagem().location()));
+            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelectedStratagem().location(), manager.getSide()));
             manager.clearStratagemCode();
         }
 

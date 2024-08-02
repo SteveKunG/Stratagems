@@ -1,5 +1,7 @@
 package com.stevekung.stratagems;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableList;
@@ -8,8 +10,7 @@ import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
 import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
@@ -49,8 +50,7 @@ public class StratagemsMod implements ModInitializer
 
         PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(UseReplenishStratagemPacket.TYPE, UseReplenishStratagemPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(UpdateServerStratagemsPacket.TYPE, UpdateServerStratagemsPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(UpdatePlayerStratagemsPacket.TYPE, UpdatePlayerStratagemsPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(UpdateStratagemsPacket.TYPE, UpdateStratagemsPacket.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
@@ -61,6 +61,7 @@ public class StratagemsMod implements ModInitializer
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
             var stratagemBall = new StratagemBall(level, player);
             stratagemBall.setVariant(stratagemHolder);
+            stratagemBall.setSide(payload.side());
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(stratagemBall);
         });
@@ -88,19 +89,18 @@ public class StratagemsMod implements ModInitializer
             var stratagemData = server.overworld().getServerStratagemData();
             stratagemData.setDirty();
             server.overworld().getDataStorage().save();
-            LOGGER.info("This world has stratagem(s): {}", stratagemData.getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()).toList());
+            LOGGER.info("This world has {} stratagem(s): {}", stratagemData.getStratagemInstances().size(), stratagemData.getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()).toList());
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
         {
-            ServerPlayNetworking.send(handler.getPlayer(), UpdateServerStratagemsPacket.mapInstanceToEntry(server.overworld().getServerStratagemData().getStratagemInstances()));
-            LOGGER.info("Send server stratagem packet to {}", handler.getPlayer().getName().getString());
+            var player = handler.getPlayer();
+            var playerStratagems = List.copyOf(player.getPlayerStratagems().values());
+            var serverStratagems = server.overworld().getServerStratagemData().getStratagemInstances();
 
-            for (var player : server.getPlayerList().getPlayers())
-            {
-                ServerPlayNetworking.send(handler.getPlayer(), UpdatePlayerStratagemsPacket.mapInstanceToEntry(ImmutableList.copyOf(player.getPlayerStratagems().values()), player.getUUID()));
-                LOGGER.info("Send player stratagem packet to {}", handler.getPlayer().getName().getString());
-            }
+            ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(serverStratagems, playerStratagems, player.getUUID()));
+            LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
+            LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
         });
 
         ServerTickEvents.START_SERVER_TICK.register(server ->

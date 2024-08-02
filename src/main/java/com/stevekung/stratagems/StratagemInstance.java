@@ -2,6 +2,7 @@ package com.stevekung.stratagems;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.IntFunction;
 
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -10,13 +11,17 @@ import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.rule.StratagemRule;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -200,6 +205,8 @@ public class StratagemInstance
         SERVER;
 
         private static final Side[] VALUES = values();
+        public static final IntFunction<Side> BY_ID = ByIdMap.continuous(Side::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+        public static final StreamCodec<ByteBuf, Side> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Side::ordinal);
 
         public static Side byName(String name)
         {
