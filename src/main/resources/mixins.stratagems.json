@@ -7,7 +7,9 @@
         "MixinArgumentTypeInfos",
         "MixinDataFixTypes",
         "MixinPlayer",
-        "MixinServerLevel"
+        "MixinPlayerList",
+        "MixinServerLevel",
+        "MixinServerPlayer"
     ],
     "client": [
     ],
