@@ -1,5 +1,6 @@
 package com.stevekung.stratagems.util;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -22,25 +23,25 @@ public class StratagemUtils
 
     public static boolean clientNoneMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(null, player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(StratagemUtils.CLIENT_STRATAGEM_LIST, player.getPlayerStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
     }
 
     public static boolean clientFoundMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(instance -> instance.canUse(null, player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(StratagemUtils.CLIENT_STRATAGEM_LIST, player.getPlayerStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
     }
 
     public static StratagemInstance getStratagemFromCode(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST)).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get();
+        return ImmutableList.copyOf(Iterables.concat(StratagemUtils.CLIENT_STRATAGEM_LIST, player.getPlayerStratagems().values())).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get();
     }
 
-    public static boolean anyMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
+    public static boolean anyMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
     {
         return list.stream().map(StratagemInstance::getStratagem).anyMatch(holder -> holder == stratagemHolder);
     }
 
-    public static boolean noneMatchHolder(List<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
+    public static boolean noneMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
     {
         return list.stream().map(StratagemInstance::getStratagem).noneMatch(holder -> holder == stratagemHolder);
     }
@@ -50,7 +51,7 @@ public class StratagemUtils
         return name.copy().withStyle(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(holder.getRegisteredName()))));
     }
 
-    public static Component decorateStratagemList(List<StratagemInstance> instances)
+    public static Component decorateStratagemList(Collection<StratagemInstance> instances)
     {
         return ComponentUtils.formatList(instances, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
     }

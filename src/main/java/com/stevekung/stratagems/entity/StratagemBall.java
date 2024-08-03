@@ -1,6 +1,5 @@
 package com.stevekung.stratagems.entity;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.stevekung.stratagems.Stratagem;
@@ -146,7 +145,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
 
                 for (var player : PlayerLookup.all(this.getServer()))
                 {
-                    ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(serverStratagem.getStratagemInstances(), List.copyOf(serverPlayer.getPlayerStratagems().values()), player.getUUID()));
+                    ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(serverStratagem.getStratagemInstances(), serverPlayer.getPlayerStratagems().values(), player.getUUID()));
                 }
             }
             else

@@ -1,5 +1,6 @@
 package com.stevekung.stratagems.packet;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 
-public record UpdateStratagemsPacket(List<StratagemEntryData> serverEntries, List<StratagemEntryData> playerEntries, UUID uuid) implements CustomPacketPayload
+public record UpdateStratagemsPacket(Collection<StratagemEntryData> serverEntries, Collection<StratagemEntryData> playerEntries, UUID uuid) implements CustomPacketPayload
 {
     public static final CustomPacketPayload.Type<UpdateStratagemsPacket> TYPE = new CustomPacketPayload.Type<>(ModConstants.Packets.UPDATE_STRATAGEMS);
     public static final StreamCodec<FriendlyByteBuf, UpdateStratagemsPacket> CODEC = CustomPacketPayload.codec(UpdateStratagemsPacket::write, UpdateStratagemsPacket::new);
@@ -40,17 +41,17 @@ public record UpdateStratagemsPacket(List<StratagemEntryData> serverEntries, Lis
         return TYPE;
     }
 
-    public static UpdateStratagemsPacket create(List<StratagemInstance> serverInstances, List<StratagemInstance> playerInstances, UUID uuid)
+    public static UpdateStratagemsPacket create(Collection<StratagemInstance> serverInstances, Collection<StratagemInstance> playerInstances, UUID uuid)
     {
         return new UpdateStratagemsPacket(mapToEntry(serverInstances), mapToEntry(playerInstances), uuid);
     }
 
-    private static List<StratagemEntryData> mapToEntry(List<StratagemInstance> list)
+    private static List<StratagemEntryData> mapToEntry(Collection<StratagemInstance> list)
     {
         return list.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
-    public static List<StratagemInstance> mapEntryToInstance(List<StratagemEntryData> entries, RegistryAccess registryAccess)
+    public static List<StratagemInstance> mapEntryToInstance(Collection<StratagemEntryData> entries, RegistryAccess registryAccess)
     {
         return entries.stream().map(entry -> new StratagemInstance(registryAccess.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }

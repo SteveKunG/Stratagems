@@ -218,7 +218,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagementry : Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST))
+            for (var stratagementry : Iterables.concat(StratagemUtils.CLIENT_STRATAGEM_LIST, player.getPlayerStratagems().values()))
             {
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
@@ -283,7 +283,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagementry : Iterables.concat(player.getPlayerStratagems().values(), StratagemUtils.CLIENT_STRATAGEM_LIST))
+            for (var stratagementry : Iterables.concat(StratagemUtils.CLIENT_STRATAGEM_LIST, player.getPlayerStratagems().values()))
             {
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();

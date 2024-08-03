@@ -1,7 +1,5 @@
 package com.stevekung.stratagems;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -82,7 +80,7 @@ public class StratagemsMod implements ModInitializer
 
             for (var serverPlayer : PlayerLookup.all(context.server()))
             {
-                ServerPlayNetworking.send(serverPlayer, UpdateStratagemsPacket.create(context.server().overworld().getServerStratagemData().getStratagemInstances(), List.copyOf(serverPlayer.getPlayerStratagems().values()), serverPlayer.getUUID()));
+                ServerPlayNetworking.send(serverPlayer, UpdateStratagemsPacket.create(context.server().overworld().getServerStratagemData().getStratagemInstances(), serverPlayer.getPlayerStratagems().values(), serverPlayer.getUUID()));
             }
         });
 
@@ -99,7 +97,7 @@ public class StratagemsMod implements ModInitializer
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
         {
             var player = handler.getPlayer();
-            var playerStratagems = List.copyOf(player.getPlayerStratagems().values());
+            var playerStratagems = player.getPlayerStratagems().values();
             var serverStratagems = server.overworld().getServerStratagemData().getStratagemInstances();
 
             ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(serverStratagems, playerStratagems, player.getUUID()));

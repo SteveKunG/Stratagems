@@ -25,7 +25,7 @@ import net.minecraft.world.entity.player.Player;
 public abstract class MixinPlayer extends LivingEntity implements PlayerStratagemsAccessor
 {
     @Unique
-    private final Map<Holder<Stratagem>, StratagemInstance> stratagems = Maps.newHashMap();
+    private final Map<Holder<Stratagem>, StratagemInstance> stratagems = Maps.newLinkedHashMap();
 
     MixinPlayer()
     {

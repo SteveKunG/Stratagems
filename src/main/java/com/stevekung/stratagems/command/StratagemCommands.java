@@ -1,7 +1,5 @@
 package com.stevekung.stratagems.command;
 
-import java.util.List;
-
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -140,7 +138,7 @@ public class StratagemCommands
         //stratagem reset
         var stratagemData = serverPlayer.getPlayerStratagems().get(stratagemHolder);
 
-        if (StratagemUtils.noneMatchHolder(List.copyOf(serverPlayer.getPlayerStratagems().values()), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(serverPlayer.getPlayerStratagems().values(), stratagemHolder))
         {
             throw ERROR_RESET_PLAYER_SPECIFIC_FAILED.create();
         }
@@ -162,7 +160,7 @@ public class StratagemCommands
         }
         else
         {
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.player", serverPlayer.getDisplayName(), stratagemData.size(), StratagemUtils.decorateStratagemList(List.copyOf(stratagemData.values()))), true);
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.player", serverPlayer.getDisplayName(), stratagemData.size(), StratagemUtils.decorateStratagemList(stratagemData.values())), true);
             return stratagemData.size();
         }
     }
@@ -216,7 +214,7 @@ public class StratagemCommands
         var stratagemInstance = serverPlayer.getPlayerStratagems().get(stratagemHolder);
         var stratagem = stratagemHolder.value();
 
-        if (StratagemUtils.noneMatchHolder(List.copyOf(serverPlayer.getPlayerStratagems().values()), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(serverPlayer.getPlayerStratagems().values(), stratagemHolder))
         {
             throw ERROR_USE_PLAYER_SPECIFIC_FAILED.create();
         }
@@ -261,7 +259,7 @@ public class StratagemCommands
         var stratagemData = serverPlayer.getPlayerStratagems();
         var stratagem = stratagemHolder.value();
 
-        if (StratagemUtils.anyMatchHolder(List.copyOf(stratagemData.values()), stratagemHolder))
+        if (StratagemUtils.anyMatchHolder(stratagemData.values(), stratagemHolder))
         {
             source.sendFailure(Component.translatable("commands.stratagem.add.player.failed", serverPlayer.getDisplayName()));
             return 0;
@@ -310,7 +308,7 @@ public class StratagemCommands
         var stratagem = stratagemHolder.value();
         var stratagemData = serverPlayer.getPlayerStratagems();
 
-        if (StratagemUtils.noneMatchHolder(List.copyOf(stratagemData.values()), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(stratagemData.values(), stratagemHolder))
         {
             throw ERROR_REMOVE_PLAYER_SPECIFIC_FAILED.create();
         }
@@ -327,7 +325,7 @@ public class StratagemCommands
     {
         for (var player : PlayerLookup.all(source.getServer()))
         {
-            ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(player.serverLevel().getServerStratagemData().getStratagemInstances(), List.copyOf(player.getPlayerStratagems().values()), player.getUUID()));
+            ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(player.serverLevel().getServerStratagemData().getStratagemInstances(), player.getPlayerStratagems().values(), player.getUUID()));
         }
     }
 }
