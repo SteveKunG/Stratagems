@@ -6,7 +6,8 @@ import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.action.StratagemActionContext;
-import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.registry.*;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -131,6 +132,11 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
                 {
                     this.getVariant().value().action().action(stratagemContext);
                     serverStratagem.use(this.getVariant().unwrapKey().orElseThrow(), serverPlayer);
+                    
+                    for (var player : PlayerLookup.all(this.getServer()))
+                    {
+                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagem.getStratagemInstances()));
+                    }
                 }
                 else
                 {
@@ -141,11 +147,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
 
                     this.getVariant().value().action().action(stratagemContext);
                     playerStratagem.use(getServer(), serverPlayer);
-                }
-
-                for (var player : PlayerLookup.all(this.getServer()))
-                {
-                    ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(serverStratagem.getStratagemInstances(), serverPlayer.getPlayerStratagems().values(), player.getUUID()));
+                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.getPlayerStratagems().values(), serverPlayer.getUUID()));
                 }
             }
             else

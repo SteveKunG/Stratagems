@@ -5,7 +5,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
-import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.util.StratagemUtils;
 
@@ -107,7 +108,8 @@ public class StratagemCommands
         var stratagemData = server.overworld().getServerStratagemData();
         stratagemData.getStratagemInstances().forEach(instance -> instance.reset(server, source.getPlayer()));
         server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().values().forEach(instance -> instance.reset(server, serverPlayer)));
-        sendPacket(source);
+        sendAllPacket(source);
+        sendAllPlayerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.everything.success"), true);
         return 1;
     }
@@ -128,7 +130,7 @@ public class StratagemCommands
         }
 
         stratagemData.reset(stratagemHolder);
-        sendPacket(source);
+        sendServerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
         return 1;
     }
@@ -144,7 +146,7 @@ public class StratagemCommands
         }
 
         stratagemData.reset(source.getServer(), serverPlayer);
-        sendPacket(source);
+        sendPlayerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.success", serverPlayer.getDisplayName()), true);
         return 1;
     }
@@ -199,7 +201,7 @@ public class StratagemCommands
         }
 
         stratagemData.use(stratagemHolder.unwrapKey().orElseThrow(), source.getPlayer());
-        sendPacket(source);
+        sendServerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.use.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
         return 1;
     }
@@ -220,7 +222,7 @@ public class StratagemCommands
         }
 
         stratagemInstance.use(source.getServer(), serverPlayer);
-        sendPacket(source);
+        sendPlayerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.use.player.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder), serverPlayer.getDisplayName()), true);
         return 1;
     }
@@ -243,7 +245,7 @@ public class StratagemCommands
         else
         {
             stratagemData.add(StratagemUtils.createInstanceWithDefaultValue(stratagemHolder, StratagemInstance.Side.SERVER));
-            sendPacket(source);
+            sendServerStratagemPacket(source);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
             return 1;
         }
@@ -267,7 +269,7 @@ public class StratagemCommands
         else
         {
             stratagemData.put(stratagemHolder, StratagemUtils.createInstanceWithDefaultValue(stratagemHolder, StratagemInstance.Side.PLAYER));
-            sendPacket(source);
+            sendPlayerStratagemPacket(source);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.add.player.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder), serverPlayer.getDisplayName()), true);
             return 1;
         }
@@ -279,7 +281,7 @@ public class StratagemCommands
         var stratagemData = server.overworld().getServerStratagemData();
         stratagemData.clear();
         server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().clear());
-        sendPacket(source);
+        sendAllPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.everything.success"), true);
         return 1;
     }
@@ -297,7 +299,7 @@ public class StratagemCommands
         else
         {
             stratagemData.remove(stratagemHolder);
-            sendPacket(source);
+            sendServerStratagemPacket(source);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.server.specific.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
             return 1;
         }
@@ -315,17 +317,37 @@ public class StratagemCommands
         else
         {
             stratagemData.remove(stratagemHolder);
-            sendPacket(source);
+            sendPlayerStratagemPacket(source);
             source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.player.specific.success", serverPlayer.getDisplayName(), StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
             return 1;
         }
     }
 
-    private static void sendPacket(CommandSourceStack source)
+    private static void sendServerStratagemPacket(CommandSourceStack source)
     {
         for (var player : PlayerLookup.all(source.getServer()))
         {
-            ServerPlayNetworking.send(player, UpdateStratagemsPacket.create(player.serverLevel().getServerStratagemData().getStratagemInstances(), player.getPlayerStratagems().values(), player.getUUID()));
+            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(player.serverLevel().getServerStratagemData().getStratagemInstances()));
         }
+    }
+
+    private static void sendPlayerStratagemPacket(CommandSourceStack source)
+    {
+        var player = source.getPlayer();
+        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
+    }
+    
+    private static void sendAllPlayerStratagemPacket(CommandSourceStack source)
+    {
+        for (var player : PlayerLookup.all(source.getServer()))
+        {
+            ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
+        }
+    }
+    
+    private static void sendAllPacket(CommandSourceStack source)
+    {
+        sendPlayerStratagemPacket(source);
+        sendServerStratagemPacket(source);
     }
 }

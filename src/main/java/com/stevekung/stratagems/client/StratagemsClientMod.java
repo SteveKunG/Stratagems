@@ -11,7 +11,8 @@ import com.stevekung.stratagems.StratagemMenuManager;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.packet.UpdateStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.ModRegistries;
@@ -45,23 +46,10 @@ public class StratagemsClientMod implements ClientModInitializer
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
         HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
 
-        ClientPlayNetworking.registerGlobalReceiver(UpdateStratagemsPacket.TYPE, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(UpdatePlayerStratagemsPacket.TYPE, (payload, context) ->
         {
             var player = context.player();
-            var serverStratagem = payload.serverEntries();
             var playerStratagem = payload.playerEntries();
-
-            LOGGER.info("Received server stratagem packet");
-
-            if (serverStratagem.isEmpty())
-            {
-                StratagemUtils.CLIENT_STRATAGEM_LIST.clear();
-                LOGGER.info("Remove all server stratagems");
-            }
-            else
-            {
-                StratagemUtils.CLIENT_STRATAGEM_LIST = UpdateStratagemsPacket.mapEntryToInstance(serverStratagem, context.client().level.registryAccess());
-            }
 
             if (player.getUUID().equals(payload.uuid()))
             {
@@ -73,6 +61,23 @@ public class StratagemsClientMod implements ClientModInitializer
                     var holder = context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
                     context.player().getPlayerStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
                 });
+            }
+        });
+        
+        ClientPlayNetworking.registerGlobalReceiver(UpdateServerStratagemsPacket.TYPE, (payload, context) ->
+        {
+            var serverStratagem = payload.serverEntries();
+
+            LOGGER.info("Received server stratagem packet");
+
+            if (serverStratagem.isEmpty())
+            {
+                StratagemUtils.CLIENT_STRATAGEM_LIST.clear();
+                LOGGER.info("Remove all server stratagems");
+            }
+            else
+            {
+                StratagemUtils.CLIENT_STRATAGEM_LIST = StratagemUtils.mapToInstance(serverStratagem, context.client().level.registryAccess());
             }
         });
     }

@@ -48,12 +48,26 @@ public class DepletedStratagemRule implements StratagemRule
             if (instance.side == Side.PLAYER && context.player().isPresent())
             {
                 var replenisher = context.player().get().level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
+
+                if (StratagemUtils.anyMatchHolder(context.player().get().getPlayerStratagems().values(), replenisher))
+                {
+                    LOGGER.info("{} player replenisher stratagem already exist", replenisher.value().name().getString());
+                    return;
+                }
+
                 context.player().get().getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.PLAYER));
                 LOGGER.info("Add {} replenisher stratagem to {}", replenisher.value().name().getString(), context.player().get().getName().getString());
             }
             if (instance.side == Side.SERVER && context.minecraftServer().isPresent())
             {
                 var replenisher = context.minecraftServer().get().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
+
+                if (StratagemUtils.anyMatchHolder(context.minecraftServer().get().overworld().getServerStratagemData().getStratagemInstances(), replenisher))
+                {
+                    LOGGER.info("{} server replenisher stratagem already exist", replenisher.value().name().getString());
+                    return;
+                }
+
                 context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.SERVER));
                 LOGGER.info("Add {} server replenisher stratagem", replenisher.value().name().getString());
             }
