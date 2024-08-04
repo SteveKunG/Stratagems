@@ -133,7 +133,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
                 {
                     this.getVariant().value().action().action(stratagemContext);
                     serverStratagems.use(this.getVariant(), serverPlayer);
-                    
+
                     for (var player : PlayerLookup.all(this.getServer()))
                     {
                         ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.getInstances()));
@@ -147,7 +147,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
                     }
 
                     this.getVariant().value().action().action(stratagemContext);
-                    playerStratagems.use(getServer(), serverPlayer);
+                    playerStratagems.use(this.getServer(), serverPlayer);
                     ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.getStratagems().values(), serverPlayer.getUUID()));
                 }
             }

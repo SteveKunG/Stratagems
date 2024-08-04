@@ -200,7 +200,7 @@ public class StratagemsClientMod implements ClientModInitializer
             if (arrowKeySound)
             {
                 // this is a little detail in HD2 when you typing stratagem code and pitch increased
-                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + (0.025f * manager.getTempStratagemCode().length()));
+                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * manager.getTempStratagemCode().length());
             }
         }
     }

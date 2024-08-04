@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.registry.StratagemActions;
+
 import net.minecraft.world.entity.LivingEntity;
 
 public record ReinforceAction() implements StratagemAction

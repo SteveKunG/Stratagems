@@ -3,6 +3,7 @@ package com.stevekung.stratagems.registry;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.entity.StratagemPod;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;

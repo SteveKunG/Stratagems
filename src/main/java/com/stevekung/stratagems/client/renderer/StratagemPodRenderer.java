@@ -2,6 +2,7 @@ package com.stevekung.stratagems.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.stevekung.stratagems.entity.StratagemPod;
+
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;

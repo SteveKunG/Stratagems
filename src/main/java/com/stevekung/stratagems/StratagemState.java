@@ -3,6 +3,7 @@ package com.stevekung.stratagems;
 import java.util.Locale;
 
 import com.mojang.serialization.Codec;
+
 import net.minecraft.util.StringRepresentable;
 
 public enum StratagemState implements StringRepresentable

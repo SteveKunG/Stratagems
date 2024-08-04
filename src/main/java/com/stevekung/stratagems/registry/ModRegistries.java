@@ -5,6 +5,7 @@ import com.stevekung.stratagems.action.StratagemAction;
 import com.stevekung.stratagems.action.StratagemActionType;
 import com.stevekung.stratagems.rule.StratagemRule;
 import com.stevekung.stratagems.rule.StratagemRuleType;
+
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

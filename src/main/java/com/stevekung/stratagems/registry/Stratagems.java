@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Either;
 import com.stevekung.stratagems.*;
 import com.stevekung.stratagems.action.*;
 import com.stevekung.stratagems.rule.*;
+
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;

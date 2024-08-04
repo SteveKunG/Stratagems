@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.rule.*;
+
 import net.minecraft.core.Registry;
 
 public class StratagemRules

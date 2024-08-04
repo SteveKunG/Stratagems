@@ -4,10 +4,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Invoker;
+
 import com.mojang.datafixers.DSL;
 import com.stevekung.stratagems.StratagemsMod;
 import com.stevekung.stratagems.registry.ModReferences;
 import com.stevekung.stratagems.util.CustomDataFixTypes;
+
 import net.minecraft.util.datafix.DataFixTypes;
 
 @Mixin(DataFixTypes.class)

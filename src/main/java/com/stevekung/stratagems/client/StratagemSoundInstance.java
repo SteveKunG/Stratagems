@@ -2,6 +2,7 @@ package com.stevekung.stratagems.client;
 
 import com.stevekung.stratagems.StratagemInputManager;
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundSource;

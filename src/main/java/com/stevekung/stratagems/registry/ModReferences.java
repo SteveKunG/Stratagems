@@ -1,6 +1,7 @@
 package com.stevekung.stratagems.registry;
 
 import com.mojang.datafixers.DSL;
+
 import net.minecraft.util.datafix.fixes.References;
 
 public class ModReferences

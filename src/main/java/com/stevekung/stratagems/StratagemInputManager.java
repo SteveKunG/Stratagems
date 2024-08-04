@@ -119,7 +119,7 @@ public class StratagemInputManager
 
     public StratagemInstance.Side getSide()
     {
-        return side;
+        return this.side;
     }
 
     public void setSide(StratagemInstance.Side side)

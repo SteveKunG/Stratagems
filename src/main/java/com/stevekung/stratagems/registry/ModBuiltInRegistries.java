@@ -2,6 +2,7 @@ package com.stevekung.stratagems.registry;
 
 import com.stevekung.stratagems.action.StratagemActionType;
 import com.stevekung.stratagems.rule.StratagemRuleType;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 

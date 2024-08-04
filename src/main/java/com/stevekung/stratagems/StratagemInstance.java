@@ -74,7 +74,6 @@ public class StratagemInstance
         var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
         var inboundDuration = 0;
         Integer duration = null;
-        var cooldown = 0;
         Integer remainingUse = null;
         var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
         var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
@@ -89,7 +88,7 @@ public class StratagemInstance
             duration = compoundTag.getInt(ModConstants.Tag.DURATION);
         }
 
-        cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
+        var cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
 
         if (compoundTag.contains(ModConstants.Tag.REMAINING_USE, Tag.TAG_INT))
         {

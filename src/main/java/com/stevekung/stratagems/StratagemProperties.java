@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import net.minecraft.util.ExtraCodecs;
 
 public record StratagemProperties(int inboundDuration, Optional<Integer> duration, int cooldown, Optional<Integer> remainingUse, int beamColor, Optional<Boolean> canDepleted, Optional<Boolean> needThrow, Optional<StratagemReplenish> replenish)
