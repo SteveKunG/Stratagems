@@ -34,19 +34,19 @@ public class StratagemInputManager
         return INSTANCE;
     }
 
-    public static boolean clientNoneMatch(String tempStratagemCode, Player player)
+    public static boolean noneMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).noneMatch(instance -> instance.getCode().startsWith(tempStratagemCode));
     }
 
-    public static boolean clientFoundMatch(String tempStratagemCode, Player player)
+    public static boolean foundMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
+        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).anyMatch(instance -> instance.getCode().equals(tempStratagemCode));
     }
 
-    public static StratagemInstance getStratagemFromCode(String tempStratagemCode, Player player)
+    public static StratagemInstance getInstanceFromCode(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get();
+        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player) && instance.getCode().equals(tempStratagemCode)).findFirst().get();
     }
 
     public boolean isMenuOpen()

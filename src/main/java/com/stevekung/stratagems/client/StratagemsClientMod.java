@@ -144,15 +144,15 @@ public class StratagemsClientMod implements ClientModInitializer
             {
                 var tempStratagemCode = manager.getTempStratagemCode();
 
-                if (StratagemInputManager.clientNoneMatch(tempStratagemCode, player))
+                if (StratagemInputManager.noneMatch(tempStratagemCode, player))
                 {
                     manager.clearTempStratagemCode();
                     fail = true;
                     LOGGER.info("FAIL");
                 }
-                if (StratagemInputManager.clientFoundMatch(tempStratagemCode, player))
+                if (StratagemInputManager.foundMatch(tempStratagemCode, player))
                 {
-                    var instance = StratagemInputManager.getStratagemFromCode(tempStratagemCode, player);
+                    var instance = StratagemInputManager.getInstanceFromCode(tempStratagemCode, player);
                     var holder = instance.getStratagem();
 
                     manager.setSide(instance.side);
