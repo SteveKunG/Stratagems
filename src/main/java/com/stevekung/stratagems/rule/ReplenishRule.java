@@ -91,15 +91,13 @@ public class ReplenishRule implements StratagemRule
 
             if (replenishSoundOptional.isPresent() && count > 0)
             {
-                var packet = new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong());
-
                 if (instance.side == Side.PLAYER && player != null)
                 {
-                    ((ServerPlayer)player).connection.send(packet);
+                    ((ServerPlayer)player).connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
                 }
                 if (instance.side == Side.SERVER && server != null)
                 {
-                    PlayerLookup.all(server).forEach(playerx -> ((ServerPlayer)player).connection.send(packet));
+                    PlayerLookup.all(server).forEach(playerx -> ((ServerPlayer)playerx).connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, playerx.getX(), playerx.getY(), playerx.getZ(), 1.0f, 1.0f, playerx.level().getRandom().nextLong())));
                 }
             }
         }
