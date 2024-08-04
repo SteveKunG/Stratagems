@@ -19,7 +19,7 @@ public class StratagemActions
     public static final Codec<Holder<StratagemAction>> CODEC = RegistryFileCodec.create(ModRegistries.STRATAGEM_ACTION, DIRECT_CODEC);
     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<StratagemAction>> STREAM_CODEC = ByteBufCodecs.holderRegistry(ModRegistries.STRATAGEM_ACTION);
 
-    public static final StratagemActionType EMPTY = register("reinforce", EmptyAction.CODEC);
+    public static final StratagemActionType EMPTY = register("empty", EmptyAction.CODEC);
     public static final StratagemActionType REINFORCE = register("reinforce", ReinforceAction.CODEC);
     public static final StratagemActionType SPAWN_ITEM = register("spawn_item", SpawnItemAction.CODEC);
     public static final StratagemActionType SPAWN_SUPPLY = register("spawn_supply", SpawnSupplyAction.CODEC);
