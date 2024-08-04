@@ -13,7 +13,10 @@ import com.stevekung.stratagems.registry.StratagemRules;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.Holder;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 
 public class ReplenishRule implements StratagemRule
 {
@@ -84,9 +87,20 @@ public class ReplenishRule implements StratagemRule
                 count++;
             }
 
-            if (player != null && stratagemReplenish.replenishSound().isPresent() && count > 0)
+            var replenishSoundOptional = stratagemReplenish.replenishSound();
+
+            if (replenishSoundOptional.isPresent() && count > 0)
             {
-                player.playSound(stratagemReplenish.replenishSound().get(), 1.0f, 1.0f);
+                var packet = new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong());
+
+                if (instance.side == Side.PLAYER && player != null)
+                {
+                    ((ServerPlayer)player).connection.send(packet);
+                }
+                if (instance.side == Side.SERVER && server != null)
+                {
+                    PlayerLookup.all(server).forEach(playerx -> ((ServerPlayer)player).connection.send(packet));
+                }
             }
         }
     }
