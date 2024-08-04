@@ -60,7 +60,7 @@ public class ReplenishRule implements StratagemRule
                     replenishedStratagem.duration = replenishedProperties.duration().get();
                 }
 
-                // replenished cooldown from rearm
+                // replenished cooldown from replenishing properties
                 replenishedStratagem.cooldown = properties.cooldown();
 
                 if (replenishedProperties.remainingUse().isPresent())
@@ -70,7 +70,7 @@ public class ReplenishRule implements StratagemRule
 
                 LOGGER.info("Replenished {} stratagem!", replenishedStratagem.stratagem().name().getString());
 
-                // Remove this rearm stratagem
+                // Remove this replenished stratagem
                 if (instance.side == Side.PLAYER)
                 {
                     player.getStratagems().remove(instance.getStratagem());
@@ -96,7 +96,7 @@ public class ReplenishRule implements StratagemRule
     {
         var instance = context.instance();
 
-        // Remove this rearm stratagem
+        // Remove this replenished stratagem
         if (instance.side == Side.PLAYER)
         {
             context.player().getStratagems().remove(instance.getStratagem());

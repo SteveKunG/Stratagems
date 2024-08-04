@@ -101,7 +101,7 @@ public class StratagemCommands
         //@formatter:on
     }
 
-    private static int resetAllStratagem(CommandSourceStack source) throws CommandSyntaxException
+    private static int resetAllStratagem(CommandSourceStack source)
     {
         //stratagem reset
         var server = source.getServer();
@@ -151,7 +151,7 @@ public class StratagemCommands
         return 1;
     }
 
-    private static int listPlayerStratagems(CommandSourceStack source, ServerPlayer serverPlayer) throws CommandSyntaxException
+    private static int listPlayerStratagems(CommandSourceStack source, ServerPlayer serverPlayer)
     {
         var playerStratagems = serverPlayer.getStratagems();
 
