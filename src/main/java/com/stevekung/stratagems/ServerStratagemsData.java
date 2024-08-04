@@ -113,6 +113,11 @@ public class ServerStratagemsData extends SavedData
         this.instances.stream().filter(instance -> instance.getStratagem() == holder).forEach(instance -> instance.reset(this.level.getServer(), null));
     }
 
+    public void reset()
+    {
+        this.instances.stream().forEach(instance -> instance.reset(this.level.getServer(), null));
+    }
+
     public void clear()
     {
         this.instances.clear();
