@@ -280,6 +280,7 @@ public class StratagemCommands
         server.overworld().getStratagemData().clear();
         server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getStratagems().clear());
         sendAllPacket(source);
+        sendAllPlayerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.everything.success"), true);
         return 1;
     }
