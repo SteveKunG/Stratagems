@@ -8,7 +8,7 @@ import com.stevekung.stratagems.action.StratagemAction;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemActions;
 import com.stevekung.stratagems.registry.StratagemRules;
-import com.stevekung.stratagems.rule.DefaultStratagemRule;
+import com.stevekung.stratagems.rule.DefaultRule;
 import com.stevekung.stratagems.rule.StratagemRule;
 
 import net.minecraft.core.Holder;
@@ -29,7 +29,7 @@ public record Stratagem(String code, Component name, Either<ItemStack, ResourceL
             ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
             Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),
             StratagemActions.DIRECT_CODEC.fieldOf("action").forGetter(Stratagem::action),
-            StratagemRules.CODEC.optionalFieldOf("rule", DefaultStratagemRule.defaultRule().build()).forGetter(Stratagem::rule),
+            StratagemRules.CODEC.optionalFieldOf("rule", DefaultRule.defaultRule().build()).forGetter(Stratagem::rule),
             StratagemProperties.CODEC.fieldOf("properties").forGetter(Stratagem::properties)
             ).apply(instance, Stratagem::new));
     public static final Codec<Holder<Stratagem>> CODEC = RegistryFileCodec.create(ModRegistries.STRATAGEM, DIRECT_CODEC);

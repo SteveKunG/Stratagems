@@ -12,9 +12,9 @@ import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.StratagemRules;
 import com.stevekung.stratagems.util.StratagemUtils;
 
-public class DepletedStratagemRule implements StratagemRule
+public class DepletedRule implements StratagemRule
 {
-    public static final MapCodec<DepletedStratagemRule> CODEC = MapCodec.unit(new DepletedStratagemRule());
+    public static final MapCodec<DepletedRule> CODEC = MapCodec.unit(new DepletedRule());
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
@@ -170,6 +170,6 @@ public class DepletedStratagemRule implements StratagemRule
 
     public static Builder defaultRule()
     {
-        return DepletedStratagemRule::new;
+        return DepletedRule::new;
     }
 }

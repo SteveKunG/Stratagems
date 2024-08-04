@@ -15,9 +15,9 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 
-public class ReplenishStratagemRule implements StratagemRule
+public class ReplenishRule implements StratagemRule
 {
-    public static final MapCodec<ReplenishStratagemRule> CODEC = MapCodec.unit(new ReplenishStratagemRule());
+    public static final MapCodec<ReplenishRule> CODEC = MapCodec.unit(new ReplenishRule());
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
@@ -155,6 +155,6 @@ public class ReplenishStratagemRule implements StratagemRule
 
     public static Builder defaultRule()
     {
-        return ReplenishStratagemRule::new;
+        return ReplenishRule::new;
     }
 }

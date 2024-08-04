@@ -11,10 +11,10 @@ public class StratagemRules
     private static final Codec<StratagemRule> TYPED_CODEC = ModBuiltInRegistries.STRATAGEM_RULE_TYPE.byNameCodec().dispatch("type", StratagemRule::getType, StratagemRuleType::codec);
     public static final Codec<StratagemRule> CODEC = Codec.lazyInitialized(() -> TYPED_CODEC);
 
-    public static final StratagemRuleType DEFAULT = register("default", DefaultStratagemRule.CODEC);
-    public static final StratagemRuleType REINFORCE = register("reinforce", ReinforceStratagemRule.CODEC);
-    public static final StratagemRuleType DEPLETED = register("depleted", DepletedStratagemRule.CODEC);
-    public static final StratagemRuleType REPLENISH = register("replenish", ReplenishStratagemRule.CODEC);
+    public static final StratagemRuleType DEFAULT = register("default", DefaultRule.CODEC);
+    public static final StratagemRuleType REINFORCE = register("reinforce", ReinforceRule.CODEC);
+    public static final StratagemRuleType DEPLETED = register("depleted", DepletedRule.CODEC);
+    public static final StratagemRuleType REPLENISH = register("replenish", ReplenishRule.CODEC);
 
     private static StratagemRuleType register(String name, MapCodec<? extends StratagemRule> codec)
     {

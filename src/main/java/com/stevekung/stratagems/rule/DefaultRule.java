@@ -7,9 +7,9 @@ import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
 
-public class DefaultStratagemRule implements StratagemRule
+public class DefaultRule implements StratagemRule
 {
-    public static final MapCodec<DefaultStratagemRule> CODEC = MapCodec.unit(new DefaultStratagemRule());
+    public static final MapCodec<DefaultRule> CODEC = MapCodec.unit(new DefaultRule());
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
@@ -99,6 +99,6 @@ public class DefaultStratagemRule implements StratagemRule
 
     public static StratagemRule.Builder defaultRule()
     {
-        return DefaultStratagemRule::new;
+        return DefaultRule::new;
     }
 }

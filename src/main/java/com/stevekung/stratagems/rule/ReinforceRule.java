@@ -9,9 +9,9 @@ import com.stevekung.stratagems.registry.StratagemRules;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 
-public class ReinforceStratagemRule implements StratagemRule
+public class ReinforceRule implements StratagemRule
 {
-    public static final MapCodec<ReinforceStratagemRule> CODEC = MapCodec.unit(new ReinforceStratagemRule());
+    public static final MapCodec<ReinforceRule> CODEC = MapCodec.unit(new ReinforceRule());
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
@@ -79,6 +79,6 @@ public class ReinforceStratagemRule implements StratagemRule
 
     public static Builder defaultRule()
     {
-        return ReinforceStratagemRule::new;
+        return ReinforceRule::new;
     }
 }
