@@ -126,11 +126,11 @@ public class ReplenishRule implements StratagemRule
                 var toReplenish = toReplenishOptional.get();
                 var player = context.player();
                 var server = context.server();
-                var serverStratagems = server.overworld().getStratagemData();
-                var playerStratagems = player.getStratagems();
 
                 if (player != null && instance.side == Side.PLAYER)
                 {
+                    var playerStratagems = player.getStratagems();
+
                     playerStratagems.entrySet().stream().filter(entry -> entry.getValue().state == StratagemState.DEPLETED && toReplenish.contains(entry.getKey())).findAny().ifPresent(ignore ->
                     {
                         instance.use(null, player);
@@ -139,6 +139,8 @@ public class ReplenishRule implements StratagemRule
                 }
                 if (server != null && instance.side == Side.SERVER)
                 {
+                    var serverStratagems = server.overworld().getStratagemData();
+
                     serverStratagems.getInstances().stream().filter(instancex -> instancex.state == StratagemState.DEPLETED && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
                     {
                         instance.use(server, player);

@@ -41,11 +41,9 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     @Inject(method = "tick", at = @At("TAIL"))
     private void tick(CallbackInfo info)
     {
-        var iterator = this.stratagems.entrySet().iterator();
-
-        while (iterator.hasNext())
+        for (var entry : this.stratagems.entrySet())
         {
-            iterator.next().getValue().tick(this.getServer(), Player.class.cast(this));
+            entry.getValue().tick(this.getServer(), Player.class.cast(this));
         }
     }
 
