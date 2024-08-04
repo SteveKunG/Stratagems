@@ -3,7 +3,6 @@ package com.stevekung.stratagems.datagen;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.common.collect.Lists;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 
@@ -12,21 +11,12 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.JsonKeySortOrderCallback;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
-import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 
 public class StratagemDataGenerator implements DataGeneratorEntrypoint
 {
-    private static final List<String> SORT_ORDERS = Util.make(Lists.newLinkedList(), list ->
-    {
-        list.add("code");
-        list.add("name");
-        list.add("action");
-        list.add("rule");
-        list.add("properties");
-        list.add("icon");
-    });
+    private static final List<String> SORT_ORDERS = List.of("code", "name", "action", "rule", "properties", "icon");
 
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator dataGenerator)

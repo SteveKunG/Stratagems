@@ -35,7 +35,8 @@ public class DefaultStratagemRule implements StratagemRule
     public void tick(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var player = context.player().orElse(null);
+        var player = context.player();
+        var stratagem = instance.stratagem();
 
         if (!instance.isReady())
         {
@@ -47,12 +48,12 @@ public class DefaultStratagemRule implements StratagemRule
 
                     if (instance.duration % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has duration: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.duration, player));
+                        LOGGER.info("{} stratagem has duration: {}", stratagem.name().getString(), instance.formatTickDuration(instance.duration, player));
                     }
                 }
                 else
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.INBOUND);
+                    LOGGER.info("{} stratagem switch state from {} to {}", stratagem.name().getString(), instance.state, StratagemState.INBOUND);
                     instance.state = StratagemState.INBOUND;
                 }
             }
@@ -63,15 +64,15 @@ public class DefaultStratagemRule implements StratagemRule
 
                 if (instance.inboundDuration % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has inboundDuration: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.inboundDuration, player));
+                    LOGGER.info("{} stratagem has inboundDuration: {}", stratagem.name().getString(), instance.formatTickDuration(instance.inboundDuration, player));
                 }
             }
 
             if (instance.state != StratagemState.COOLDOWN && instance.inboundDuration == 0)
             {
-                LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.COOLDOWN);
+                LOGGER.info("{} stratagem switch state from {} to {}", stratagem.name().getString(), instance.state, StratagemState.COOLDOWN);
                 instance.state = StratagemState.COOLDOWN;
-                instance.cooldown = instance.stratagem().properties().cooldown();
+                instance.cooldown = stratagem.properties().cooldown();
             }
 
             if (instance.state == StratagemState.COOLDOWN)
@@ -82,15 +83,15 @@ public class DefaultStratagemRule implements StratagemRule
 
                     if (instance.cooldown % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
+                        LOGGER.info("{} stratagem has cooldown: {}", stratagem.name().getString(), instance.formatTickDuration(instance.cooldown, player));
                     }
                 }
 
                 if (instance.cooldown == 0)
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.READY);
+                    LOGGER.info("{} stratagem switch state from {} to {}", stratagem.name().getString(), instance.state, StratagemState.READY);
                     instance.state = StratagemState.READY;
-                    instance.resetStratagemTicks(instance.stratagem().properties());
+                    instance.resetStratagemTicks(stratagem.properties());
                 }
             }
         }

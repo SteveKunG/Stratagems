@@ -26,8 +26,6 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -45,7 +43,7 @@ public class StratagemsMod implements ModInitializer
         ModEntityDataSerializers.init();
 
         DynamicRegistries.registerSynced(ModRegistries.STRATAGEM, Stratagem.DIRECT_CODEC, DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY);
-        DynamicRegistrySetupCallback.EVENT.register(registryView -> addListenerForDynamic(registryView, ModRegistries.STRATAGEM));
+        DynamicRegistrySetupCallback.EVENT.register(StratagemsMod::addListenerForDynamic);
 
         PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(UseReplenishStratagemPacket.TYPE, UseReplenishStratagemPacket.CODEC);
@@ -56,11 +54,11 @@ public class StratagemsMod implements ModInitializer
         {
             var player = context.player();
             var level = player.serverLevel();
-            var stratagemHolder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()));
+            var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
             var stratagemBall = new StratagemBall(level, player);
-            stratagemBall.setVariant(stratagemHolder);
+            stratagemBall.setVariant(holder);
             stratagemBall.setSide(payload.side());
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
             level.addFreshEntity(stratagemBall);
@@ -68,21 +66,24 @@ public class StratagemsMod implements ModInitializer
 
         ServerPlayNetworking.registerGlobalReceiver(UseReplenishStratagemPacket.TYPE, (payload, context) ->
         {
-            var player = context.server().getPlayerList().getPlayer(payload.uuid());
-            var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()));
+            var server = context.server();
+            var player = server.getPlayerList().getPlayer(payload.uuid());
+            var serverStratagems = server.overworld().getStratagemData();
+            var playerStratagems = player.getStratagems();
+            var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
             if (payload.side() == Side.PLAYER)
             {
-                player.getPlayerStratagems().get(holder).use(context.server(), player);
-                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
+                playerStratagems.get(holder).use(server, player);
+                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID()));
             }
             else
             {
-                context.server().overworld().getServerStratagemData().use(ResourceKey.create(ModRegistries.STRATAGEM, payload.stratagem()), player);
+                serverStratagems.use(holder, player);
 
-                for (var serverPlayer : PlayerLookup.all(context.server()))
+                for (var serverPlayer : PlayerLookup.all(server))
                 {
-                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(context.server().overworld().getServerStratagemData().getStratagemInstances()));
+                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.getInstances()));
                 }
             }
         });
@@ -91,17 +92,17 @@ public class StratagemsMod implements ModInitializer
 
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
-            var stratagemData = server.overworld().getServerStratagemData();
-            stratagemData.setDirty();
+            var serverStratagems = server.overworld().getStratagemData();
+            serverStratagems.setDirty();
             server.overworld().getDataStorage().save();
-            LOGGER.info("This world has {} stratagem(s): {}", stratagemData.getStratagemInstances().size(), stratagemData.getStratagemInstances().stream().map(entry -> entry.getResourceKey().location()).toList());
+            LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.getInstances().size(), serverStratagems.getInstances().stream().map(entry -> entry.getResourceKey().location()).toList());
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
         {
             var player = handler.getPlayer();
-            var playerStratagems = player.getPlayerStratagems().values();
-            var serverStratagems = server.overworld().getServerStratagemData().getStratagemInstances();
+            var playerStratagems = player.getStratagems().values();
+            var serverStratagems = server.overworld().getStratagemData().getInstances();
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
             ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
@@ -115,7 +116,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                server.overworld().getServerStratagemData().tick();
+                server.overworld().getStratagemData().tick();
             }
 
             server.getProfiler().pop();
@@ -127,8 +128,8 @@ public class StratagemsMod implements ModInitializer
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
-    private static void addListenerForDynamic(DynamicRegistryView registryView, ResourceKey<? extends Registry<?>> key)
+    private static void addListenerForDynamic(DynamicRegistryView registryView)
     {
-        registryView.registerEntryAdded(key, (rawId, id, object) -> LOGGER.info("Loaded entry of {}: {} = {}", key, id, object));
+        registryView.registerEntryAdded(ModRegistries.STRATAGEM, (rawId, id, object) -> LOGGER.info("Loaded entry of {}: {} = {}", ModRegistries.STRATAGEM, id, object));
     }
 }

@@ -105,47 +105,47 @@ public class StratagemCommands
     {
         //stratagem reset
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
-        stratagemData.getStratagemInstances().forEach(instance -> instance.reset(server, source.getPlayer()));
-        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().values().forEach(instance -> instance.reset(server, serverPlayer)));
+        var serverStratagems = server.overworld().getStratagemData();
+        serverStratagems.getInstances().forEach(instance -> instance.reset(server, source.getPlayer()));
+        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getStratagems().values().forEach(instance -> instance.reset(server, serverPlayer)));
         sendAllPacket(source);
         sendAllPlayerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.everything.success"), true);
         return 1;
     }
 
-    private static int resetServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int resetServerStratagem(CommandSourceStack source, Holder<Stratagem> holder) throws CommandSyntaxException
     {
         //stratagem reset server stratagems:reinforce
         //stratagem reset server stratagems:block
         //stratagem reset server stratagems:tnt
         //stratagem reset server stratagems:tnt_rearm
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
-        var stratagem = stratagemHolder.value();
+        var serverStratagems = server.overworld().getStratagemData();
+        var stratagem = holder.value();
 
-        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemInstances(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(serverStratagems.getInstances(), holder))
         {
             throw ERROR_RESET_SERVER_SPECIFIC_FAILED.create();
         }
 
-        stratagemData.reset(stratagemHolder);
+        serverStratagems.reset(holder);
         sendServerStratagemPacket(source);
-        source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
+        source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
         return 1;
     }
 
-    private static int resetPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int resetPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> holder) throws CommandSyntaxException
     {
         //stratagem reset
-        var stratagemData = serverPlayer.getPlayerStratagems().get(stratagemHolder);
+        var playerStratagems = serverPlayer.getStratagems();
 
-        if (StratagemUtils.noneMatchHolder(serverPlayer.getPlayerStratagems().values(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(playerStratagems.values(), holder))
         {
             throw ERROR_RESET_PLAYER_SPECIFIC_FAILED.create();
         }
 
-        stratagemData.reset(source.getServer(), serverPlayer);
+        playerStratagems.get(holder).reset(source.getServer(), serverPlayer);
         sendPlayerStratagemPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.success", serverPlayer.getDisplayName()), true);
         return 1;
@@ -153,38 +153,37 @@ public class StratagemCommands
 
     private static int listPlayerStratagems(CommandSourceStack source, ServerPlayer serverPlayer) throws CommandSyntaxException
     {
-        var stratagemData = serverPlayer.getPlayerStratagems();
+        var playerStratagems = serverPlayer.getStratagems();
 
-        if (stratagemData.isEmpty())
+        if (playerStratagems.isEmpty())
         {
             source.sendFailure(Component.translatable("commands.stratagem.list.player.empty", serverPlayer.getDisplayName()));
             return 0;
         }
         else
         {
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.player", serverPlayer.getDisplayName(), stratagemData.size(), StratagemUtils.decorateStratagemList(stratagemData.values())), true);
-            return stratagemData.size();
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.player", serverPlayer.getDisplayName(), playerStratagems.size(), StratagemUtils.decorateStratagemList(playerStratagems.values())), true);
+            return playerStratagems.size();
         }
     }
 
     private static int listServerStratagems(CommandSourceStack source) throws CommandSyntaxException
     {
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
-        var stratagemInstances = stratagemData.getStratagemInstances();
+        var instances = server.overworld().getStratagemData().getInstances();
 
-        if (stratagemInstances.isEmpty())
+        if (instances.isEmpty())
         {
             throw ERROR_LIST_EMPTY_SERVER.create();
         }
         else
         {
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.server", stratagemInstances.size(), StratagemUtils.decorateStratagemList(stratagemInstances)), true);
-            return stratagemInstances.size();
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.server", instances.size(), StratagemUtils.decorateStratagemList(instances)), true);
+            return instances.size();
         }
     }
 
-    private static int useServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int useServerStratagem(CommandSourceStack source, Holder<Stratagem> holder) throws CommandSyntaxException
     {
         //stratagem use server stratagems:reinforce
         //stratagem use server stratagems:block
@@ -192,42 +191,42 @@ public class StratagemCommands
         //stratagem use server stratagems:tnt_rearm
 
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
-        var stratagem = stratagemHolder.value();
+        var serverStratagems = server.overworld().getStratagemData();
+        var stratagem = holder.value();
 
-        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemInstances(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(serverStratagems.getInstances(), holder))
         {
             throw ERROR_USE_SERVER_SPECIFIC_FAILED.create();
         }
 
-        stratagemData.use(stratagemHolder.unwrapKey().orElseThrow(), source.getPlayer());
+        serverStratagems.use(holder, source.getPlayer());
         sendServerStratagemPacket(source);
-        source.sendSuccess(() -> Component.translatable("commands.stratagem.use.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
+        source.sendSuccess(() -> Component.translatable("commands.stratagem.use.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
         return 1;
     }
 
-    private static int usePlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int usePlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> holder) throws CommandSyntaxException
     {
         //stratagem use player stratagems:reinforce
         //stratagem use player stratagems:block
         //stratagem use player stratagems:tnt
         //stratagem use player stratagems:tnt_rearm
 
-        var stratagemInstance = serverPlayer.getPlayerStratagems().get(stratagemHolder);
-        var stratagem = stratagemHolder.value();
+        var playerStratagems = serverPlayer.getStratagems();
+        var stratagem = holder.value();
 
-        if (StratagemUtils.noneMatchHolder(serverPlayer.getPlayerStratagems().values(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(playerStratagems.values(), holder))
         {
             throw ERROR_USE_PLAYER_SPECIFIC_FAILED.create();
         }
 
-        stratagemInstance.use(source.getServer(), serverPlayer);
+        playerStratagems.get(holder).use(source.getServer(), serverPlayer);
         sendPlayerStratagemPacket(source);
-        source.sendSuccess(() -> Component.translatable("commands.stratagem.use.player.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder), serverPlayer.getDisplayName()), true);
+        source.sendSuccess(() -> Component.translatable("commands.stratagem.use.player.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder), serverPlayer.getDisplayName()), true);
         return 1;
     }
 
-    private static int addServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int addServerStratagem(CommandSourceStack source, Holder<Stratagem> holder) throws CommandSyntaxException
     {
         //stratagem add server stratagems:block
         //stratagem add server stratagems:bow
@@ -235,42 +234,42 @@ public class StratagemCommands
         //stratagem add server stratagems:tnt_rearm
 
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
-        var stratagem = stratagemHolder.value();
+        var serverStratagems = server.overworld().getStratagemData();
+        var stratagem = holder.value();
 
-        if (StratagemUtils.anyMatchHolder(stratagemData.getStratagemInstances(), stratagemHolder))
+        if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances(), holder))
         {
             throw ERROR_ADD_SERVER_FAILED.create();
         }
         else
         {
-            stratagemData.add(StratagemUtils.createInstanceWithDefaultValue(stratagemHolder, StratagemInstance.Side.SERVER));
+            serverStratagems.add(StratagemUtils.createInstanceWithDefaultValue(holder, StratagemInstance.Side.SERVER));
             sendServerStratagemPacket(source);
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.add.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.add.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
             return 1;
         }
     }
 
-    private static int addPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> stratagemHolder)
+    private static int addPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> holder)
     {
         //stratagem add player stratagems:block
         //stratagem add player stratagems:bow
         //stratagem add player stratagems:tnt
         //stratagem add player stratagems:tnt_rearm
 
-        var stratagemData = serverPlayer.getPlayerStratagems();
-        var stratagem = stratagemHolder.value();
+        var playerStratagems = serverPlayer.getStratagems();
+        var stratagem = holder.value();
 
-        if (StratagemUtils.anyMatchHolder(stratagemData.values(), stratagemHolder))
+        if (StratagemUtils.anyMatchHolder(playerStratagems.values(), holder))
         {
             source.sendFailure(Component.translatable("commands.stratagem.add.player.failed", serverPlayer.getDisplayName()));
             return 0;
         }
         else
         {
-            stratagemData.put(stratagemHolder, StratagemUtils.createInstanceWithDefaultValue(stratagemHolder, StratagemInstance.Side.PLAYER));
+            playerStratagems.put(holder, StratagemUtils.createInstanceWithDefaultValue(holder, StratagemInstance.Side.PLAYER));
             sendPlayerStratagemPacket(source);
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.add.player.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder), serverPlayer.getDisplayName()), true);
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.add.player.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder), serverPlayer.getDisplayName()), true);
             return 1;
         }
     }
@@ -278,47 +277,46 @@ public class StratagemCommands
     private static int removeAllStratagem(CommandSourceStack source)
     {
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
-        stratagemData.clear();
-        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getPlayerStratagems().clear());
+        server.overworld().getStratagemData().clear();
+        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.getStratagems().clear());
         sendAllPacket(source);
         source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.everything.success"), true);
         return 1;
     }
 
-    private static int removeServerStratagem(CommandSourceStack source, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int removeServerStratagem(CommandSourceStack source, Holder<Stratagem> holder) throws CommandSyntaxException
     {
-        var stratagem = stratagemHolder.value();
         var server = source.getServer();
-        var stratagemData = server.overworld().getServerStratagemData();
+        var stratagem = holder.value();
+        var serverStratagems = server.overworld().getStratagemData();
 
-        if (StratagemUtils.noneMatchHolder(stratagemData.getStratagemInstances(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(serverStratagems.getInstances(), holder))
         {
             throw ERROR_REMOVE_SERVER_SPECIFIC_FAILED.create();
         }
         else
         {
-            stratagemData.remove(stratagemHolder);
+            serverStratagems.remove(holder);
             sendServerStratagemPacket(source);
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.server.specific.success", StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.server.specific.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
             return 1;
         }
     }
 
-    private static int removePlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> stratagemHolder) throws CommandSyntaxException
+    private static int removePlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, Holder<Stratagem> holder) throws CommandSyntaxException
     {
-        var stratagem = stratagemHolder.value();
-        var stratagemData = serverPlayer.getPlayerStratagems();
+        var stratagem = holder.value();
+        var playerStratagems = serverPlayer.getStratagems();
 
-        if (StratagemUtils.noneMatchHolder(stratagemData.values(), stratagemHolder))
+        if (StratagemUtils.noneMatchHolder(playerStratagems.values(), holder))
         {
             throw ERROR_REMOVE_PLAYER_SPECIFIC_FAILED.create();
         }
         else
         {
-            stratagemData.remove(stratagemHolder);
+            playerStratagems.remove(holder);
             sendPlayerStratagemPacket(source);
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.player.specific.success", serverPlayer.getDisplayName(), StratagemUtils.decorateStratagemName(stratagem.name(), stratagemHolder)), true);
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.remove.player.specific.success", serverPlayer.getDisplayName(), StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
             return 1;
         }
     }
@@ -327,24 +325,24 @@ public class StratagemCommands
     {
         for (var player : PlayerLookup.all(source.getServer()))
         {
-            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(player.serverLevel().getServerStratagemData().getStratagemInstances()));
+            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(player.serverLevel().getStratagemData().getInstances()));
         }
     }
 
     private static void sendPlayerStratagemPacket(CommandSourceStack source)
     {
         var player = source.getPlayer();
-        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
+        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID()));
     }
-    
+
     private static void sendAllPlayerStratagemPacket(CommandSourceStack source)
     {
         for (var player : PlayerLookup.all(source.getServer()))
         {
-            ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
+            ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID()));
         }
     }
-    
+
     private static void sendAllPacket(CommandSourceStack source)
     {
         sendPlayerStratagemPacket(source);

@@ -2,21 +2,14 @@ package com.stevekung.stratagems;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
 import com.stevekung.stratagems.registry.ModRegistries;
-import net.minecraft.Util;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
 public interface ModConstants
 {
-    Map<Character, Character> WASD_TO_ARROWS = Util.make(Maps.newHashMap(), map ->
-    {
-        map.put('w', '↑');
-        map.put('a', '←');
-        map.put('s', '↓');
-        map.put('d', '→');
-    });
+    Map<Character, Character> WASD_TO_ARROWS = Map.of('w', '↑', 'a', '←', 's', '↓', 'd', '→');
 
     static String charToArrow(char code)
     {
@@ -49,6 +42,8 @@ public interface ModConstants
 
     interface Tag
     {
+        String VARIANT = "variant";
+
         String STRATAGEM = "stratagem";
         String STRATAGEMS = "stratagems";
         String TICK = "tick";

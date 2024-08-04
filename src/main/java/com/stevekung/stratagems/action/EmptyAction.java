@@ -15,8 +15,7 @@ public record EmptyAction() implements StratagemAction
 
     @Override
     public void action(StratagemActionContext context)
-    {
-    }
+    {}
 
     public static Builder empty()
     {

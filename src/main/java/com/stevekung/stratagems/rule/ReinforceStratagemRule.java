@@ -31,7 +31,7 @@ public class ReinforceStratagemRule implements StratagemRule
     {
         if (context.instance().remainingUse > 0)
         {
-            if (context.player().isPresent() && context.player().get() instanceof ServerPlayer serverPlayer && serverPlayer.serverLevel().players().stream().anyMatch(LivingEntity::isDeadOrDying))
+            if (context.player() instanceof ServerPlayer serverPlayer && serverPlayer.serverLevel().players().stream().anyMatch(LivingEntity::isDeadOrDying))
             {
                 context.instance().remainingUse--;
                 LOGGER.info("{} stratagem has remainingUse: {}", context.instance().stratagem().name().getString(), context.instance().remainingUse);
@@ -47,7 +47,7 @@ public class ReinforceStratagemRule implements StratagemRule
     public void tick(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var player = context.player().orElse(null);
+        var player = context.player();
 
         if (instance.state != StratagemState.COOLDOWN && instance.remainingUse == 0)
         {

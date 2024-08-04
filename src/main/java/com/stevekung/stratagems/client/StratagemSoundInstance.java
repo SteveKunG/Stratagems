@@ -1,6 +1,6 @@
 package com.stevekung.stratagems.client;
 
-import com.stevekung.stratagems.StratagemMenuManager;
+import com.stevekung.stratagems.StratagemInputManager;
 import com.stevekung.stratagems.registry.StratagemSounds;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -21,7 +21,7 @@ public class StratagemSoundInstance extends AbstractTickableSoundInstance
     @Override
     public void tick()
     {
-        if (!StratagemMenuManager.getInstance().hasSelectedStratagem())
+        if (!StratagemInputManager.getInstance().hasSelectedStratagem())
         {
             this.stop();
         }

@@ -2,6 +2,7 @@ package com.stevekung.stratagems.entity;
 
 import java.util.Optional;
 
+import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.registry.ModEntityDataSerializers;
 import com.stevekung.stratagems.registry.ModRegistries;
@@ -61,12 +62,12 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
     @Override
     public void addAdditionalSaveData(CompoundTag compound)
     {
-        this.getVariant().unwrapKey().ifPresent(resourceKey -> compound.putString("variant", resourceKey.location().toString()));
+        this.getVariant().unwrapKey().ifPresent(resourceKey -> compound.putString(ModConstants.Tag.VARIANT, resourceKey.location().toString()));
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound)
     {
-        Optional.ofNullable(ResourceLocation.tryParse(compound.getString("variant"))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).ifPresent(this::setVariant);
+        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).ifPresent(this::setVariant);
     }
 }

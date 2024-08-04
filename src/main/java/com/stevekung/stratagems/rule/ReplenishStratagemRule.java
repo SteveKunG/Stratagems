@@ -36,52 +36,57 @@ public class ReplenishStratagemRule implements StratagemRule
     public void onUse(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var player = context.player().orElse(null);
-        var stratagemData = instance.side == Side.PLAYER ? player.getPlayerStratagems().values() : context.minecraftServer().get().overworld().getServerStratagemData().getStratagemInstances();
-        var rearmProperties = instance.stratagem().properties();
+        var player = context.player();
+        var server = context.server();
+        var stratagems = instance.side == Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances();
+        var properties = instance.stratagem().properties();
+        var replenishOptional = properties.replenish();
         var count = 0;
 
-        if (rearmProperties.replenish().isPresent() && rearmProperties.replenish().get().toReplenish().isPresent())
+        if (replenishOptional.isPresent() && replenishOptional.get().toReplenish().isPresent())
         {
-            for (var toReplenishinstance : stratagemData.stream().filter(toReplenishinstance -> rearmProperties.replenish().get().toReplenish().get().contains(toReplenishinstance.getStratagem())).toList())
-            {
-                toReplenishinstance.state = StratagemState.COOLDOWN;
+            var stratagemReplenish = replenishOptional.get();
+            var toReplenishSet = stratagemReplenish.toReplenish().get();
 
-                var replenishedProperties = toReplenishinstance.stratagem().properties();
-                toReplenishinstance.inboundDuration = replenishedProperties.inboundDuration();
+            for (var replenishedStratagem : stratagems.stream().filter(stratagem -> toReplenishSet.contains(stratagem.getStratagem())).toList())
+            {
+                replenishedStratagem.state = StratagemState.COOLDOWN;
+
+                var replenishedProperties = replenishedStratagem.stratagem().properties();
+                replenishedStratagem.inboundDuration = replenishedProperties.inboundDuration();
 
                 if (replenishedProperties.duration().isPresent())
                 {
-                    toReplenishinstance.duration = replenishedProperties.duration().get();
+                    replenishedStratagem.duration = replenishedProperties.duration().get();
                 }
 
                 // replenished cooldown from rearm
-                toReplenishinstance.cooldown = rearmProperties.cooldown();
+                replenishedStratagem.cooldown = properties.cooldown();
 
                 if (replenishedProperties.remainingUse().isPresent())
                 {
-                    toReplenishinstance.remainingUse = replenishedProperties.remainingUse().get();
+                    replenishedStratagem.remainingUse = replenishedProperties.remainingUse().get();
                 }
 
-                LOGGER.info("Replenished {} stratagem!", toReplenishinstance.stratagem().name().getString());
+                LOGGER.info("Replenished {} stratagem!", replenishedStratagem.stratagem().name().getString());
 
                 // Remove this rearm stratagem
                 if (instance.side == Side.PLAYER)
                 {
-                    player.getPlayerStratagems().remove(instance.getStratagem());
+                    player.getStratagems().remove(instance.getStratagem());
                 }
                 else
                 {
-                    context.minecraftServer().get().overworld().getServerStratagemData().remove(instance.getStratagem());
+                    server.overworld().getStratagemData().remove(instance.getStratagem());
                 }
 
                 LOGGER.info("Remove {} replenisher stratagem!", instance.stratagem().name().getString());
                 count++;
             }
 
-            if (player != null && rearmProperties.replenish().get().replenishSound().isPresent() && count > 0)
+            if (player != null && stratagemReplenish.replenishSound().isPresent() && count > 0)
             {
-                player.playSound(rearmProperties.replenish().get().replenishSound().get(), 1.0f, 1.0f);
+                player.playSound(stratagemReplenish.replenishSound().get(), 1.0f, 1.0f);
             }
         }
     }
@@ -89,49 +94,60 @@ public class ReplenishStratagemRule implements StratagemRule
     @Override
     public void onReset(StratagemInstanceContext context)
     {
-        context.player().get().getPlayerStratagems().remove(context.instance().getStratagem());
-        LOGGER.info("Remove {} replenisher stratagem on reset!", context.instance().stratagem().name().getString());
+        var instance = context.instance();
+
+        // Remove this rearm stratagem
+        if (instance.side == Side.PLAYER)
+        {
+            context.player().getStratagems().remove(instance.getStratagem());
+        }
+        else
+        {
+            context.server().overworld().getStratagemData().remove(instance.getStratagem());
+        }
+
+        LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
     }
 
     @Override
     public void tick(StratagemInstanceContext context)
     {
-        if (context.minecraftServer().isPresent() && context.instance().stratagem().properties().replenish().isPresent())
+        var instance = context.instance();
+        var properties = instance.stratagem().properties();
+        var replenishOptional = properties.replenish();
+
+        if (replenishOptional.isPresent())
         {
-            if (context.instance().stratagem().properties().replenish().get().toReplenish().isPresent())
+            var replenish = replenishOptional.get();
+            var toReplenishOptional = replenish.toReplenish();
+
+            if (toReplenishOptional.isPresent())
             {
-                var instance = context.instance();
-                var player = context.player().orElse(null);
+                var toReplenish = toReplenishOptional.get();
+                var player = context.player();
+                var server = context.server();
+                var serverStratagems = server.overworld().getStratagemData();
+                var playerStratagems = player.getStratagems();
 
-                if (instance.side == Side.PLAYER)
+                if (player != null && instance.side == Side.PLAYER)
                 {
-                    var depletedStratagem = player.getPlayerStratagems().entrySet().stream().filter(entry ->
+                    playerStratagems.entrySet().stream().filter(entry -> entry.getValue().state == StratagemState.DEPLETED && toReplenish.contains(entry.getKey())).findAny().ifPresent(ignore ->
                     {
-                        return entry.getValue().state == StratagemState.DEPLETED && context.instance().stratagem().properties().replenish().get().toReplenish().get().contains(entry.getKey());
+                        instance.use(null, player);
+                        ServerPlayNetworking.send((ServerPlayer)player, UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID()));
                     });
-
-                    if (depletedStratagem.findAny().isPresent())
-                    {
-                        context.instance().use(context.minecraftServer().get(), player);
-                        ServerPlayNetworking.send((ServerPlayer)player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
-                    }
                 }
-                else
+                if (server != null && instance.side == Side.SERVER)
                 {
-                    var depletedStratagem = context.minecraftServer().get().overworld().getServerStratagemData().getStratagemInstances().stream().filter(instancex ->
+                    serverStratagems.getInstances().stream().filter(instancex -> instancex.state == StratagemState.DEPLETED && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
                     {
-                        return instancex.state == StratagemState.DEPLETED && context.instance().stratagem().properties().replenish().get().toReplenish().get().contains(instancex.getStratagem());
-                    });
+                        instance.use(server, player);
 
-                    if (depletedStratagem.findAny().isPresent())
-                    {
-                        context.instance().use(context.minecraftServer().get(), player);
-                        
-                        for (var serverPlayer : PlayerLookup.all(context.minecraftServer().get()))
+                        for (var serverPlayer : PlayerLookup.all(server))
                         {
-                            ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(context.minecraftServer().get().overworld().getServerStratagemData().getStratagemInstances()));
+                            ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.getInstances()));
                         }
-                    }
+                    });
                 }
             }
         }

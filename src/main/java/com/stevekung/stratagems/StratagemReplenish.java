@@ -17,5 +17,5 @@ public record StratagemReplenish(Optional<ResourceKey<Stratagem>> replenisher, O
             ResourceKey.codec(ModRegistries.STRATAGEM).optionalFieldOf("replenisher").forGetter(StratagemReplenish::replenisher),
             RegistryCodecs.homogeneousList(ModRegistries.STRATAGEM).optionalFieldOf("to_replenish").forGetter(StratagemReplenish::toReplenish),
             BuiltInRegistries.SOUND_EVENT.byNameCodec().optionalFieldOf("replenish_sound").forGetter(StratagemReplenish::replenishSound)
-    ).apply(instance, StratagemReplenish::new));
+            ).apply(instance, StratagemReplenish::new));
 }

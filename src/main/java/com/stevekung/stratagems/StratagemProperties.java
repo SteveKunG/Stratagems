@@ -17,7 +17,7 @@ public record StratagemProperties(int inboundDuration, Optional<Integer> duratio
             Codec.BOOL.optionalFieldOf("can_depleted").forGetter(StratagemProperties::canDepleted),
             Codec.BOOL.optionalFieldOf("need_throw").forGetter(StratagemProperties::needThrow),
             StratagemReplenish.CODEC.optionalFieldOf("replenish").forGetter(StratagemProperties::replenish)
-    ).apply(instance, StratagemProperties::new));
+            ).apply(instance, StratagemProperties::new));
 
     public static StratagemProperties simple(int inboundDuration, int cooldown, int beamColor)
     {

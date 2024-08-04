@@ -14,7 +14,7 @@ public abstract class MixinServerLevel implements ServerStratagemsDataAccessor
     abstract MinecraftServer getServer();
 
     @Override
-    public ServerStratagemsData getServerStratagemData()
+    public ServerStratagemsData getStratagemData()
     {
         return this.getServer().overworld().getDataStorage().computeIfAbsent(ServerStratagemsData.factory(ServerLevel.class.cast(this)), ServerStratagemsData.getFileId());
     }

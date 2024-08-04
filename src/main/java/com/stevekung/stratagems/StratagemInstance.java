@@ -5,9 +5,7 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
-import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.rule.StratagemRule;
 
@@ -28,7 +26,6 @@ import net.minecraft.world.level.Level;
 
 public class StratagemInstance
 {
-    private static final Logger LOGGER = LogUtils.getLogger();
     private final Holder<Stratagem> stratagem;
     public int inboundDuration;
     public Integer duration;

@@ -13,7 +13,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -22,7 +21,7 @@ public class ServerStratagemsData extends SavedData
 {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "server_stratagems";
-    private final List<StratagemInstance> stratagemInstances = Lists.newCopyOnWriteArrayList();
+    private final List<StratagemInstance> instances = Lists.newCopyOnWriteArrayList();
     private final ServerLevel level;
     private int tick;
 
@@ -40,7 +39,7 @@ public class ServerStratagemsData extends SavedData
     public void tick()
     {
         this.tick++;
-        this.stratagemInstances.forEach(instance -> instance.tick(this.level.getServer(), null));
+        this.instances.forEach(instance -> instance.tick(this.level.getServer(), null));
 
         if (this.tick % 100 == 0)
         {
@@ -48,26 +47,26 @@ public class ServerStratagemsData extends SavedData
         }
     }
 
-    public void use(ResourceKey<Stratagem> resourceKey, Player player)
+    public void use(Holder<Stratagem> holder, Player player)
     {
-        this.stratagemInstances.stream().filter(entry -> entry.getStratagem().unwrapKey().orElseThrow().equals(resourceKey)).findFirst().ifPresent(entry ->
+        this.instances.stream().filter(instance -> instance.getStratagem() == holder).findFirst().ifPresent(instance ->
         {
-            if (entry.canUse(this.level.getServer(), player))
+            if (instance.canUse(this.level.getServer(), player))
             {
-                entry.use(this.level.getServer(), player);
+                instance.use(this.level.getServer(), player);
                 this.setDirty();
             }
             else
             {
-                LOGGER.info("Cannot use {} stratagem because it's in {} state!", entry.stratagem().name().getString(), entry.state);
+                LOGGER.info("Cannot use {} stratagem because it's in {} state!", instance.stratagem().name().getString(), instance.state);
             }
         });
     }
 
     public static ServerStratagemsData load(ServerLevel level, CompoundTag tag)
     {
-        var stratagems = new ServerStratagemsData(level);
-        stratagems.tick = tag.getInt(ModConstants.Tag.TICK);
+        var data = new ServerStratagemsData(level);
+        data.tick = tag.getInt(ModConstants.Tag.TICK);
 
         if (tag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
         {
@@ -75,13 +74,11 @@ public class ServerStratagemsData extends SavedData
 
             for (var i = 0; i < listTag.size(); i++)
             {
-                var compoundTag = listTag.getCompound(i);
-                var stratagemInstance = StratagemInstance.load(compoundTag, level);
-                stratagems.stratagemInstances.add(stratagemInstance);
+                data.instances.add(StratagemInstance.load(listTag.getCompound(i), level));
             }
         }
 
-        return stratagems;
+        return data;
     }
 
     @Override
@@ -89,10 +86,10 @@ public class ServerStratagemsData extends SavedData
     {
         var listTag = new ListTag();
 
-        for (var stratagemInstance : this.stratagemInstances)
+        for (var instance : this.instances)
         {
             var compoundTag = new CompoundTag();
-            stratagemInstance.save(compoundTag);
+            instance.save(compoundTag);
             listTag.add(compoundTag);
         }
 
@@ -103,27 +100,27 @@ public class ServerStratagemsData extends SavedData
 
     public void add(StratagemInstance instance)
     {
-        this.stratagemInstances.add(instance);
+        this.instances.add(instance);
     }
 
-    public void remove(Holder<Stratagem> stratagemHolder)
+    public void remove(Holder<Stratagem> holder)
     {
-        this.stratagemInstances.removeIf(entry -> entry.getStratagem() == stratagemHolder);
+        this.instances.removeIf(instance -> instance.getStratagem() == holder);
     }
 
-    public void reset(Holder<Stratagem> stratagemHolder)
+    public void reset(Holder<Stratagem> holder)
     {
-        this.stratagemInstances.stream().filter(entry -> entry.getStratagem() == stratagemHolder).forEach(instance -> instance.reset(this.level.getServer(), null));
+        this.instances.stream().filter(instance -> instance.getStratagem() == holder).forEach(instance -> instance.reset(this.level.getServer(), null));
     }
 
     public void clear()
     {
-        this.stratagemInstances.clear();
+        this.instances.clear();
     }
 
-    public List<StratagemInstance> getStratagemInstances()
+    public List<StratagemInstance> getInstances()
     {
-        return this.stratagemInstances;
+        return this.instances;
     }
 
     public static String getFileId()

@@ -19,6 +19,6 @@ public class MixinServerPlayer
     private void changeDimension(DimensionTransition transition, CallbackInfoReturnable<Entity> info)
     {
         var player = ServerPlayer.class.cast(this);
-        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getPlayerStratagems().values(), player.getUUID()));
+        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID()));
     }
 }

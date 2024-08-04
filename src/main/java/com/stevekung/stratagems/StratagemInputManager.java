@@ -1,14 +1,20 @@
 package com.stevekung.stratagems;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.stevekung.stratagems.client.StratagemsClientMod;
 import com.stevekung.stratagems.registry.StratagemSounds;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 
-public class StratagemMenuManager
+public class StratagemInputManager
 {
-    private static final StratagemMenuManager INSTANCE = new StratagemMenuManager();
+    private static final StratagemInputManager INSTANCE = new StratagemInputManager();
 
     private boolean stratagemsMenuOpen;
     private String tempStratagemCode = "";
@@ -18,14 +24,29 @@ public class StratagemMenuManager
 
     private final Minecraft minecraft;
 
-    private StratagemMenuManager()
+    private StratagemInputManager()
     {
         this.minecraft = Minecraft.getInstance();
     }
 
-    public static StratagemMenuManager getInstance()
+    public static StratagemInputManager getInstance()
     {
         return INSTANCE;
+    }
+
+    public static boolean clientNoneMatch(String tempStratagemCode, Player player)
+    {
+        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).noneMatch(entry -> entry.getCode().startsWith(tempStratagemCode));
+    }
+
+    public static boolean clientFoundMatch(String tempStratagemCode, Player player)
+    {
+        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).anyMatch(entry -> entry.getCode().equals(tempStratagemCode));
+    }
+
+    public static StratagemInstance getStratagemFromCode(String tempStratagemCode, Player player)
+    {
+        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(entry -> entry.canUse(null, player) && entry.getCode().equals(tempStratagemCode)).findFirst().get();
     }
 
     public boolean isMenuOpen()

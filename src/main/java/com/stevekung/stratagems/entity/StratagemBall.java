@@ -2,6 +2,7 @@ package com.stevekung.stratagems.entity;
 
 import java.util.Optional;
 
+import com.stevekung.stratagems.ModConstants;
 import com.stevekung.stratagems.Stratagem;
 import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.StratagemsMod;
@@ -85,14 +86,14 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
     public void addAdditionalSaveData(CompoundTag compound)
     {
         super.addAdditionalSaveData(compound);
-        this.getVariant().unwrapKey().ifPresent(resourceKey -> compound.putString("variant", resourceKey.location().toString()));
+        this.getVariant().unwrapKey().ifPresent(resourceKey -> compound.putString(ModConstants.Tag.VARIANT, resourceKey.location().toString()));
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound)
     {
         super.readAdditionalSaveData(compound);
-        Optional.ofNullable(ResourceLocation.tryParse(compound.getString("variant"))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).ifPresent(this::setVariant);
+        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).ifPresent(this::setVariant);
     }
 
     @Override
@@ -125,29 +126,29 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {
                 var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
-                var serverStratagem = serverLevel.getServer().overworld().getServerStratagemData();
-                var playerStratagem = serverPlayer.getPlayerStratagems().get(this.getVariant());
+                var serverStratagems = serverLevel.getServer().overworld().getStratagemData();
+                var playerStratagems = serverPlayer.getStratagems().get(this.getVariant());
 
                 if (this.getSide() == StratagemInstance.Side.SERVER)
                 {
                     this.getVariant().value().action().action(stratagemContext);
-                    serverStratagem.use(this.getVariant().unwrapKey().orElseThrow(), serverPlayer);
+                    serverStratagems.use(this.getVariant(), serverPlayer);
                     
                     for (var player : PlayerLookup.all(this.getServer()))
                     {
-                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagem.getStratagemInstances()));
+                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.getInstances()));
                     }
                 }
                 else
                 {
-                    if (playerStratagem == null)
+                    if (playerStratagems == null)
                     {
                         return;
                     }
 
                     this.getVariant().value().action().action(stratagemContext);
-                    playerStratagem.use(getServer(), serverPlayer);
-                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.getPlayerStratagems().values(), serverPlayer.getUUID()));
+                    playerStratagems.use(getServer(), serverPlayer);
+                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.getStratagems().values(), serverPlayer.getUUID()));
                 }
             }
             else

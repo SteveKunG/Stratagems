@@ -33,7 +33,7 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     }
 
     @Override
-    public Map<Holder<Stratagem>, StratagemInstance> getPlayerStratagems()
+    public Map<Holder<Stratagem>, StratagemInstance> getStratagems()
     {
         return this.stratagems;
     }
@@ -56,10 +56,10 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
         {
             var listTag = new ListTag();
 
-            for (var stratagemInstance : this.stratagems.values())
+            for (var instances : this.stratagems.values())
             {
                 var compoundTag = new CompoundTag();
-                stratagemInstance.save(compoundTag);
+                instances.save(compoundTag);
                 listTag.add(compoundTag);
             }
 
@@ -77,8 +77,8 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
             for (var i = 0; i < listTag.size(); i++)
             {
                 var compoundTag = listTag.getCompound(i);
-                var stratagemInstance = StratagemInstance.load(compoundTag, this.level());
-                this.stratagems.put(stratagemInstance.getStratagem(), stratagemInstance);
+                var instance = StratagemInstance.load(compoundTag, this.level());
+                this.stratagems.put(instance.getStratagem(), instance);
             }
         }
     }

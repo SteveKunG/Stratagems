@@ -33,43 +33,56 @@ public class DepletedStratagemRule implements StratagemRule
     public void onUse(StratagemInstanceContext context)
     {
         var instance = context.instance();
+        var player = context.player();
+        var server = context.server();
+        var stratagem = instance.stratagem();
+        var replenishOptional = stratagem.properties().replenish();
 
         if (instance.remainingUse > 0)
         {
             // Set state from READY to IN_USE
             instance.state = StratagemState.IN_USE;
             instance.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", instance.stratagem().name().getString(), instance.remainingUse);
+            LOGGER.info("{} stratagem has remainingUse: {}", stratagem.name().getString(), instance.remainingUse);
         }
 
-        // Add replenisher stratagem when remaining use is 0
-        if (instance.remainingUse < instance.stratagem().properties().remainingUse().get() && instance.stratagem().properties().replenish().isPresent() && instance.stratagem().properties().replenish().get().replenisher().isPresent())
+        // Add replenisher stratagem when remaining use is lower than original
+        if (instance.remainingUse < stratagem.properties().remainingUse().get() && replenishOptional.isPresent())
         {
-            if (instance.side == Side.PLAYER && context.player().isPresent())
+            var replenisherOptional = replenishOptional.get().replenisher();
+
+            if (replenisherOptional.isPresent())
             {
-                var replenisher = context.player().get().level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
+                var replenisherKey = replenisherOptional.get();
 
-                if (StratagemUtils.anyMatchHolder(context.player().get().getPlayerStratagems().values(), replenisher))
+                if (instance.side == Side.PLAYER && player != null)
                 {
-                    LOGGER.info("{} player replenisher stratagem already exist", replenisher.value().name().getString());
-                    return;
+                    var playerStratagems = player.getStratagems();
+                    var replenisherStratagem = player.level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
+
+                    if (StratagemUtils.anyMatchHolder(playerStratagems.values(), replenisherStratagem))
+                    {
+                        LOGGER.info("{} player replenisher stratagem already exist", replenisherStratagem.value().name().getString());
+                        return;
+                    }
+
+                    playerStratagems.put(replenisherStratagem, StratagemUtils.createInstanceWithDefaultValue(replenisherStratagem, StratagemInstance.Side.PLAYER));
+                    LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
                 }
-
-                context.player().get().getPlayerStratagems().put(replenisher, StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.PLAYER));
-                LOGGER.info("Add {} replenisher stratagem to {}", replenisher.value().name().getString(), context.player().get().getName().getString());
-            }
-            if (instance.side == Side.SERVER && context.minecraftServer().isPresent())
-            {
-                var replenisher = context.minecraftServer().get().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(instance.stratagem().properties().replenish().get().replenisher().get());
-
-                if (StratagemUtils.anyMatchHolder(context.minecraftServer().get().overworld().getServerStratagemData().getStratagemInstances(), replenisher))
+                if (instance.side == Side.SERVER && server != null)
                 {
-                    LOGGER.info("{} server replenisher stratagem already exist", replenisher.value().name().getString());
-                    return;
-                }
+                    var serverStratagems = server.overworld().getStratagemData();
+                    var replenisherStratagem = server.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
 
-                context.minecraftServer().get().overworld().getServerStratagemData().add(StratagemUtils.createInstanceWithDefaultValue(replenisher, StratagemInstance.Side.SERVER));
-                LOGGER.info("Add {} server replenisher stratagem", replenisher.value().name().getString());
+                    if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances(), replenisherStratagem))
+                    {
+                        LOGGER.info("{} server replenisher stratagem already exist", replenisherStratagem.value().name().getString());
+                        return;
+                    }
+
+                    serverStratagems.add(StratagemUtils.createInstanceWithDefaultValue(replenisherStratagem, StratagemInstance.Side.SERVER));
+                    LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
+                }
             }
         }
     }
@@ -78,7 +91,10 @@ public class DepletedStratagemRule implements StratagemRule
     public void tick(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var player = context.player().orElse(null);
+        var player = context.player();
+        var stratagem = instance.stratagem();
+        var stratagemName = stratagem.name().getString();
+        var properties = stratagem.properties();
 
         if (!instance.isReady())
         {
@@ -90,12 +106,12 @@ public class DepletedStratagemRule implements StratagemRule
 
                     if (instance.duration % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has duration: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.duration, player));
+                        LOGGER.info("{} stratagem has duration: {}", stratagemName, instance.formatTickDuration(instance.duration, player));
                     }
                 }
                 else
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.INBOUND);
+                    LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.INBOUND);
                     instance.state = StratagemState.INBOUND;
                 }
             }
@@ -106,19 +122,19 @@ public class DepletedStratagemRule implements StratagemRule
 
                 if (instance.inboundDuration % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has inboundDuration: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.inboundDuration, player));
+                    LOGGER.info("{} stratagem has inboundDuration: {}", stratagemName, instance.formatTickDuration(instance.inboundDuration, player));
                 }
                 if (instance.inboundDuration == 0)
                 {
                     if (instance.remainingUse == 0)
                     {
                         instance.state = StratagemState.DEPLETED;
-                        LOGGER.info("{} stratagem is now depleted!", instance.stratagem().name().getString());
+                        LOGGER.info("{} stratagem is now depleted!", stratagemName);
                         return;
                     }
-                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.COOLDOWN);
+                    LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.COOLDOWN);
                     instance.state = StratagemState.COOLDOWN;
-                    instance.cooldown = instance.stratagem().properties().cooldown();
+                    instance.cooldown = properties.cooldown();
                 }
             }
 
@@ -130,16 +146,15 @@ public class DepletedStratagemRule implements StratagemRule
 
                     if (instance.cooldown % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
+                        LOGGER.info("{} stratagem has cooldown: {}", stratagemName, instance.formatTickDuration(instance.cooldown, player));
                     }
                 }
 
                 if (instance.cooldown == 0)
                 {
-                    LOGGER.info("{} stratagem switch state from {} to {}", instance.stratagem().name().getString(), instance.state, StratagemState.READY);
+                    LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.READY);
                     instance.state = StratagemState.READY;
 
-                    var properties = instance.stratagem().properties();
                     instance.inboundDuration = properties.inboundDuration();
 
                     if (properties.duration().isPresent())
