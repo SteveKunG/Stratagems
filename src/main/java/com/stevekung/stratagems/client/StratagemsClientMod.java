@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
@@ -362,9 +363,9 @@ public class StratagemsClientMod implements ClientModInitializer
                 var finalIndex = index;
                 var display = stratagem.display();
 
-                if (display.type() == StratagemDisplay.Type.ITEM)
+                switch (display.type())
                 {
-                    display.itemStack().ifPresent(itemStack ->
+                    case ITEM -> display.itemStack().ifPresent(itemStack ->
                     {
                         if (display.useRemainingAsCount() && stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
                         {
@@ -377,7 +378,15 @@ public class StratagemsClientMod implements ClientModInitializer
                             guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagementry.remainingUse), 8, 24 + finalIndex * 30, String.valueOf(itemStack.getCount()));
                         }
                     });
+                    case TEXTURE ->
+                            display.texture().ifPresent(resourceLocation -> guiGraphics.blitSprite(resourceLocation, 8, 24 + finalIndex * 30, 16, 16));
+                    case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
+                    {
+                        var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
+                        PlayerFaceRenderer.draw(guiGraphics, supplier.get(), 8, 24 + finalIndex * 30, 12);
+                    });
                 }
+
                 guiGraphics.pose().popPose();
 
                 // broken
