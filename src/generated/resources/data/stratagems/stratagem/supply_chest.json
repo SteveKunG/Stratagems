@@ -16,10 +16,7 @@
     "inbound_duration": 200
   },
   "display": {
-    "type": "item",
-    "item_stack": {
-      "count": 1,
-      "id": "minecraft:chest"
-    }
+    "type": "texture",
+    "texture": "stratagems:textures/stratagem/supply_chest.png"
   }
 }

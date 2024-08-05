@@ -23,7 +23,7 @@
     "display_count_override": "64",
     "item_stack": {
       "count": 1,
-      "id": "minecraft:tnt"
+      "id": "minecraft:stone"
     },
     "use_remaining_as_count": false
   }

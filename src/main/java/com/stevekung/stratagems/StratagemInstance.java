@@ -28,8 +28,10 @@ public class StratagemInstance
 {
     private final Holder<Stratagem> stratagem;
     public int inboundDuration;
+    @Nullable
     public Integer duration;
     public int cooldown;
+    @Nullable
     public Integer remainingUse;
     public StratagemState state;
     public Side side;
@@ -109,31 +111,6 @@ public class StratagemInstance
     public Holder<Stratagem> getStratagem()
     {
         return this.stratagem;
-    }
-
-    public int getInboundDuration()
-    {
-        return this.inboundDuration;
-    }
-
-    public Integer getDuration()
-    {
-        return this.duration;
-    }
-
-    public int getCooldown()
-    {
-        return this.cooldown;
-    }
-
-    public Integer getRemainingUse()
-    {
-        return this.remainingUse;
-    }
-
-    public StratagemState getState()
-    {
-        return this.state;
     }
 
     public void tick(@Nullable MinecraftServer minecraftServer, @Nullable Player player)

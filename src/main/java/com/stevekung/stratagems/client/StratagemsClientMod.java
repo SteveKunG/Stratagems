@@ -32,6 +32,8 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.StringUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class StratagemsClientMod implements ClientModInitializer
 {
@@ -376,7 +378,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 index++;
             }
 
-            guiGraphics.fill(4, 12, 84 + max, 56 + index * 24, -1, grayAlpha);
+            guiGraphics.fill(4, 12, 84 + max, 56 + index * 25, -1, grayAlpha);
         }
     }
 
@@ -386,24 +388,37 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             case ITEM -> display.itemStack().ifPresent(itemStack ->
             {
-                if (display.useRemainingAsCount() && instance.remainingUse != null && instance.remainingUse > 0)
+                guiGraphics.renderItem(itemStack, 8, 22 + index * 30);
+
+                if (display.useRemainingAsCount())
                 {
-                    itemStack.setCount(instance.remainingUse);
+                    if (instance.remainingUse != null && instance.remainingUse > 0)
+                    {
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, String.valueOf(instance.remainingUse));
+                    }
                 }
-
-                guiGraphics.renderItem(itemStack, 8, 24 + index * 30);
-
-                if (display.useRemainingAsCount() && instance.remainingUse != null)
+                else
                 {
-                    guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(instance.remainingUse), 8, 24 + index * 30, String.valueOf(itemStack.getCount()));
+                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, displayCount));
                 }
             });
-            case TEXTURE ->
-                    display.texture().ifPresent(resourceLocation -> guiGraphics.blitSprite(resourceLocation, 8, 24 + index * 30, 16, 16));
+            case TEXTURE -> display.texture().ifPresent(resourceLocation -> guiGraphics.blit(resourceLocation, 8, 22 + index * 30, 0, 0, 16, 16, 16, 16));
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
             {
                 var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
-                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), 8, 24 + index * 30, 12);
+                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), 8, 22 + index * 30, 16);
+
+                if (display.useRemainingAsCount())
+                {
+                    if (instance.remainingUse != null && instance.remainingUse > 0)
+                    {
+                        guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, String.valueOf(instance.remainingUse));
+                    }
+                }
+                else
+                {
+                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, displayCount));
+                }
             });
         }
     }
