@@ -1,6 +1,5 @@
 package com.stevekung.stratagems;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -18,16 +17,14 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFileCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.item.ItemStack;
 
-public record Stratagem(String code, Component name, Either<ItemStack, ResourceLocation> icon, StratagemAction action, StratagemRule rule, StratagemProperties properties)
+public record Stratagem(String code, Component name, StratagemDisplay display, StratagemAction action, StratagemRule rule, StratagemProperties properties)
 {
     public static final Codec<Stratagem> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ExtraCodecs.NON_EMPTY_STRING.validate(Stratagem::validateStratagemCode).fieldOf("code").forGetter(Stratagem::code),
             ComponentSerialization.CODEC.fieldOf("name").forGetter(Stratagem::name),
-            Codec.either(ItemStack.CODEC, ResourceLocation.CODEC).fieldOf("icon").forGetter(Stratagem::icon),
+            StratagemDisplay.CODEC.fieldOf("display").forGetter(Stratagem::display),
             StratagemActions.DIRECT_CODEC.fieldOf("action").forGetter(Stratagem::action),
             StratagemRules.CODEC.optionalFieldOf("rule", DefaultRule.defaultRule().build()).forGetter(Stratagem::rule),
             StratagemProperties.CODEC.fieldOf("properties").forGetter(Stratagem::properties)

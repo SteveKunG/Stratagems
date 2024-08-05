@@ -22,8 +22,11 @@
     "cooldown": 6000,
     "inbound_duration": 100
   },
-  "icon": {
-    "count": 1,
-    "id": "minecraft:bow"
+  "display": {
+    "type": "item",
+    "item_stack": {
+      "count": 1,
+      "id": "minecraft:bow"
+    }
   }
 }

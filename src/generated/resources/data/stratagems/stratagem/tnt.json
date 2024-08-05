@@ -20,8 +20,11 @@
       "replenisher": "stratagems:tnt_rearm"
     }
   },
-  "icon": {
-    "count": 1,
-    "id": "minecraft:tnt"
+  "display": {
+    "type": "item",
+    "item_stack": {
+      "count": 1,
+      "id": "minecraft:tnt"
+    }
   }
 }

@@ -16,7 +16,7 @@ import net.minecraft.core.RegistrySetBuilder;
 
 public class StratagemDataGenerator implements DataGeneratorEntrypoint
 {
-    private static final List<String> SORT_ORDERS = List.of("code", "name", "action", "rule", "properties", "icon");
+    private static final List<String> SORT_ORDERS = List.of("code", "name", "action", "rule", "properties", "display");
 
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator dataGenerator)

@@ -18,8 +18,11 @@
     "cooldown": 6000,
     "inbound_duration": 200
   },
-  "icon": {
-    "count": 1,
-    "id": "minecraft:iron_pickaxe"
+  "display": {
+    "type": "item",
+    "item_stack": {
+      "count": 1,
+      "id": "minecraft:iron_pickaxe"
+    }
   }
 }

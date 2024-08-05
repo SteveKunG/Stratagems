@@ -18,8 +18,13 @@
     "cooldown": 1200,
     "inbound_duration": 100
   },
-  "icon": {
-    "count": 1,
-    "id": "minecraft:stone"
+  "display": {
+    "type": "item",
+    "display_count_override": "64",
+    "item_stack": {
+      "count": 1,
+      "id": "minecraft:tnt"
+    },
+    "use_remaining_as_count": false
   }
 }

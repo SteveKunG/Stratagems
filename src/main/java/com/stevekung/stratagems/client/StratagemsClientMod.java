@@ -8,10 +8,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.ModConstants;
-import com.stevekung.stratagems.StratagemInputManager;
-import com.stevekung.stratagems.StratagemInstance;
-import com.stevekung.stratagems.StratagemState;
+import com.stevekung.stratagems.*;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
@@ -267,15 +264,20 @@ public class StratagemsClientMod implements ClientModInitializer
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().translate(0, 0, hasCode ? 0 : -300);
                     var finalIndex = index;
-                    stratagem.icon().ifLeft(itemStack ->
+                    var display = stratagem.display();
+
+                    if (display.type() == StratagemDisplay.Type.ITEM)
                     {
-                        if (stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
+                        display.itemStack().ifPresent(itemStack ->
                         {
-                            itemStack.setCount(stratagementry.remainingUse);
-                        }
-                        guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 24 + finalIndex * 30);
-                    });
+                            if (display.useRemainingAsCount() && stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
+                            {
+                                itemStack.setCount(stratagementry.remainingUse);
+                            }
+                            guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
+                            guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 24 + finalIndex * 30);
+                        });
+                    }
                     guiGraphics.pose().popPose();
                 }
 
@@ -358,20 +360,24 @@ public class StratagemsClientMod implements ClientModInitializer
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, hasCode ? 0 : -300);
                 var finalIndex = index;
-                stratagem.icon().ifLeft(itemStack ->
+                var display = stratagem.display();
+
+                if (display.type() == StratagemDisplay.Type.ITEM)
                 {
-                    if (stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
+                    display.itemStack().ifPresent(itemStack ->
                     {
-                        itemStack.setCount(stratagementry.remainingUse);
-                    }
+                        if (display.useRemainingAsCount() && stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
+                        {
+                            itemStack.setCount(stratagementry.remainingUse);
+                        }
+                        guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
 
-                    guiGraphics.renderItem(itemStack, 8, 24 + finalIndex * 30);
-
-                    if (stratagementry.remainingUse != null)
-                    {
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagementry.remainingUse), 8, 24 + finalIndex * 30, String.valueOf(itemStack.getCount()));
-                    }
-                });
+                        if (display.useRemainingAsCount() && stratagementry.remainingUse != null)
+                        {
+                            guiGraphics.renderItemDecorations(minecraft.font, itemStack.copyWithCount(stratagementry.remainingUse), 8, 24 + finalIndex * 30, String.valueOf(itemStack.getCount()));
+                        }
+                    });
+                }
                 guiGraphics.pose().popPose();
 
                 // broken
