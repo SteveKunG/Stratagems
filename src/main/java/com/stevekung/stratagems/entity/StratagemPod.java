@@ -2,10 +2,10 @@ package com.stevekung.stratagems.entity;
 
 import java.util.Optional;
 
-import com.stevekung.stratagems.ModConstants;
-import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.registry.ModEntityDataSerializers;
-import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
+import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 
 import net.minecraft.core.Holder;

@@ -2,7 +2,7 @@ package com.stevekung.stratagems.client;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.stevekung.stratagems.ModConstants;
+import com.stevekung.stratagems.api.ModConstants;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;

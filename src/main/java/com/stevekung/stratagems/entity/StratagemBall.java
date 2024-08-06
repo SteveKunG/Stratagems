@@ -2,13 +2,15 @@ package com.stevekung.stratagems.entity;
 
 import java.util.Optional;
 
-import com.stevekung.stratagems.ModConstants;
-import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.StratagemInstance;
-import com.stevekung.stratagems.StratagemsMod;
-import com.stevekung.stratagems.action.StratagemActionContext;
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.action.StratagemActionContext;
+import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
+import com.stevekung.stratagems.api.references.ModRegistries;
+import com.stevekung.stratagems.api.references.StratagemSounds;
 import com.stevekung.stratagems.registry.*;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -153,7 +155,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             }
             else
             {
-                StratagemsMod.LOGGER.warn("Stratagem owner is {} rather than a player!", this.getOwner());
+                ModConstants.LOGGER.warn("Stratagem owner is {} rather than a player!", this.getOwner());
             }
 
             this.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);

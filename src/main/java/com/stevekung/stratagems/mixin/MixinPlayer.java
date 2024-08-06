@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.common.collect.Maps;
-import com.stevekung.stratagems.ModConstants;
-import com.stevekung.stratagems.PlayerStratagemsAccessor;
-import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.StratagemInstance;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.accessor.PlayerStratagemsAccessor;
+import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.StratagemInstance;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;

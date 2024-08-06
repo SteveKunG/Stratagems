@@ -2,9 +2,9 @@ package com.stevekung.stratagems.datagen;
 
 import java.util.concurrent.CompletableFuture;
 
-import com.stevekung.stratagems.ModConstants;
-import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;

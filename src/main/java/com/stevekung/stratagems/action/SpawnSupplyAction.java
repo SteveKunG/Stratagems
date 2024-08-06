@@ -2,7 +2,10 @@ package com.stevekung.stratagems.action;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.stevekung.stratagems.registry.StratagemActions;
+import com.stevekung.stratagems.api.action.StratagemAction;
+import com.stevekung.stratagems.api.action.StratagemActionContext;
+import com.stevekung.stratagems.api.action.StratagemActionType;
+import com.stevekung.stratagems.api.references.StratagemActions;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;

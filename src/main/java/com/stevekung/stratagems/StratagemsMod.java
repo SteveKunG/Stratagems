@@ -1,19 +1,16 @@
 package com.stevekung.stratagems;
 
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.StratagemInstance.Side;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.references.*;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
-import com.stevekung.stratagems.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
-import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
+import com.stevekung.stratagems.api.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
-import com.stevekung.stratagems.registry.ModEntityDataSerializers;
-import com.stevekung.stratagems.registry.ModRegistries;
-import com.stevekung.stratagems.registry.StratagemSounds;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -26,21 +23,19 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
 public class StratagemsMod implements ModInitializer
 {
-    public static final Logger LOGGER = LogUtils.getLogger();
-    public static final String MOD_ID = "stratagems";
-
     @Override
     public void onInitialize()
     {
         StratagemSounds.init();
         ModEntities.init();
         ModEntityDataSerializers.init();
+        StratagemActions.init();
+        StratagemRules.init();
 
         DynamicRegistries.registerSynced(ModRegistries.STRATAGEM, Stratagem.DIRECT_CODEC, DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY);
         DynamicRegistrySetupCallback.EVENT.register(StratagemsMod::addListenerForDynamic);
@@ -72,7 +67,7 @@ public class StratagemsMod implements ModInitializer
             var playerStratagems = player.getStratagems();
             var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
-            if (payload.side() == Side.PLAYER)
+            if (payload.side() == StratagemInstance.Side.PLAYER)
             {
                 playerStratagems.get(holder).use(server, player);
                 ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID()));
@@ -95,7 +90,7 @@ public class StratagemsMod implements ModInitializer
             var serverStratagems = server.overworld().getStratagemData();
             serverStratagems.setDirty();
             server.overworld().getDataStorage().save();
-            LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.getInstances().size(), serverStratagems.getInstances().stream().map(instance -> instance.getResourceKey().location()).toList());
+            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.getInstances().size(), serverStratagems.getInstances().stream().map(instance -> instance.getResourceKey().location()).toList());
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
@@ -106,8 +101,8 @@ public class StratagemsMod implements ModInitializer
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
             ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
-            LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
-            LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
+            ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
+            ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
         });
 
         ServerTickEvents.START_SERVER_TICK.register(server ->
@@ -123,13 +118,8 @@ public class StratagemsMod implements ModInitializer
         });
     }
 
-    public static ResourceLocation id(String path)
-    {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
-    }
-
     private static void addListenerForDynamic(DynamicRegistryView registryView)
     {
-        registryView.registerEntryAdded(ModRegistries.STRATAGEM, (rawId, id, object) -> LOGGER.info("Loaded entry of {}: {} = {}", ModRegistries.STRATAGEM, id, object));
+        registryView.registerEntryAdded(ModRegistries.STRATAGEM, (rawId, id, object) -> ModConstants.LOGGER.info("Loaded entry of {}: {} = {}", ModRegistries.STRATAGEM, id, object));
     }
 }

@@ -5,9 +5,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
 
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.portal.DimensionTransition;
@@ -19,6 +19,6 @@ public class MixinServerPlayer
     private void changeDimension(DimensionTransition transition, CallbackInfoReturnable<Entity> info)
     {
         var player = ServerPlayer.class.cast(this);
-        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID()));
+        player.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID())));
     }
 }

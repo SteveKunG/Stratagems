@@ -3,8 +3,8 @@ package com.stevekung.stratagems.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.stevekung.stratagems.ServerStratagemsData;
-import com.stevekung.stratagems.server.ServerStratagemsDataAccessor;
+import com.stevekung.stratagems.api.ServerStratagemsData;
+import com.stevekung.stratagems.api.accessor.ServerStratagemsDataAccessor;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;

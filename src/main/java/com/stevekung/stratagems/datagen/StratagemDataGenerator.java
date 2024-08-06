@@ -3,7 +3,7 @@ package com.stevekung.stratagems.datagen;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import com.stevekung.stratagems.registry.ModRegistries;
+import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;

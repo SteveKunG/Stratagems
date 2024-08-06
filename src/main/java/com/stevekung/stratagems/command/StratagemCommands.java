@@ -3,15 +3,13 @@ package com.stevekung.stratagems.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.stevekung.stratagems.Stratagem;
-import com.stevekung.stratagems.StratagemInstance;
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
-import com.stevekung.stratagems.registry.ModRegistries;
-import com.stevekung.stratagems.util.StratagemUtils;
+import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.references.ModRegistries;
+import com.stevekung.stratagems.api.util.StratagemUtils;
 
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -19,6 +17,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerPlayer;
 
 public class StratagemCommands
@@ -370,23 +369,23 @@ public class StratagemCommands
 
     private static void sendServerStratagemPacket(CommandSourceStack source)
     {
-        for (var player : PlayerLookup.all(source.getServer()))
+        for (var player : source.getServer().getPlayerList().getPlayers())
         {
-            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(player.serverLevel().getStratagemData().getInstances()));
+            player.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(player.serverLevel().getStratagemData().getInstances())));
         }
     }
 
     private static void sendPlayerStratagemPacket(CommandSourceStack source)
     {
         var player = source.getPlayer();
-        ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID()));
+        player.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID())));
     }
 
     private static void sendAllPlayerStratagemPacket(CommandSourceStack source)
     {
-        for (var player : PlayerLookup.all(source.getServer()))
+        for (var player : source.getServer().getPlayerList().getPlayers())
         {
-            ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID()));
+            player.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(player.getStratagems().values(), player.getUUID())));
         }
     }
 

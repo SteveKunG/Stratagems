@@ -1,6 +1,6 @@
 package com.stevekung.stratagems.registry;
 
-import com.stevekung.stratagems.StratagemsMod;
+import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.entity.StratagemPod;
 
@@ -23,6 +23,6 @@ public class ModEntities
 
     private static <T extends Entity> void register(String key, EntityType<T> type)
     {
-        Registry.register(BuiltInRegistries.ENTITY_TYPE, StratagemsMod.id(key), type);
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, ModConstants.id(key), type);
     }
 }

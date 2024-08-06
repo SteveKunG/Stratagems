@@ -1,22 +1,23 @@
 package com.stevekung.stratagems.client;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.*;
+import com.stevekung.stratagems.api.StratagemDisplay;
+import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.client.StratagemInputManager;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
-import com.stevekung.stratagems.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.packet.UpdateServerStratagemsPacket;
-import com.stevekung.stratagems.packet.UseReplenishStratagemPacket;
+import com.stevekung.stratagems.api.packet.SpawnStratagemPacket;
+import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UseReplenishStratagemPacket;
 import com.stevekung.stratagems.registry.ModEntities;
-import com.stevekung.stratagems.registry.ModRegistries;
-import com.stevekung.stratagems.registry.StratagemSounds;
-import com.stevekung.stratagems.util.StratagemUtils;
+import com.stevekung.stratagems.api.references.ModRegistries;
+import com.stevekung.stratagems.api.references.StratagemSounds;
+import com.stevekung.stratagems.api.util.StratagemUtils;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -37,7 +38,6 @@ import net.minecraft.world.item.Items;
 public class StratagemsClientMod implements ClientModInitializer
 {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public static final List<StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Lists.newCopyOnWriteArrayList();
 
     @Override
     public void onInitializeClient()
@@ -72,8 +72,8 @@ public class StratagemsClientMod implements ClientModInitializer
         ClientPlayNetworking.registerGlobalReceiver(UpdateServerStratagemsPacket.TYPE, (payload, context) ->
         {
             LOGGER.info("Received server stratagem packet");
-            CLIENT_SERVER_STRATAGEM_LIST.clear();
-            CLIENT_SERVER_STRATAGEM_LIST.addAll(StratagemUtils.mapToInstance(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.clear();
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.addAll(StratagemUtils.mapToInstance(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
         });
     }
 
@@ -91,7 +91,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (!minecraft.isPaused() && level.tickRateManager().runsNormally())
         {
-            CLIENT_SERVER_STRATAGEM_LIST.forEach(instance -> instance.tick(null, player));
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.forEach(instance -> instance.tick(null, player));
         }
 
         minecraft.getProfiler().pop();

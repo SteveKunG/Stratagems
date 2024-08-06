@@ -30,10 +30,10 @@
     "custom": {
         "loom:injected_interfaces": {
             "net/minecraft/class_3218": [
-                "com/stevekung/stratagems/server/ServerStratagemsDataAccessor"
+                "com/stevekung/stratagems/api/accessor/ServerStratagemsDataAccessor"
             ],
             "net/minecraft/class_1657": [
-                "com/stevekung/stratagems/PlayerStratagemsAccessor"
+                "com/stevekung/stratagems/api/accessor/PlayerStratagemsAccessor"
             ]
         }
     },

@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 import com.mojang.datafixers.DSL;
-import com.stevekung.stratagems.StratagemsMod;
-import com.stevekung.stratagems.registry.ModReferences;
-import com.stevekung.stratagems.util.CustomDataFixTypes;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.references.ModReferences;
+import com.stevekung.stratagems.api.util.CustomDataFixTypes;
 
 import net.minecraft.util.datafix.DataFixTypes;
 
@@ -29,6 +29,6 @@ public class MixinDataFixTypes
         var entry = create("SAVED_DATA_STRATAGEMS", $VALUES.length, ModReferences.SAVED_DATA_STRATAGEMS);
         $VALUES = ArrayUtils.add($VALUES, entry);
 
-        StratagemsMod.LOGGER.info("Added new enum to {}: {}", DataFixTypes.class, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
+        ModConstants.LOGGER.info("Added new enum to {}: {}", DataFixTypes.class, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
     }
 }

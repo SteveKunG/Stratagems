@@ -4,9 +4,12 @@ import java.util.Optional;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import com.stevekung.stratagems.*;
 import com.stevekung.stratagems.action.*;
-import com.stevekung.stratagems.rule.*;
+import com.stevekung.stratagems.api.*;
+import com.stevekung.stratagems.api.action.EmptyAction;
+import com.stevekung.stratagems.api.action.StratagemAction;
+import com.stevekung.stratagems.api.references.ModRegistries;
+import com.stevekung.stratagems.api.rule.*;
 
 import net.minecraft.Util;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -37,7 +40,7 @@ public class Stratagems
     {
         register(context, REINFORCE, "wsdaw", new ItemStack(Items.RESPAWN_ANCHOR), new StratagemDisplay(StratagemDisplay.Type.PLAYER_ICON, Optional.empty(), Optional.empty(), Optional.of(new ResolvableProfile(Optional.empty(), Optional.empty(), Util.make(new PropertyMap(), map -> map.put("name", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZjVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0"))))), true, Optional.empty()), ReinforceAction.reinforce(), ReinforceRule.defaultRule(), StratagemProperties.withDepleted(0, 2400, 20, BLUE_COLOR));
         register(context, BOW, "ssawd", new ItemStack(Items.BOW), SpawnItemAction.spawnItems(new ItemStack(Items.BOW), new ItemStack(Items.ARROW, 64)), StratagemProperties.simple(100, 6000, BLUE_COLOR));
-        register(context, SUPPLY_CHEST, "sswd", new ItemStack(Items.CHEST), new StratagemDisplay(StratagemDisplay.Type.TEXTURE, Optional.empty(), Optional.of(StratagemsMod.id("textures/stratagem/supply_chest.png")), Optional.empty(), true, Optional.empty()), SpawnSupplyAction.spawnSupply(BuiltInLootTables.SPAWN_BONUS_CHEST), DefaultRule.defaultRule(), StratagemProperties.simple(200, 6000, BLUE_COLOR));
+        register(context, SUPPLY_CHEST, "sswd", new ItemStack(Items.CHEST), new StratagemDisplay(StratagemDisplay.Type.TEXTURE, Optional.empty(), Optional.of(ModConstants.id("textures/stratagem/supply_chest.png")), Optional.empty(), true, Optional.empty()), SpawnSupplyAction.spawnSupply(BuiltInLootTables.SPAWN_BONUS_CHEST), DefaultRule.defaultRule(), StratagemProperties.simple(200, 6000, BLUE_COLOR));
         register(context, IRON_SWORD, "saswd", new ItemStack(Items.IRON_SWORD), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_SWORD)), StratagemProperties.simple(100, 6000, BLUE_COLOR));
         register(context, IRON_PICKAXE, "saswwd", new ItemStack(Items.IRON_PICKAXE), SpawnItemAction.spawnItem(new ItemStack(Items.IRON_PICKAXE)), StratagemProperties.simple(200, 6000, BLUE_COLOR));
         register(context, BLOCK, "wdsd", new StratagemDisplay(StratagemDisplay.Type.ITEM, Optional.of(new ItemStack(Items.STONE)), Optional.empty(), Optional.empty(), false, Optional.of("64")), SpawnItemAction.spawnItem(new ItemStack(Items.STONE, 64)), StratagemProperties.simple(100, 1200, BLUE_COLOR));
@@ -67,6 +70,6 @@ public class Stratagems
 
     private static ResourceKey<Stratagem> createKey(String name)
     {
-        return ResourceKey.create(ModRegistries.STRATAGEM, StratagemsMod.id(name));
+        return ResourceKey.create(ModRegistries.STRATAGEM, ModConstants.id(name));
     }
 }
