@@ -58,17 +58,17 @@ public class ReplenishRule implements StratagemRule
                 var replenishedProperties = replenishedStratagem.stratagem().properties();
                 replenishedStratagem.inboundDuration = replenishedProperties.inboundDuration();
 
-                if (replenishedProperties.duration().isPresent())
+                if (replenishedProperties.duration() > 0)
                 {
-                    replenishedStratagem.duration = replenishedProperties.duration().get();
+                    replenishedStratagem.duration = replenishedProperties.duration();
                 }
 
                 // replenished cooldown from replenishing properties
                 replenishedStratagem.cooldown = properties.cooldown();
 
-                if (replenishedProperties.remainingUse().isPresent())
+                if (replenishedProperties.remainingUse() > 0)
                 {
-                    replenishedStratagem.remainingUse = replenishedProperties.remainingUse().get();
+                    replenishedStratagem.remainingUse = replenishedProperties.remainingUse();
                 }
 
                 LOGGER.info("Replenished {} stratagem!", replenishedStratagem.stratagem().name().getString());

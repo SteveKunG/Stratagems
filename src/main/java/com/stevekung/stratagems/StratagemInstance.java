@@ -26,15 +26,13 @@ public class StratagemInstance
 {
     private final Holder<Stratagem> stratagem;
     public int inboundDuration;
-    @Nullable
-    public Integer duration;
+    public int duration;
     public int cooldown;
-    @Nullable
-    public Integer remainingUse;
+    public int remainingUse;
     public StratagemState state;
     public Side side;
 
-    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, Integer duration, int cooldown, Integer remainingUse, StratagemState state, Side side)
+    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, Side side)
     {
         this.stratagem = stratagem;
         this.inboundDuration = inboundDuration;
@@ -52,14 +50,14 @@ public class StratagemInstance
             compoundTag.putInt(ModConstants.Tag.INBOUND_DURATION, this.inboundDuration);
         }
 
-        if (this.duration != null)
+        if (this.duration > 0)
         {
             compoundTag.putInt(ModConstants.Tag.DURATION, this.duration);
         }
 
         compoundTag.putInt(ModConstants.Tag.COOLDOWN, this.cooldown);
 
-        if (this.remainingUse != null)
+        if (this.remainingUse > 0)
         {
             compoundTag.putInt(ModConstants.Tag.REMAINING_USE, this.remainingUse);
         }
@@ -73,8 +71,8 @@ public class StratagemInstance
     {
         var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
         var inboundDuration = 0;
-        Integer duration = null;
-        Integer remainingUse = null;
+        var duration = -1;
+        var remainingUse = -1;
         var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
         var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
 
@@ -101,9 +99,9 @@ public class StratagemInstance
     public void resetStratagemTicks(StratagemProperties properties)
     {
         this.inboundDuration = properties.inboundDuration();
-        this.duration = properties.duration().orElse(null);
+        this.duration = properties.duration();
         this.cooldown = properties.cooldown();
-        this.remainingUse = properties.remainingUse().orElse(null);
+        this.remainingUse = properties.remainingUse();
     }
 
     public Holder<Stratagem> getStratagem()

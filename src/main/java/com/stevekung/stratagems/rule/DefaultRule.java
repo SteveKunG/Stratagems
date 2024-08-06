@@ -45,7 +45,7 @@ public class DefaultRule implements StratagemRule
         {
             if (instance.state == StratagemState.IN_USE)
             {
-                if (instance.duration != null && instance.duration > 0)
+                if (instance.duration > 0)
                 {
                     instance.duration--;
 

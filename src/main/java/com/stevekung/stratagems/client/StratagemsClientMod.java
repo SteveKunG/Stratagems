@@ -149,7 +149,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     manager.setSelectedCode(inputCode);
                     manager.setSelected(instance.getResourceKey());
 
-                    if (stratagem.properties().needThrow().isPresent() && !stratagem.properties().needThrow().get())
+                    if (!stratagem.properties().needThrow())
                     {
                         ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelected(), instance.side, player.getUUID()));
                         LOGGER.info("Select replenish {}", instance.getResourceKey().location());
@@ -263,7 +263,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     {
                         display.itemStack().ifPresent(itemStack ->
                         {
-                            if (display.useRemainingAsCount() && stratagementry.remainingUse != null && stratagementry.remainingUse > 0)
+                            if (display.useRemainingAsCount() && stratagementry.remainingUse > 0)
                             {
                                 itemStack.setCount(stratagementry.remainingUse);
                             }
@@ -300,7 +300,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 guiGraphics.drawString(minecraft.font, stratagemName, 32, 20 + index * 30, codeMatched ? white : gray);
 
-                if (instance.state == StratagemState.DEPLETED && instance.remainingUse != null && instance.remainingUse == 0)
+                if (instance.state == StratagemState.DEPLETED && instance.remainingUse == 0)
                 {
                     statusText = Component.translatable("stratagem.menu.unavailable");
                 }
@@ -381,7 +381,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (display.useRemainingAsCount())
                 {
-                    if (instance.remainingUse != null && instance.remainingUse > 0)
+                    if (instance.remainingUse > 0)
                     {
                         guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, String.valueOf(instance.remainingUse));
                     }
@@ -399,7 +399,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (display.useRemainingAsCount())
                 {
-                    if (instance.remainingUse != null && instance.remainingUse > 0)
+                    if (instance.remainingUse > 0)
                     {
                         guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, String.valueOf(instance.remainingUse));
                     }

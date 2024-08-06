@@ -60,6 +60,6 @@ public class StratagemUtils
     public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> holder, StratagemInstance.Side side)
     {
         var properties = holder.value().properties();
-        return new StratagemInstance(holder, properties.inboundDuration(), properties.duration().orElse(null), properties.cooldown(), properties.remainingUse().orElse(null), StratagemState.READY, side);
+        return new StratagemInstance(holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.remainingUse(), StratagemState.READY, side);
     }
 }

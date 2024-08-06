@@ -47,7 +47,7 @@ public class DepletedRule implements StratagemRule
         }
 
         // Add replenisher stratagem when remaining use is lower than original
-        if (instance.remainingUse < stratagem.properties().remainingUse().get() && replenishOptional.isPresent())
+        if (instance.remainingUse < stratagem.properties().remainingUse() && replenishOptional.isPresent())
         {
             var replenisherOptional = replenishOptional.get().replenisher();
 
@@ -101,7 +101,7 @@ public class DepletedRule implements StratagemRule
         {
             if (instance.state == StratagemState.IN_USE)
             {
-                if (instance.duration != null && instance.duration > 0)
+                if (instance.duration > 0)
                 {
                     instance.duration--;
 
@@ -158,9 +158,9 @@ public class DepletedRule implements StratagemRule
 
                     instance.inboundDuration = properties.inboundDuration();
 
-                    if (properties.duration().isPresent())
+                    if (properties.duration() > 0)
                     {
-                        instance.duration = properties.duration().get();
+                        instance.duration = properties.duration();
                     }
 
                     instance.cooldown = properties.cooldown();
