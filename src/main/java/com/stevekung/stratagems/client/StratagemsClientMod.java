@@ -320,11 +320,11 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
                     {
-                        statusText = Component.translatable("stratagem.menu.inbound").append(" ").append(instance.formatTickDuration(instance.inboundDuration, level));
+                        statusText = Component.translatable("stratagem.menu.inbound").append(" ").append(StratagemUtils.formatTickDuration(instance.inboundDuration, level));
                     }
                     if (instance.state == StratagemState.COOLDOWN && instance.cooldown > 0)
                     {
-                        statusText = Component.translatable("stratagem.menu.cooldown").append(" ").append(instance.formatTickDuration(instance.cooldown, level));
+                        statusText = Component.translatable("stratagem.menu.cooldown").append(" ").append(StratagemUtils.formatTickDuration(instance.cooldown, level));
                     }
                 }
 

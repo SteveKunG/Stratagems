@@ -17,9 +17,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.StringUtil;
+import net.minecraft.world.level.Level;
 
 public class StratagemUtils
 {
+    public static String formatTickDuration(int duration, Level level)
+    {
+        return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, level.tickRateManager().tickrate());
+    }
+
     public static boolean anyMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> holder)
     {
         return list.stream().map(StratagemInstance::getStratagem).anyMatch(holderx -> holder == holderx);

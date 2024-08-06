@@ -7,6 +7,7 @@ import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.StratagemInstanceContext;
 import com.stevekung.stratagems.StratagemState;
 import com.stevekung.stratagems.registry.StratagemRules;
+import com.stevekung.stratagems.util.StratagemUtils;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,12 +51,13 @@ public class ReinforceRule implements StratagemRule
     {
         var instance = context.instance();
         var player = context.player();
+        var level = player != null ? player.level() : context.server().overworld();
 
         if (instance.state != StratagemState.COOLDOWN && instance.remainingUse == 0)
         {
             instance.cooldown = instance.stratagem().properties().cooldown();
             instance.state = StratagemState.COOLDOWN;
-            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
+            LOGGER.info("{} stratagem has no remaining use, cooldown: {}", instance.stratagem().name().getString(), StratagemUtils.formatTickDuration(instance.cooldown, level));
         }
 
         if (instance.state == StratagemState.COOLDOWN)
@@ -66,7 +68,7 @@ public class ReinforceRule implements StratagemRule
 
                 if (instance.cooldown % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has cooldown: {}", instance.stratagem().name().getString(), instance.formatTickDuration(instance.cooldown, player));
+                    LOGGER.info("{} stratagem has cooldown: {}", instance.stratagem().name().getString(), StratagemUtils.formatTickDuration(instance.cooldown, level));
                 }
             }
 

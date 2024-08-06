@@ -95,6 +95,7 @@ public class DepletedRule implements StratagemRule
         var stratagem = instance.stratagem();
         var stratagemName = stratagem.name().getString();
         var properties = stratagem.properties();
+        var level = player != null ? player.level() : context.server().overworld();
 
         if (!instance.isReady())
         {
@@ -106,7 +107,7 @@ public class DepletedRule implements StratagemRule
 
                     if (instance.duration % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has duration: {}", stratagemName, instance.formatTickDuration(instance.duration, player));
+                        LOGGER.info("{} stratagem has duration: {}", stratagemName, StratagemUtils.formatTickDuration(instance.duration, level));
                     }
                 }
                 else
@@ -122,7 +123,7 @@ public class DepletedRule implements StratagemRule
 
                 if (instance.inboundDuration % 20 == 0)
                 {
-                    LOGGER.info("{} stratagem has inboundDuration: {}", stratagemName, instance.formatTickDuration(instance.inboundDuration, player));
+                    LOGGER.info("{} stratagem has inboundDuration: {}", stratagemName, StratagemUtils.formatTickDuration(instance.inboundDuration, level));
                 }
                 if (instance.inboundDuration == 0)
                 {
@@ -146,7 +147,7 @@ public class DepletedRule implements StratagemRule
 
                     if (instance.cooldown % 20 == 0)
                     {
-                        LOGGER.info("{} stratagem has cooldown: {}", stratagemName, instance.formatTickDuration(instance.cooldown, player));
+                        LOGGER.info("{} stratagem has cooldown: {}", stratagemName, StratagemUtils.formatTickDuration(instance.cooldown, level));
                     }
                 }
 

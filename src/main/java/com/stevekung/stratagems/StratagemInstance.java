@@ -8,19 +8,17 @@ import org.jetbrains.annotations.Nullable;
 
 import com.stevekung.stratagems.registry.ModRegistries;
 import com.stevekung.stratagems.rule.StratagemRule;
-
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ByIdMap;
-import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -151,20 +149,6 @@ public class StratagemInstance
     public ResourceKey<Stratagem> getResourceKey()
     {
         return this.stratagem.unwrapKey().orElseThrow();
-    }
-
-    public String formatTickDuration(int duration, Player player)
-    {
-        if (player == null)
-        {
-            return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, 20.0F);
-        }
-        return this.formatTickDuration(duration, player.level());
-    }
-
-    public String formatTickDuration(int duration, Level level)
-    {
-        return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, level.tickRateManager().tickrate());
     }
 
     public boolean isReady()
