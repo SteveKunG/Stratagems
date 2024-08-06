@@ -20,14 +20,14 @@ import net.minecraft.resources.ResourceKey;
 
 public class StratagemUtils
 {
-    public static boolean anyMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
+    public static boolean anyMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> holder)
     {
-        return list.stream().map(StratagemInstance::getStratagem).anyMatch(holder -> holder == stratagemHolder);
+        return list.stream().map(StratagemInstance::getStratagem).anyMatch(holderx -> holder == holderx);
     }
 
-    public static boolean noneMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> stratagemHolder)
+    public static boolean noneMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> holder)
     {
-        return list.stream().map(StratagemInstance::getStratagem).noneMatch(holder -> holder == stratagemHolder);
+        return list.stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holder == holderx);
     }
 
     public static List<StratagemInstance> mapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
@@ -45,14 +45,14 @@ public class StratagemUtils
         return name.copy().withStyle(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(holder.getRegisteredName()))));
     }
 
-    public static Component decorateStratagemList(Collection<StratagemInstance> instances)
+    public static Component decorateStratagemList(Collection<StratagemInstance> list)
     {
-        return ComponentUtils.formatList(instances, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
+        return ComponentUtils.formatList(list, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
     }
 
-    public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> stratagemHolder, StratagemInstance.Side side)
+    public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> holder, StratagemInstance.Side side)
     {
-        var properties = stratagemHolder.value().properties();
-        return new StratagemInstance(stratagemHolder, properties.inboundDuration(), properties.duration().orElse(null), properties.cooldown(), properties.remainingUse().orElse(null), StratagemState.READY, side);
+        var properties = holder.value().properties();
+        return new StratagemInstance(holder, properties.inboundDuration(), properties.duration().orElse(null), properties.cooldown(), properties.remainingUse().orElse(null), StratagemState.READY, side);
     }
 }
