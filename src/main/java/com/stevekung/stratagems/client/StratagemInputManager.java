@@ -1,10 +1,13 @@
-package com.stevekung.stratagems;
+package com.stevekung.stratagems.client;
+
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.stevekung.stratagems.client.StratagemsClientMod;
+import com.google.common.collect.Lists;
+import com.stevekung.stratagems.Stratagem;
+import com.stevekung.stratagems.StratagemInstance;
 import com.stevekung.stratagems.registry.StratagemSounds;
 
 import net.minecraft.client.Minecraft;
@@ -36,17 +39,17 @@ public class StratagemInputManager
 
     public static boolean noneMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).noneMatch(instance -> instance.getCode().startsWith(tempStratagemCode));
+        return all(player).stream().filter(instance -> instance.canUse(null, player)).noneMatch(instance -> instance.getCode().startsWith(tempStratagemCode));
     }
 
     public static boolean foundMatch(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player)).anyMatch(instance -> instance.getCode().equals(tempStratagemCode));
+        return all(player).stream().filter(instance -> instance.canUse(null, player)).anyMatch(instance -> instance.getCode().equals(tempStratagemCode));
     }
 
     public static StratagemInstance getInstanceFromCode(String tempStratagemCode, Player player)
     {
-        return ImmutableList.copyOf(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values())).stream().filter(instance -> instance.canUse(null, player) && instance.getCode().equals(tempStratagemCode)).findFirst().get();
+        return all(player).stream().filter(instance -> instance.canUse(null, player) && instance.getCode().equals(tempStratagemCode)).findFirst().get();
     }
 
     public boolean isMenuOpen()
@@ -125,5 +128,10 @@ public class StratagemInputManager
     public void setSide(StratagemInstance.Side side)
     {
         this.side = side;
+    }
+
+    public static List<StratagemInstance> all(Player player)
+    {
+        return Lists.newArrayList(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values()));
     }
 }

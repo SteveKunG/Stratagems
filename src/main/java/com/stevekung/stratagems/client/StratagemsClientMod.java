@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
@@ -229,7 +228,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var stratagementry : Iterables.concat(CLIENT_STRATAGEM_LIST, player.getStratagems().values()))
+            for (var stratagementry : StratagemInputManager.all(player))
             {
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
@@ -299,7 +298,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var index = 0;
             var max = 0;
 
-            for (var instance : Iterables.concat(CLIENT_STRATAGEM_LIST, player.getStratagems().values()))
+            for (var instance : StratagemInputManager.all(player))
             {
                 var stratagem = instance.stratagem();
                 var stratagemName = stratagem.name();
