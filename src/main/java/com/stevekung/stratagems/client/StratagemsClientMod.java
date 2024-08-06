@@ -101,7 +101,7 @@ public class StratagemsClientMod implements ClientModInitializer
         if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
         {
             manager.setMenuOpen(!manager.isMenuOpen());
-            manager.clearStratagemCode();
+            manager.clearCode();
         }
 
         var arrowKeySound = false;
@@ -111,50 +111,50 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             if (KeyBindings.STRATAGEMS_UP.consumeClick())
             {
-                manager.appendTempStratagemCode("w");
+                manager.appendInputCode("w");
                 arrowKeySound = true;
             }
             else if (KeyBindings.STRATAGEMS_DOWN.consumeClick())
             {
-                manager.appendTempStratagemCode("s");
+                manager.appendInputCode("s");
                 arrowKeySound = true;
             }
             else if (KeyBindings.STRATAGEMS_LEFT.consumeClick())
             {
-                manager.appendTempStratagemCode("a");
+                manager.appendInputCode("a");
                 arrowKeySound = true;
             }
             else if (KeyBindings.STRATAGEMS_RIGHT.consumeClick())
             {
-                manager.appendTempStratagemCode("d");
+                manager.appendInputCode("d");
                 arrowKeySound = true;
             }
 
-            if (manager.hasTempStratagemCode())
+            if (manager.hasInputCode())
             {
-                var tempStratagemCode = manager.getTempStratagemCode();
+                var inputCode = manager.getInputCode();
 
-                if (StratagemInputManager.noneMatch(tempStratagemCode, player))
+                if (StratagemInputManager.noneMatch(inputCode, player))
                 {
-                    manager.clearTempStratagemCode();
+                    manager.clearInputCode();
                     fail = true;
                     LOGGER.info("FAIL");
                 }
-                if (StratagemInputManager.foundMatch(tempStratagemCode, player))
+                if (StratagemInputManager.foundMatch(inputCode, player))
                 {
-                    var instance = StratagemInputManager.getInstanceFromCode(tempStratagemCode, player);
+                    var instance = StratagemInputManager.getInstanceFromCode(inputCode, player);
                     var stratagem = instance.getStratagem().value();
 
                     manager.setSide(instance.side);
-                    manager.setSelectedStratagemCode(tempStratagemCode);
-                    manager.setSelectedStratagem(instance.getResourceKey());
+                    manager.setSelectedCode(inputCode);
+                    manager.setSelected(instance.getResourceKey());
 
                     if (stratagem.properties().needThrow().isPresent() && !stratagem.properties().needThrow().get())
                     {
-                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelectedStratagem(), instance.side, player.getUUID()));
+                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelected(), instance.side, player.getUUID()));
                         LOGGER.info("Select replenish {}", instance.getResourceKey().location());
-                        manager.clearTempStratagemCode();
-                        manager.clearStratagemCode();
+                        manager.clearInputCode();
+                        manager.clearCode();
                         manager.setMenuOpen(false);
                         return;
                     }
@@ -162,23 +162,23 @@ public class StratagemsClientMod implements ClientModInitializer
                     minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
                     minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
 
-                    manager.clearTempStratagemCode();
+                    manager.clearInputCode();
                     manager.setMenuOpen(false);
 
-                    LOGGER.info("Select {}", manager.getSelectedStratagem().location());
+                    LOGGER.info("Select {}", manager.getSelected().location());
                 }
             }
         }
         else
         {
-            manager.clearTempStratagemCode();
+            manager.clearInputCode();
         }
 
-        if (manager.hasSelectedStratagem() && minecraft.options.keyAttack.isDown())
+        if (manager.hasSelected() && minecraft.options.keyAttack.isDown())
         {
-            LOGGER.info("Throwing {}", manager.getSelectedStratagem().location());
-            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelectedStratagem(), manager.getSide()));
-            manager.clearStratagemCode();
+            LOGGER.info("Throwing {}", manager.getSelected().location());
+            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelected(), manager.getSide()));
+            manager.clearCode();
         }
 
         if (fail)
@@ -190,7 +190,7 @@ public class StratagemsClientMod implements ClientModInitializer
             if (arrowKeySound)
             {
                 // this is a little detail in HD2 when you're typing stratagem code and sound pitch increased
-                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * manager.getTempStratagemCode().length());
+                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * manager.getInputCode().length());
             }
         }
     }
@@ -213,7 +213,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         guiGraphics.drawString(minecraft.font, "Menu Active: " + manager.isMenuOpen(), guiGraphics.guiWidth() / 2 - "Menu Active: ".length(), 10, white);
 
-        if (manager.hasSelectedStratagemCode())
+        if (manager.hasSelectedCode())
         {
             var index = 0;
             var max = 0;
@@ -223,8 +223,8 @@ public class StratagemsClientMod implements ClientModInitializer
                 var stratagem = stratagementry.stratagem();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var hasCode = code.startsWith(manager.getSelectedStratagemCode());
-                var equals = code.equals(manager.getSelectedStratagemCode());
+                var hasCode = code.startsWith(manager.getSelectedCode());
+                var equals = code.equals(manager.getSelectedCode());
 
                 if (equals)
                 {
@@ -284,7 +284,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (manager.isMenuOpen())
         {
-            var tempStratagemCode = manager.getTempStratagemCode();
+            var inputCode = manager.getInputCode();
             var index = 0;
             var max = 0;
 
@@ -294,7 +294,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 var stratagemName = stratagem.name();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var codeMatched = code.startsWith(tempStratagemCode) && instance.canUse(null, player);
+                var codeMatched = code.startsWith(inputCode) && instance.canUse(null, player);
                 var combinedArrows = new StringBuilder();
                 var statusText = Component.empty();
 
@@ -352,11 +352,11 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (codeMatched)
                 {
-                    var tempCode = tempStratagemCode.toCharArray();
+                    var inputCodeChars = inputCode.toCharArray();
 
-                    for (var i = 0; i < tempCode.length; i++)
+                    for (var i = 0; i < inputCodeChars.length; i++)
                     {
-                        guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(tempCode[i]), 32 + i * 8, 32 + index * 30, gray);
+                        guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), 32 + i * 8, 32 + index * 30, gray);
                     }
                 }
 

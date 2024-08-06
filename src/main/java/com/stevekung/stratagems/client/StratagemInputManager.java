@@ -19,10 +19,10 @@ public class StratagemInputManager
 {
     private static final StratagemInputManager INSTANCE = new StratagemInputManager();
 
-    private boolean stratagemsMenuOpen;
-    private String tempStratagemCode = "";
-    private String selectedStratagemCode;
-    private ResourceKey<Stratagem> selectedStratagem;
+    private boolean menuOpen;
+    private String inputCode = "";
+    private String selectedCode;
+    private ResourceKey<Stratagem> selected;
     private StratagemInstance.Side side;
 
     private final Minecraft minecraft;
@@ -37,87 +37,87 @@ public class StratagemInputManager
         return INSTANCE;
     }
 
-    public static boolean noneMatch(String tempStratagemCode, Player player)
+    public static boolean noneMatch(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player)).noneMatch(instance -> instance.getCode().startsWith(tempStratagemCode));
+        return all(player).stream().filter(instance -> instance.canUse(null, player)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
     }
 
-    public static boolean foundMatch(String tempStratagemCode, Player player)
+    public static boolean foundMatch(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player)).anyMatch(instance -> instance.getCode().equals(tempStratagemCode));
+        return all(player).stream().filter(instance -> instance.canUse(null, player)).anyMatch(instance -> instance.getCode().equals(inputCode));
     }
 
-    public static StratagemInstance getInstanceFromCode(String tempStratagemCode, Player player)
+    public static StratagemInstance getInstanceFromCode(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player) && instance.getCode().equals(tempStratagemCode)).findFirst().get();
+        return all(player).stream().filter(instance -> instance.canUse(null, player) && instance.getCode().equals(inputCode)).findFirst().get();
     }
 
     public boolean isMenuOpen()
     {
-        return this.stratagemsMenuOpen;
+        return this.menuOpen;
     }
 
-    public void setMenuOpen(boolean stratagemsMenuOpen)
+    public void setMenuOpen(boolean menuOpen)
     {
-        this.stratagemsMenuOpen = stratagemsMenuOpen;
+        this.menuOpen = menuOpen;
     }
 
-    public boolean hasTempStratagemCode()
+    public boolean hasInputCode()
     {
-        return StringUtils.isNotEmpty(this.tempStratagemCode);
+        return StringUtils.isNotEmpty(this.inputCode);
     }
 
-    public String getTempStratagemCode()
+    public String getInputCode()
     {
-        return this.tempStratagemCode;
+        return this.inputCode;
     }
 
-    public void clearTempStratagemCode()
+    public void clearInputCode()
     {
-        this.tempStratagemCode = "";
+        this.inputCode = "";
     }
 
-    public void appendTempStratagemCode(String tempStratagemCode)
+    public void appendInputCode(String inputCode)
     {
-        this.tempStratagemCode += tempStratagemCode;
+        this.inputCode += inputCode;
     }
 
-    public String getSelectedStratagemCode()
+    public String getSelectedCode()
     {
-        return this.selectedStratagemCode;
+        return this.selectedCode;
     }
 
-    public boolean hasSelectedStratagemCode()
+    public boolean hasSelectedCode()
     {
-        return StringUtils.isNotEmpty(this.selectedStratagemCode);
+        return StringUtils.isNotEmpty(this.selectedCode);
     }
 
-    public void setSelectedStratagemCode(String selectedStratagemCode)
+    public void setSelectedCode(String selectedCode)
     {
-        this.selectedStratagemCode = selectedStratagemCode;
+        this.selectedCode = selectedCode;
     }
 
-    public void clearStratagemCode()
+    public void clearCode()
     {
-        this.selectedStratagemCode = null;
-        this.selectedStratagem = null;
+        this.selectedCode = null;
+        this.selected = null;
         this.side = null;
         this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
     }
 
-    public boolean hasSelectedStratagem()
+    public boolean hasSelected()
     {
-        return this.selectedStratagem != null;
+        return this.selected != null;
     }
 
-    public ResourceKey<Stratagem> getSelectedStratagem()
+    public ResourceKey<Stratagem> getSelected()
     {
-        return this.selectedStratagem;
+        return this.selected;
     }
 
-    public void setSelectedStratagem(ResourceKey<Stratagem> selectedStratagem)
+    public void setSelected(ResourceKey<Stratagem> selected)
     {
-        this.selectedStratagem = selectedStratagem;
+        this.selected = selected;
     }
 
     public StratagemInstance.Side getSide()

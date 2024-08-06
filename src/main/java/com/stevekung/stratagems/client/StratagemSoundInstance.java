@@ -21,7 +21,7 @@ public class StratagemSoundInstance extends AbstractTickableSoundInstance
     @Override
     public void tick()
     {
-        if (!StratagemInputManager.getInstance().hasSelectedStratagem())
+        if (!StratagemInputManager.getInstance().hasSelected())
         {
             this.stop();
         }
