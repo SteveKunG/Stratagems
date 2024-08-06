@@ -11,7 +11,8 @@ import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.references.StratagemSounds;
-import com.stevekung.stratagems.registry.*;
+import com.stevekung.stratagems.registry.ModEntities;
+import com.stevekung.stratagems.registry.Stratagems;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

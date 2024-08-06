@@ -3,7 +3,6 @@ package com.stevekung.stratagems.api.references;
 import com.mojang.serialization.Codec;
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.rule.*;
-import com.stevekung.stratagems.api.rule.ReplenishRule;
 
 import net.minecraft.core.Registry;
 

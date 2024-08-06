@@ -6,9 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.references.StratagemSounds;
 
 import net.minecraft.client.Minecraft;

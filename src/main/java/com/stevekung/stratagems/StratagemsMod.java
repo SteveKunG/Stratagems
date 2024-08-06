@@ -3,13 +3,13 @@ package com.stevekung.stratagems;
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.references.*;
-import com.stevekung.stratagems.command.StratagemCommands;
-import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.api.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UseReplenishStratagemPacket;
+import com.stevekung.stratagems.api.references.*;
+import com.stevekung.stratagems.command.StratagemCommands;
+import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.registry.ModEntities;
 
 import net.fabricmc.api.ModInitializer;

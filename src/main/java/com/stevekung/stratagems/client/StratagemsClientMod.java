@@ -4,20 +4,20 @@ import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
+import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.StratagemDisplay;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemState;
-import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
-import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.api.packet.SpawnStratagemPacket;
 import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UseReplenishStratagemPacket;
-import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.references.StratagemSounds;
 import com.stevekung.stratagems.api.util.StratagemUtils;
+import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
+import com.stevekung.stratagems.registry.ModEntities;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

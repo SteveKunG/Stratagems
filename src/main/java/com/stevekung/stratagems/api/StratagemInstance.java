@@ -8,8 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.rule.StratagemRule;
-import io.netty.buffer.ByteBuf;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
