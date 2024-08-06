@@ -115,7 +115,7 @@ public class ServerStratagemsData extends SavedData
 
     public void reset()
     {
-        this.instances.stream().forEach(instance -> instance.reset(this.level.getServer(), null));
+        this.instances.forEach(instance -> instance.reset(this.level.getServer(), null));
     }
 
     public void clear()

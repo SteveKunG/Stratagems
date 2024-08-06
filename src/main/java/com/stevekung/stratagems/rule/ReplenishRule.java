@@ -97,7 +97,7 @@ public class ReplenishRule implements StratagemRule
                 }
                 if (instance.side == Side.SERVER && server != null)
                 {
-                    PlayerLookup.all(server).forEach(playerx -> ((ServerPlayer)playerx).connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, playerx.getX(), playerx.getY(), playerx.getZ(), 1.0f, 1.0f, playerx.level().getRandom().nextLong())));
+                    PlayerLookup.all(server).forEach(playerx -> playerx.connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, playerx.getX(), playerx.getY(), playerx.getZ(), 1.0f, 1.0f, playerx.level().getRandom().nextLong())));
                 }
             }
         }
