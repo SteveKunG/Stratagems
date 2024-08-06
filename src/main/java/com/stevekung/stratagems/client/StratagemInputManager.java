@@ -132,6 +132,6 @@ public class StratagemInputManager
 
     public static List<StratagemInstance> all(Player player)
     {
-        return Lists.newArrayList(Iterables.concat(StratagemsClientMod.CLIENT_STRATAGEM_LIST, player.getStratagems().values()));
+        return Lists.newArrayList(Iterables.concat(StratagemsClientMod.CLIENT_SERVER_STRATAGEM_LIST, player.getStratagems().values()));
     }
 }

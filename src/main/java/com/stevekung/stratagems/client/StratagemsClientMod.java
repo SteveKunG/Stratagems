@@ -37,7 +37,7 @@ import net.minecraft.world.item.Items;
 public class StratagemsClientMod implements ClientModInitializer
 {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public static List<StratagemInstance> CLIENT_STRATAGEM_LIST = Lists.newCopyOnWriteArrayList();
+    public static final List<StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Lists.newCopyOnWriteArrayList();
 
     @Override
     public void onInitializeClient()
@@ -71,19 +71,9 @@ public class StratagemsClientMod implements ClientModInitializer
 
         ClientPlayNetworking.registerGlobalReceiver(UpdateServerStratagemsPacket.TYPE, (payload, context) ->
         {
-            var serverStratagems = payload.serverEntries();
-
             LOGGER.info("Received server stratagem packet");
-
-            if (serverStratagems.isEmpty())
-            {
-                CLIENT_STRATAGEM_LIST.clear();
-                LOGGER.info("Remove all server stratagems");
-            }
-            else
-            {
-                CLIENT_STRATAGEM_LIST = StratagemUtils.mapToInstance(serverStratagems, resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey));
-            }
+            CLIENT_SERVER_STRATAGEM_LIST.clear();
+            CLIENT_SERVER_STRATAGEM_LIST.addAll(StratagemUtils.mapToInstance(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
         });
     }
 
@@ -101,7 +91,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (!minecraft.isPaused() && level.tickRateManager().runsNormally())
         {
-            CLIENT_STRATAGEM_LIST.forEach(instance -> instance.tick(null, player));
+            CLIENT_SERVER_STRATAGEM_LIST.forEach(instance -> instance.tick(null, player));
         }
 
         minecraft.getProfiler().pop();
