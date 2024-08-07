@@ -28,19 +28,21 @@
 
   "commands.stratagem.list.player": "%s has %s stratagem(s): %s",
   "commands.stratagem.list.server": "There are %s stratagem(s) on the server: %s",
-  "commands.stratagem.list.player.empty": "%s has no stratagem!",
+  "commands.stratagem.list.player.empty": "%s has empty stratagem!",
   "commands.stratagem.list.server.empty": "Server has empty stratagem!",
 
   "commands.stratagem.use.server.success": "Used %s Server Stratagem",
   "commands.stratagem.use.player.success": "Used %s %s's Stratagem",
-  "commands.stratagem.use.player.specific.failed": "Cannot use a stratagem from the player because it doesn't exists",
-  "commands.stratagem.use.server.specific.failed": "Cannot use a stratagem from the server because it doesn't exists",
+  "commands.stratagem.use.player.specific.failed": "Stratagem doesn't exists on the player",
+  "commands.stratagem.use.server.specific.failed": "Stratagem doesn't exists on the server",
 
   "commands.stratagem.reset.everything.success": "All Stratagems have been reset",
   "commands.stratagem.reset.server.everything.success": "All Server Stratagems have been reset",
   "commands.stratagem.reset.player.everything.success": "All %s Stratagems have been reset",
   "commands.stratagem.reset.server.success": "Server %s Stratagem have been reset",
   "commands.stratagem.reset.player.success": "%s's Stratagems have been reset",
+  "commands.stratagem.reset.player.specific.failed": "Failed to reset player stratagem",
+  "commands.stratagem.reset.server.specific.failed": "Failed to reset server stratagem",
 
   "commands.stratagem.remove.everything.success": "All stratagems has been removed",
   "commands.stratagem.remove.server.everything.success": "Remove all stratagems from server",
