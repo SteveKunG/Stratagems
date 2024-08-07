@@ -59,13 +59,8 @@ public class StratagemsClientMod implements ClientModInitializer
             if (player.getUUID().equals(payload.uuid()))
             {
                 LOGGER.info("Add stratagem from packet to {}", level.getPlayerByUUID(payload.uuid()).getName().getString());
-
                 player.getStratagems().clear();
-                playerStratagems.forEach(entry ->
-                {
-                    var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entry.stratagem());
-                    player.getStratagems().put(holder, new StratagemInstance(holder, entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side()));
-                });
+                player.getStratagems().putAll(StratagemUtils.entryToMap(playerStratagems, level));
             }
         });
 
