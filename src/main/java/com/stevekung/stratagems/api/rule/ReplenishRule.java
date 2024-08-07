@@ -142,7 +142,7 @@ public class ReplenishRule implements StratagemRule
                 {
                     var playerStratagems = player.getStratagems();
 
-                    playerStratagems.entrySet().stream().filter(entry -> entry.getValue().state == StratagemState.DEPLETED && toReplenish.contains(entry.getKey())).findAny().ifPresent(ignore ->
+                    playerStratagems.entrySet().stream().filter(entry -> entry.getValue().state == StratagemState.UNAVAILABLE && toReplenish.contains(entry.getKey())).findAny().ifPresent(ignore ->
                     {
                         instance.use(null, player);
                         ((ServerPlayer)player).connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
@@ -152,7 +152,7 @@ public class ReplenishRule implements StratagemRule
                 {
                     var serverStratagems = server.overworld().getStratagemData();
 
-                    serverStratagems.getInstances().stream().filter(instancex -> instancex.state == StratagemState.DEPLETED && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
+                    serverStratagems.getInstances().stream().filter(instancex -> instancex.state == StratagemState.UNAVAILABLE && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
                     {
                         instance.use(server, player);
 

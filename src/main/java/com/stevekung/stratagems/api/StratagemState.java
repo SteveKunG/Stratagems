@@ -13,7 +13,7 @@ public enum StratagemState implements StringRepresentable
     INBOUND,
     COOLDOWN,
     IMPACT,
-    DEPLETED,
+    UNAVAILABLE,
     BLOCKED;
 
     public static final Codec<StratagemState> CODEC = StringRepresentable.fromValues(StratagemState::values);

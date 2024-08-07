@@ -128,7 +128,7 @@ public class DepletedRule implements StratagemRule
                 {
                     if (instance.remainingUse == 0)
                     {
-                        instance.state = StratagemState.DEPLETED;
+                        instance.state = StratagemState.UNAVAILABLE;
                         LOGGER.info("{} stratagem is now depleted!", stratagemName);
                         return;
                     }
