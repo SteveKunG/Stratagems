@@ -33,11 +33,11 @@ public interface ModConstants
     {
         String CATEGORY = "key.categories.stratagems";
 
-        String STRATAGEMS_MENU = "key.open_stratagems_menu";
-        String STRATAGEMS_UP = "key.stratagems_up";
-        String STRATAGEMS_DOWN = "key.stratagems_down";
-        String STRATAGEMS_LEFT = "key.stratagems_left";
-        String STRATAGEMS_RIGHT = "key.stratagems_right";
+        String STRATAGEM_MENU = "key.open_stratagem_menu";
+        String STRATAGEM_UP = "key.stratagem_up";
+        String STRATAGEM_DOWN = "key.stratagem_down";
+        String STRATAGEM_LEFT = "key.stratagem_left";
+        String STRATAGEM_RIGHT = "key.stratagem_right";
     }
 
     interface Packets

@@ -9,11 +9,11 @@ import net.minecraft.client.KeyMapping;
 
 public class KeyBindings
 {
-    public static final KeyMapping OPEN_STRATAGEMS_MENU = new KeyMapping(ModConstants.KeyBindings.STRATAGEMS_MENU, GLFW.GLFW_KEY_Z, ModConstants.KeyBindings.CATEGORY);
-    public static final KeyMapping STRATAGEMS_UP = new KeyMapping(ModConstants.KeyBindings.STRATAGEMS_UP, GLFW.GLFW_KEY_UP, ModConstants.KeyBindings.CATEGORY);
-    public static final KeyMapping STRATAGEMS_DOWN = new KeyMapping(ModConstants.KeyBindings.STRATAGEMS_DOWN, GLFW.GLFW_KEY_DOWN, ModConstants.KeyBindings.CATEGORY);
-    public static final KeyMapping STRATAGEMS_LEFT = new KeyMapping(ModConstants.KeyBindings.STRATAGEMS_LEFT, GLFW.GLFW_KEY_LEFT, ModConstants.KeyBindings.CATEGORY);
-    public static final KeyMapping STRATAGEMS_RIGHT = new KeyMapping(ModConstants.KeyBindings.STRATAGEMS_RIGHT, GLFW.GLFW_KEY_RIGHT, ModConstants.KeyBindings.CATEGORY);
+    public static final KeyMapping OPEN_STRATAGEMS_MENU = new KeyMapping(ModConstants.KeyBindings.STRATAGEM_MENU, GLFW.GLFW_KEY_Z, ModConstants.KeyBindings.CATEGORY);
+    public static final KeyMapping STRATAGEMS_UP = new KeyMapping(ModConstants.KeyBindings.STRATAGEM_UP, GLFW.GLFW_KEY_UP, ModConstants.KeyBindings.CATEGORY);
+    public static final KeyMapping STRATAGEMS_DOWN = new KeyMapping(ModConstants.KeyBindings.STRATAGEM_DOWN, GLFW.GLFW_KEY_DOWN, ModConstants.KeyBindings.CATEGORY);
+    public static final KeyMapping STRATAGEMS_LEFT = new KeyMapping(ModConstants.KeyBindings.STRATAGEM_LEFT, GLFW.GLFW_KEY_LEFT, ModConstants.KeyBindings.CATEGORY);
+    public static final KeyMapping STRATAGEMS_RIGHT = new KeyMapping(ModConstants.KeyBindings.STRATAGEM_RIGHT, GLFW.GLFW_KEY_RIGHT, ModConstants.KeyBindings.CATEGORY);
 
     public static void init()
     {
