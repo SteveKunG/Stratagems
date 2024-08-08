@@ -1,5 +1,7 @@
 {
   "values": [
-    "stratagems:tnt"
+    "stratagems:tnt",
+    "stratagems:fast_tnt",
+    "stratagems:long_tnt"
   ]
 }
