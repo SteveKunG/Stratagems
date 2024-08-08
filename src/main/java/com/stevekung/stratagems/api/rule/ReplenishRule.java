@@ -142,17 +142,17 @@ public class ReplenishRule implements StratagemRule
                 {
                     var playerStratagems = player.getStratagems();
 
-                    playerStratagems.entrySet().stream().filter(entry -> entry.getValue().state == StratagemState.UNAVAILABLE && toReplenish.contains(entry.getKey())).findAny().ifPresent(ignore ->
+                    if (playerStratagems.entrySet().stream().allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE && toReplenish.contains(entry.getKey())))
                     {
                         instance.use(null, player);
                         ((ServerPlayer)player).connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
-                    });
+                    }
                 }
                 if (server != null && instance.side == StratagemInstance.Side.SERVER)
                 {
                     var serverStratagems = server.overworld().getStratagemData();
 
-                    serverStratagems.getInstances().values().stream().filter(instancex -> instancex.state == StratagemState.UNAVAILABLE && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
+                    if (serverStratagems.getInstances().values().stream().allMatch(instancex -> instancex.state == StratagemState.UNAVAILABLE && toReplenish.contains(instancex.getStratagem())))
                     {
                         instance.use(server, player);
 
@@ -160,7 +160,7 @@ public class ReplenishRule implements StratagemRule
                         {
                             serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values())));
                         }
-                    });
+                    }
                 }
             }
         }
