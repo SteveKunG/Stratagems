@@ -139,7 +139,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
 
                     for (var player : PlayerLookup.all(this.getServer()))
                     {
-                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.getInstances()));
+                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values()));
                     }
                 }
                 else

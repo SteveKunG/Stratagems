@@ -3,10 +3,7 @@ package com.stevekung.stratagems;
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.UseReplenishStratagemPacket;
+import com.stevekung.stratagems.api.packet.*;
 import com.stevekung.stratagems.api.references.*;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
@@ -44,6 +41,8 @@ public class StratagemsMod implements ModInitializer
         PayloadTypeRegistry.playC2S().register(UseReplenishStratagemPacket.TYPE, UseReplenishStratagemPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(UpdatePlayerStratagemsPacket.TYPE, UpdatePlayerStratagemsPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(UpdateServerStratagemsPacket.TYPE, UpdateServerStratagemsPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(UpdateStratagemPacket.TYPE, UpdateStratagemPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(ClearStratagemsPacket.TYPE, ClearStratagemsPacket.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
@@ -78,7 +77,7 @@ public class StratagemsMod implements ModInitializer
 
                 for (var serverPlayer : PlayerLookup.all(server))
                 {
-                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.getInstances()));
+                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values()));
                 }
             }
         });
@@ -90,7 +89,7 @@ public class StratagemsMod implements ModInitializer
             var serverStratagems = server.overworld().getStratagemData();
             serverStratagems.setDirty();
             server.overworld().getDataStorage().save();
-            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.getInstances().size(), serverStratagems.getInstances().stream().map(instance -> instance.getResourceKey().location()).toList());
+            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.getInstances().size(), serverStratagems.getInstances().values().stream().map(instance -> instance.getResourceKey().location()).toList());
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
@@ -100,7 +99,7 @@ public class StratagemsMod implements ModInitializer
             var serverStratagems = server.overworld().getStratagemData().getInstances();
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
-            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
+            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.values()));
             ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
             ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
         });

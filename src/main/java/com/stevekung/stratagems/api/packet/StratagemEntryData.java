@@ -25,4 +25,9 @@ public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int inboundDu
         buffer.writeEnum(this.state);
         buffer.writeEnum(this.side);
     }
+
+    public static StratagemEntryData fromInstance(StratagemInstance instance)
+    {
+        return new StratagemEntryData(instance.getResourceKey(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side);
+    }
 }

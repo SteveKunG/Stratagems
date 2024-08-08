@@ -1,6 +1,7 @@
 package com.stevekung.stratagems.api.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,9 +44,9 @@ public class StratagemInputManager
         return all(player).stream().filter(instance -> instance.canUse(null, player)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
     }
 
-    public static boolean foundMatch(String inputCode, Player player)
+    public static Optional<StratagemInstance> foundMatchFirst(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player)).anyMatch(instance -> instance.getCode().equals(inputCode));
+        return all(player).stream().filter(instance -> instance.canUse(null, player) && instance.getCode().equals(inputCode)).findFirst();
     }
 
     public static StratagemInstance getInstanceFromCode(String inputCode, Player player)
@@ -133,6 +134,6 @@ public class StratagemInputManager
 
     public static List<StratagemInstance> all(Player player)
     {
-        return Lists.newArrayList(Iterables.concat(ModConstants.CLIENT_SERVER_STRATAGEM_LIST, player.getStratagems().values()));
+        return Lists.newArrayList(Iterables.concat(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values(), player.getStratagems().values()));
     }
 }

@@ -1,10 +1,10 @@
 package com.stevekung.stratagems.api;
 
-import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.api.util.CustomDataFixTypes;
 
@@ -21,7 +21,7 @@ public class ServerStratagemsData extends SavedData
 {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "server_stratagems";
-    private final List<StratagemInstance> instances = Lists.newCopyOnWriteArrayList();
+    private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newHashMap();
     private final ServerLevel level;
     private int tick;
 
@@ -39,7 +39,11 @@ public class ServerStratagemsData extends SavedData
     public void tick()
     {
         this.tick++;
-        this.instances.forEach(instance -> instance.tick(this.level.getServer(), null));
+
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().tick(this.level.getServer(), null);
+        }
 
         if (this.tick % 100 == 0)
         {
@@ -49,18 +53,17 @@ public class ServerStratagemsData extends SavedData
 
     public void use(Holder<Stratagem> holder, Player player)
     {
-        this.instances.stream().filter(instance -> instance.getStratagem() == holder).findFirst().ifPresent(instance ->
+        var instance = this.instances.get(holder);
+
+        if (instance.canUse(this.level.getServer(), player))
         {
-            if (instance.canUse(this.level.getServer(), player))
-            {
-                instance.use(this.level.getServer(), player);
-                this.setDirty();
-            }
-            else
-            {
-                LOGGER.info("Cannot use {} stratagem because it's in {} state!", instance.stratagem().name().getString(), instance.state);
-            }
-        });
+            instance.use(this.level.getServer(), player);
+            this.setDirty();
+        }
+        else
+        {
+            LOGGER.info("Cannot use {} stratagem because it's in {} state!", instance.stratagem().name().getString(), instance.state);
+        }
     }
 
     public static ServerStratagemsData load(ServerLevel level, CompoundTag tag)
@@ -74,7 +77,8 @@ public class ServerStratagemsData extends SavedData
 
             for (var i = 0; i < listTag.size(); i++)
             {
-                data.instances.add(StratagemInstance.load(listTag.getCompound(i), level));
+                var instance = StratagemInstance.load(listTag.getCompound(i), level);
+                data.instances.put(instance.getStratagem(), instance);
             }
         }
 
@@ -86,7 +90,7 @@ public class ServerStratagemsData extends SavedData
     {
         var listTag = new ListTag();
 
-        for (var instance : this.instances)
+        for (var instance : this.instances.values())
         {
             var compoundTag = new CompoundTag();
             instance.save(compoundTag);
@@ -100,22 +104,22 @@ public class ServerStratagemsData extends SavedData
 
     public void add(StratagemInstance instance)
     {
-        this.instances.add(instance);
+        this.instances.putIfAbsent(instance.getStratagem(), instance);
     }
 
     public void remove(Holder<Stratagem> holder)
     {
-        this.instances.removeIf(instance -> instance.getStratagem() == holder);
+        this.instances.remove(holder);
     }
 
     public void reset(Holder<Stratagem> holder)
     {
-        this.instances.stream().filter(instance -> instance.getStratagem() == holder).forEach(instance -> instance.reset(this.level.getServer(), null));
+        this.instances.get(holder).reset(this.level.getServer(), null);
     }
 
     public void reset()
     {
-        this.instances.forEach(instance -> instance.reset(this.level.getServer(), null));
+        this.instances.values().forEach(instance -> instance.reset(this.level.getServer(), null));
     }
 
     public void clear()
@@ -123,7 +127,7 @@ public class ServerStratagemsData extends SavedData
         this.instances.clear();
     }
 
-    public List<StratagemInstance> getInstances()
+    public Map<Holder<Stratagem>, StratagemInstance> getInstances()
     {
         return this.instances;
     }

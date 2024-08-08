@@ -40,7 +40,7 @@ public class ReplenishRule implements StratagemRule
         var instance = context.instance();
         var player = context.player();
         var server = context.server();
-        var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances();
+        var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
         var properties = instance.stratagem().properties();
         var replenishOptional = properties.replenish();
         var count = 0;
@@ -152,13 +152,13 @@ public class ReplenishRule implements StratagemRule
                 {
                     var serverStratagems = server.overworld().getStratagemData();
 
-                    serverStratagems.getInstances().stream().filter(instancex -> instancex.state == StratagemState.UNAVAILABLE && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
+                    serverStratagems.getInstances().values().stream().filter(instancex -> instancex.state == StratagemState.UNAVAILABLE && toReplenish.contains(instancex.getStratagem())).findAny().ifPresent(ignore ->
                     {
                         instance.use(server, player);
 
                         for (var serverPlayer : server.getPlayerList().getPlayers())
                         {
-                            serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.getInstances())));
+                            serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values())));
                         }
                     });
                 }

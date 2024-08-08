@@ -73,7 +73,7 @@ public class DepletedRule implements StratagemRule
                     var serverStratagems = server.overworld().getStratagemData();
                     var replenisherStratagem = server.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
 
-                    if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances(), replenisherStratagem))
+                    if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances().values(), replenisherStratagem))
                     {
                         LOGGER.info("{} server replenisher stratagem already exist", replenisherStratagem.value().name().getString());
                         return;

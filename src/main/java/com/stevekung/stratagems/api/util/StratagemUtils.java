@@ -39,9 +39,9 @@ public class StratagemUtils
         return list.stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holder == holderx);
     }
 
-    public static List<StratagemInstance> mapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
+    public static Map<Holder<Stratagem>, StratagemInstance> mapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        return entries.stream().map(entry -> new StratagemInstance(function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
+        return entries.stream().map(entry -> new StratagemInstance(function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
     }
 
     public static List<StratagemEntryData> mapToEntry(Collection<StratagemInstance> list)
