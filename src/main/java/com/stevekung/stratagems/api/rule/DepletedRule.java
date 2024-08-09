@@ -45,6 +45,8 @@ public class DepletedRule implements StratagemRule
             LOGGER.info("{} stratagem has remainingUse: {}", stratagem.name().getString(), instance.remainingUse);
         }
 
+        //TODO Set cooldown for all toReplenish stratagems
+
         // Add replenisher stratagem when remaining use is lower than original
         if (instance.remainingUse < stratagem.properties().remainingUse() && replenishOptional.isPresent())
         {

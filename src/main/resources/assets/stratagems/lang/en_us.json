@@ -6,6 +6,8 @@
   "stratagem.stratagems.iron_pickaxe": "Iron Pickaxe",
   "stratagem.stratagems.block": "Block",
   "stratagem.stratagems.tnt": "TNT",
+  "stratagem.stratagems.fast_tnt": "Fast TNT",
+  "stratagem.stratagems.long_tnt": "Long TNT",
   "stratagem.stratagems.tnt_rearm": "TNT Rearm",
 
   "key.categories.stratagems": "Stratagems",
