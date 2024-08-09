@@ -119,7 +119,10 @@ public class ServerStratagemsData extends SavedData
 
     public void reset()
     {
-        this.instances.values().forEach(instance -> instance.reset(this.level.getServer(), null));
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().reset(this.level.getServer(), null);
+        }
     }
 
     public void clear()

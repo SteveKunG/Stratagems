@@ -40,12 +40,28 @@ public class DepletedRule implements StratagemRule
         if (instance.remainingUse > 0)
         {
             // Set state from READY to IN_USE
-            instance.state = StratagemState.IN_USE;
+            if (replenishOptional.isPresent())
+            {
+                var toReplenishOptional = replenishOptional.get().toReplenish();
+
+                if (toReplenishOptional.isPresent())
+                {
+                    var toReplenish = toReplenishOptional.get();
+                    var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
+
+                    stratagems.forEach(instancex ->
+                    {
+                        if (toReplenish.contains(instancex.getStratagem()))
+                        {
+                            instancex.state = StratagemState.IN_USE;
+                        }
+                    });
+                }
+            }
+
             instance.remainingUse--;
             LOGGER.info("{} stratagem has remainingUse: {}", stratagem.name().getString(), instance.remainingUse);
         }
-
-        //TODO Set cooldown for all toReplenish stratagems
 
         // Add replenisher stratagem when remaining use is lower than original
         if (instance.remainingUse < stratagem.properties().remainingUse() && replenishOptional.isPresent())

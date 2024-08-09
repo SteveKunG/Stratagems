@@ -16,7 +16,8 @@
     "inbound_duration": 40,
     "remaining_use": 3,
     "replenish": {
-      "replenisher": "stratagems:tnt_rearm"
+      "replenisher": "stratagems:tnt_rearm",
+      "to_replenish": "#stratagems:tnt_replenish"
     }
   },
   "display": {
