@@ -40,7 +40,25 @@ public class DepletedRule implements StratagemRule
         if (instance.remainingUse > 0)
         {
             // Set state from READY to IN_USE
-            instance.state = StratagemState.IN_USE;
+            if (replenishOptional.isPresent())
+            {
+                var toReplenishOptional = replenishOptional.get().toReplenish();
+
+                if (toReplenishOptional.isPresent())
+                {
+                    var toReplenish = toReplenishOptional.get();
+                    var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
+
+                    stratagems.forEach(instancex ->
+                    {
+                        if (toReplenish.contains(instancex.getStratagem()) && instancex.state != StratagemState.UNAVAILABLE)
+                        {
+                            instancex.state = StratagemState.IN_USE;
+                        }
+                    });
+                }
+            }
+
             instance.remainingUse--;
             LOGGER.info("{} stratagem has remainingUse: {}", stratagem.name().getString(), instance.remainingUse);
         }
@@ -65,7 +83,7 @@ public class DepletedRule implements StratagemRule
                         return;
                     }
 
-                    playerStratagems.put(replenisherStratagem, StratagemUtils.createInstanceWithDefaultValue(replenisherStratagem, StratagemInstance.Side.PLAYER));
+                    playerStratagems.put(replenisherStratagem, StratagemUtils.createInstanceForPlayer(replenisherStratagem, player.getUniqueStratagemId()));
                     LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
                 }
                 if (instance.side == StratagemInstance.Side.SERVER && server != null)
@@ -73,13 +91,13 @@ public class DepletedRule implements StratagemRule
                     var serverStratagems = server.overworld().getStratagemData();
                     var replenisherStratagem = server.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
 
-                    if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances(), replenisherStratagem))
+                    if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances().values(), replenisherStratagem))
                     {
                         LOGGER.info("{} server replenisher stratagem already exist", replenisherStratagem.value().name().getString());
                         return;
                     }
 
-                    serverStratagems.add(StratagemUtils.createInstanceWithDefaultValue(replenisherStratagem, StratagemInstance.Side.SERVER));
+                    serverStratagems.add(replenisherStratagem, StratagemInstance.Side.SERVER);
                     LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
                 }
             }

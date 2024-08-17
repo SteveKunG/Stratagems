@@ -1,10 +1,14 @@
 {
-  "code": "wdsd",
+  "code": "awdw",
   "name": {
-    "translate": "stratagem.stratagems.tnt"
+    "translate": "stratagem.stratagems.long_tnt"
   },
   "action": {
-    "type": "stratagems:spawn_bomb"
+    "type": "stratagems:spawn_bomb",
+    "block_state": {
+      "Name": "minecraft:diamond_block"
+    },
+    "fuse": 100
   },
   "rule": {
     "type": "stratagems:depleted"
@@ -12,9 +16,9 @@
   "properties": {
     "beam_color": -50116,
     "can_depleted": true,
-    "cooldown": 60,
-    "inbound_duration": 40,
-    "remaining_use": 3,
+    "cooldown": 30,
+    "inbound_duration": 20,
+    "remaining_use": 1,
     "replenish": {
       "replenisher": "stratagems:tnt_rearm",
       "to_replenish": "#stratagems:tnt_replenish"

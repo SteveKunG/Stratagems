@@ -1,11 +1,12 @@
 package com.stevekung.stratagems.api;
 
-import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
+import com.stevekung.stratagems.api.StratagemInstance.Side;
 import com.stevekung.stratagems.api.util.CustomDataFixTypes;
 
 import net.minecraft.core.Holder;
@@ -21,9 +22,10 @@ public class ServerStratagemsData extends SavedData
 {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "server_stratagems";
-    private final List<StratagemInstance> instances = Lists.newCopyOnWriteArrayList();
+    private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
     private final ServerLevel level;
     private int tick;
+    private int nextAvailableID;
 
     public static SavedData.Factory<ServerStratagemsData> factory(ServerLevel level)
     {
@@ -33,13 +35,18 @@ public class ServerStratagemsData extends SavedData
     public ServerStratagemsData(ServerLevel level)
     {
         this.level = level;
+        this.nextAvailableID = 1;
         this.setDirty();
     }
 
     public void tick()
     {
         this.tick++;
-        this.instances.forEach(instance -> instance.tick(this.level.getServer(), null));
+
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().tick(this.level.getServer(), null);
+        }
 
         if (this.tick % 100 == 0)
         {
@@ -49,24 +56,24 @@ public class ServerStratagemsData extends SavedData
 
     public void use(Holder<Stratagem> holder, Player player)
     {
-        this.instances.stream().filter(instance -> instance.getStratagem() == holder).findFirst().ifPresent(instance ->
+        var instance = this.instances.get(holder);
+
+        if (instance.canUse(this.level.getServer(), player))
         {
-            if (instance.canUse(this.level.getServer(), player))
-            {
-                instance.use(this.level.getServer(), player);
-                this.setDirty();
-            }
-            else
-            {
-                LOGGER.info("Cannot use {} stratagem because it's in {} state!", instance.stratagem().name().getString(), instance.state);
-            }
-        });
+            instance.use(this.level.getServer(), player);
+            this.setDirty();
+        }
+        else
+        {
+            LOGGER.info("Cannot use {} stratagem because it's in {} state!", instance.stratagem().name().getString(), instance.state);
+        }
     }
 
     public static ServerStratagemsData load(ServerLevel level, CompoundTag tag)
     {
         var data = new ServerStratagemsData(level);
         data.tick = tag.getInt(ModConstants.Tag.TICK);
+        data.nextAvailableID = tag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
 
         if (tag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
         {
@@ -74,7 +81,8 @@ public class ServerStratagemsData extends SavedData
 
             for (var i = 0; i < listTag.size(); i++)
             {
-                data.instances.add(StratagemInstance.load(listTag.getCompound(i), level));
+                var instance = StratagemInstance.load(listTag.getCompound(i), level);
+                data.instances.put(instance.getStratagem(), instance);
             }
         }
 
@@ -86,7 +94,7 @@ public class ServerStratagemsData extends SavedData
     {
         var listTag = new ListTag();
 
-        for (var instance : this.instances)
+        for (var instance : this.instances.values())
         {
             var compoundTag = new CompoundTag();
             instance.save(compoundTag);
@@ -95,27 +103,33 @@ public class ServerStratagemsData extends SavedData
 
         tag.put(ModConstants.Tag.STRATAGEMS, listTag);
         tag.putInt(ModConstants.Tag.TICK, this.tick);
+        tag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableID);
         return tag;
     }
 
-    public void add(StratagemInstance instance)
+    public void add(Holder<Stratagem> holder, Side side)
     {
-        this.instances.add(instance);
+        var properties = holder.value().properties();
+        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.remainingUse(), StratagemState.READY, side);
+        this.instances.put(holder, instance);
     }
 
     public void remove(Holder<Stratagem> holder)
     {
-        this.instances.removeIf(instance -> instance.getStratagem() == holder);
+        this.instances.remove(holder);
     }
 
     public void reset(Holder<Stratagem> holder)
     {
-        this.instances.stream().filter(instance -> instance.getStratagem() == holder).forEach(instance -> instance.reset(this.level.getServer(), null));
+        this.instances.get(holder).reset(this.level.getServer(), null);
     }
 
     public void reset()
     {
-        this.instances.forEach(instance -> instance.reset(this.level.getServer(), null));
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().reset(this.level.getServer(), null);
+        }
     }
 
     public void clear()
@@ -123,9 +137,14 @@ public class ServerStratagemsData extends SavedData
         this.instances.clear();
     }
 
-    public List<StratagemInstance> getInstances()
+    public Map<Holder<Stratagem>, StratagemInstance> getInstances()
     {
         return this.instances;
+    }
+
+    private int getUniqueId()
+    {
+        return ++this.nextAvailableID;
     }
 
     public static String getFileId()

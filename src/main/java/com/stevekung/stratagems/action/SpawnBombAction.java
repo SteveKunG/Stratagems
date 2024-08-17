@@ -13,11 +13,13 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.level.block.state.BlockState;
 
-public record SpawnBombAction(Optional<Integer> fuse) implements StratagemAction
+public record SpawnBombAction(Optional<Integer> fuse, Optional<BlockState> blockState) implements StratagemAction
 {
     public static final MapCodec<SpawnBombAction> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("fuse").forGetter(SpawnBombAction::fuse)
+            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("fuse").forGetter(SpawnBombAction::fuse),
+            BlockState.CODEC.optionalFieldOf("block_state").forGetter(SpawnBombAction::blockState)
             ).apply(instance, SpawnBombAction::new));
 
     @Override
@@ -33,17 +35,23 @@ public record SpawnBombAction(Optional<Integer> fuse) implements StratagemAction
         var blockPos = context.blockPos();
         var primedTnt = new PrimedTnt(level, blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5, context.serverPlayer());
         this.fuse.ifPresent(primedTnt::setFuse);
+        this.blockState.ifPresent(primedTnt::setBlockState);
         level.playSound(null, primedTnt.getX(), primedTnt.getY(), primedTnt.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
         level.addFreshEntity(primedTnt);
     }
 
     public static Builder spawnBomb()
     {
-        return () -> new SpawnBombAction(Optional.empty());
+        return () -> new SpawnBombAction(Optional.empty(), Optional.empty());
     }
 
     public static Builder spawnBomb(int fuse)
     {
-        return () -> new SpawnBombAction(Optional.of(fuse));
+        return () -> new SpawnBombAction(Optional.of(fuse), Optional.empty());
+    }
+
+    public static Builder spawnBomb(int fuse, BlockState blockState)
+    {
+        return () -> new SpawnBombAction(Optional.of(fuse), Optional.of(blockState));
     }
 }

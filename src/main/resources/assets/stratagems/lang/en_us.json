@@ -6,6 +6,8 @@
   "stratagem.stratagems.iron_pickaxe": "Iron Pickaxe",
   "stratagem.stratagems.block": "Block",
   "stratagem.stratagems.tnt": "TNT",
+  "stratagem.stratagems.fast_tnt": "Fast TNT",
+  "stratagem.stratagems.long_tnt": "Long TNT",
   "stratagem.stratagems.tnt_rearm": "TNT Rearm",
 
   "key.categories.stratagems": "Stratagems",
@@ -49,6 +51,6 @@
   "commands.stratagem.remove.player.everything.success": "Remove all stratagems from %s",
   "commands.stratagem.remove.player.specific.success": "Remove %s stratagem from %s",
   "commands.stratagem.remove.server.specific.success": "Remove %s stratagem from server",
-  "commands.stratagem.remove.player.specific.failed": "Failed to remove a stratagem from the player!",
-  "commands.stratagem.remove.server.specific.failed": "Failed to remove a stratagem from the server!"
+  "commands.stratagem.remove.player.specific.failed": "%s doesn't have the stratagem",
+  "commands.stratagem.remove.server.specific.failed": "Server doesn't have the stratagem"
 }

@@ -1,20 +1,20 @@
 package com.stevekung.stratagems.api;
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.stevekung.stratagems.api.references.ModRegistries;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
 public interface ModConstants
 {
-    List<StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Lists.newCopyOnWriteArrayList();
+    Map<Holder<Stratagem>, StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Maps.newLinkedHashMap();
     Map<Character, Character> WASD_TO_ARROWS = Map.of('w', '↑', 'a', '←', 's', '↓', 'd', '→');
     String MOD_ID = "stratagems";
     Logger LOGGER = LoggerFactory.getLogger("Stratagems");
@@ -46,6 +46,8 @@ public interface ModConstants
         ResourceLocation USE_REPLENISH_STRATAGEM = id("use_replenish_stratagem");
         ResourceLocation UPDATE_PLAYER_STRATAGEMS = id("update_player_stratagems");
         ResourceLocation UPDATE_SERVER_STRATAGEMS = id("update_server_stratagems");
+        ResourceLocation UPDATE_STRATAGEM = id("update_stratagem");
+        ResourceLocation CLEAR_STRATAGEMS = id("clear_stratagems");
     }
 
     interface StratagemTag
@@ -60,6 +62,8 @@ public interface ModConstants
         String STRATAGEM = "stratagem";
         String STRATAGEMS = "stratagems";
         String TICK = "tick";
+        String NEXT_AVAILABLE_STRATAGEM_ID = "next_available_stratagem_id";
+        String ID = "id";
         String INBOUND_DURATION = "inbound_duration";
         String DURATION = "duration";
         String COOLDOWN = "cooldown";

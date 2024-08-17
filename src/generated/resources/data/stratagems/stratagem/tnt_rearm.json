@@ -23,7 +23,7 @@
     "type": "item",
     "item_stack": {
       "count": 1,
-      "id": "minecraft:redstone_block"
+      "id": "minecraft:redstone_torch"
     }
   }
 }

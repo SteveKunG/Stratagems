@@ -9,10 +9,7 @@ import com.stevekung.stratagems.api.StratagemDisplay;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
-import com.stevekung.stratagems.api.packet.SpawnStratagemPacket;
-import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.UseReplenishStratagemPacket;
+import com.stevekung.stratagems.api.packet.*;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.references.StratagemSounds;
 import com.stevekung.stratagems.api.util.StratagemUtils;
@@ -68,7 +65,74 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             LOGGER.info("Received server stratagem packet");
             ModConstants.CLIENT_SERVER_STRATAGEM_LIST.clear();
-            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.addAll(StratagemUtils.mapToInstance(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.putAll(StratagemUtils.mapToInstance(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(ClearStratagemsPacket.TYPE, (payload, context) ->
+        {
+            var clearServer = payload.server();
+            var clearPlayer = payload.player();
+
+            if (clearPlayer)
+            {
+                var player = context.player();
+
+                if (payload.uuid() != null)
+                {
+                    if (player.getUUID().equals(payload.uuid()))
+                    {
+                        player.getStratagems().clear();
+                    }
+                }
+                else
+                {
+                    LOGGER.warn("Player UUID should not be null!");
+                }
+            }
+            if (clearServer)
+            {
+                ModConstants.CLIENT_SERVER_STRATAGEM_LIST.clear();
+            }
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(UpdateStratagemPacket.TYPE, (payload, context) ->
+        {
+            var entryData = payload.entryData();
+            var level = context.client().level;
+            var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
+            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.remainingUse(), entryData.state(), entryData.side());
+
+            if (entryData.side() == StratagemInstance.Side.SERVER)
+            {
+                switch (payload.action())
+                {
+                    case UPDATE -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.replace(holder, instance);
+                    case ADD -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.put(holder, instance);
+                    case REMOVE -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.remove(holder);
+                }
+            }
+            else
+            {
+                var player = context.player();
+                var uuid = payload.uuid();
+
+                if (uuid != null)
+                {
+                    if (player.getUUID().equals(uuid))
+                    {
+                        switch (payload.action())
+                        {
+                            case UPDATE -> player.getStratagems().replace(holder, instance);
+                            case ADD -> player.getStratagems().put(holder, instance);
+                            case REMOVE -> player.getStratagems().remove(holder);
+                        }
+                    }
+                }
+                else
+                {
+                    LOGGER.warn("Player UUID should not be null!");
+                }
+            }
         });
     }
 
@@ -86,7 +150,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (!minecraft.isPaused() && level.tickRateManager().runsNormally())
         {
-            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.forEach(instance -> instance.tick(null, player));
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values().forEach(instance -> instance.tick(null, player));
         }
 
         minecraft.getProfiler().pop();
@@ -135,7 +199,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     fail = true;
                     LOGGER.info("FAIL");
                 }
-                if (StratagemInputManager.foundMatch(inputCode, player))
+                if (StratagemInputManager.foundMatchFirst(inputCode, player).isPresent())
                 {
                     var instance = StratagemInputManager.getInstanceFromCode(inputCode, player);
                     var stratagem = instance.getStratagem().value();
@@ -386,7 +450,8 @@ public class StratagemsClientMod implements ClientModInitializer
                     display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, displayCount));
                 }
             });
-            case TEXTURE -> display.texture().ifPresent(resourceLocation -> guiGraphics.blit(resourceLocation, 8, 22 + index * 30, 0, 0, 16, 16, 16, 16));
+            case TEXTURE ->
+                    display.texture().ifPresent(resourceLocation -> guiGraphics.blit(resourceLocation, 8, 22 + index * 30, 0, 0, 16, 16, 16, 16));
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
             {
                 var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
