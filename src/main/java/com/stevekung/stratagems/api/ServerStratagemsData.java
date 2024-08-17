@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
+import com.stevekung.stratagems.api.StratagemInstance.Side;
 import com.stevekung.stratagems.api.util.CustomDataFixTypes;
 
 import net.minecraft.core.Holder;
@@ -21,9 +22,10 @@ public class ServerStratagemsData extends SavedData
 {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "server_stratagems";
-    private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newHashMap();
+    private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
     private final ServerLevel level;
     private int tick;
+    private int nextAvailableID;
 
     public static SavedData.Factory<ServerStratagemsData> factory(ServerLevel level)
     {
@@ -33,6 +35,7 @@ public class ServerStratagemsData extends SavedData
     public ServerStratagemsData(ServerLevel level)
     {
         this.level = level;
+        this.nextAvailableID = 1;
         this.setDirty();
     }
 
@@ -70,6 +73,7 @@ public class ServerStratagemsData extends SavedData
     {
         var data = new ServerStratagemsData(level);
         data.tick = tag.getInt(ModConstants.Tag.TICK);
+        data.nextAvailableID = tag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
 
         if (tag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
         {
@@ -99,12 +103,15 @@ public class ServerStratagemsData extends SavedData
 
         tag.put(ModConstants.Tag.STRATAGEMS, listTag);
         tag.putInt(ModConstants.Tag.TICK, this.tick);
+        tag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableID);
         return tag;
     }
 
-    public void add(StratagemInstance instance)
+    public void add(Holder<Stratagem> holder, Side side)
     {
-        this.instances.putIfAbsent(instance.getStratagem(), instance);
+        var properties = holder.value().properties();
+        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.remainingUse(), StratagemState.READY, side);
+        this.instances.put(holder, instance);
     }
 
     public void remove(Holder<Stratagem> holder)
@@ -133,6 +140,11 @@ public class ServerStratagemsData extends SavedData
     public Map<Holder<Stratagem>, StratagemInstance> getInstances()
     {
         return this.instances;
+    }
+
+    private int getUniqueId()
+    {
+        return ++this.nextAvailableID;
     }
 
     public static String getFileId()

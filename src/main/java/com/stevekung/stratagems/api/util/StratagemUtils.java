@@ -20,6 +20,7 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.StringUtil;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class StratagemUtils
@@ -41,18 +42,18 @@ public class StratagemUtils
 
     public static Map<Holder<Stratagem>, StratagemInstance> mapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        return entries.stream().map(entry -> new StratagemInstance(function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
+        return entries.stream().map(entry -> new StratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
     }
 
     public static List<StratagemEntryData> mapToEntry(Collection<StratagemInstance> list)
     {
-        return list.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
+        return list.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
     public static Map<Holder<Stratagem>, StratagemInstance> entryToMap(Collection<StratagemEntryData> list, Level level)
     {
         Function<ResourceKey<Stratagem>, Holder<Stratagem>> function = resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey);
-        return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new StratagemInstance(function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())));
+        return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new StratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.remainingUse(), entry.state(), entry.side())));
     }
 
     public static Component decorateStratagemName(Component name, Holder<Stratagem> holder)
@@ -65,9 +66,9 @@ public class StratagemUtils
         return ComponentUtils.formatList(list, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
     }
 
-    public static StratagemInstance createInstanceWithDefaultValue(Holder<Stratagem> holder, StratagemInstance.Side side)
+    public static StratagemInstance createInstanceForPlayer(Holder<Stratagem> holder, int id)
     {
         var properties = holder.value().properties();
-        return new StratagemInstance(holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.remainingUse(), StratagemState.READY, side);
+        return new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.remainingUse(), StratagemState.READY, StratagemInstance.Side.PLAYER);
     }
 }

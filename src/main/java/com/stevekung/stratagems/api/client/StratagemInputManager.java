@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
@@ -134,6 +135,6 @@ public class StratagemInputManager
 
     public static List<StratagemInstance> all(Player player)
     {
-        return Lists.newArrayList(Iterables.concat(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values(), player.getStratagems().values()));
+        return Lists.newArrayList(Iterables.concat(Ordering.natural().sortedCopy(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values()), Ordering.natural().sortedCopy(player.getStratagems().values())));
     }
 }

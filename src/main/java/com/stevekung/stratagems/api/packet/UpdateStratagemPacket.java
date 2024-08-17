@@ -32,6 +32,7 @@ public record UpdateStratagemPacket(Action action, StratagemEntryData entryData,
 
     private void write(FriendlyByteBuf buffer)
     {
+        buffer.writeEnum(this.action);
         this.entryData.write(buffer);
         buffer.writeNullable(this.uuid, (bufferx, uuid) -> bufferx.writeUUID(uuid));
     }

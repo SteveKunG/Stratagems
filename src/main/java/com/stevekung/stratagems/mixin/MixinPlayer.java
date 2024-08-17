@@ -27,6 +27,9 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     @Unique
     private final Map<Holder<Stratagem>, StratagemInstance> stratagems = Maps.newLinkedHashMap();
 
+    @Unique
+    private int nextAvailableId = 1;
+
     MixinPlayer()
     {
         super(null, null);
@@ -63,6 +66,7 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
 
             compound.put(ModConstants.Tag.STRATAGEMS, listTag);
         }
+        compound.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
@@ -79,5 +83,14 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
                 this.stratagems.put(instance.getStratagem(), instance);
             }
         }
+        if (compound.contains(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, Tag.TAG_INT))
+        {
+            this.nextAvailableId = compound.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
+        }
+    }
+
+    public int getUniqueStratagemId()
+    {
+        return ++this.nextAvailableId;
     }
 }

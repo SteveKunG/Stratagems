@@ -14,7 +14,7 @@ import net.minecraft.tags.TagKey;
 
 public interface ModConstants
 {
-    Map<Holder<Stratagem>, StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Maps.newHashMap();
+    Map<Holder<Stratagem>, StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Maps.newLinkedHashMap();
     Map<Character, Character> WASD_TO_ARROWS = Map.of('w', '↑', 'a', '←', 's', '↓', 'd', '→');
     String MOD_ID = "stratagems";
     Logger LOGGER = LoggerFactory.getLogger("Stratagems");
@@ -62,6 +62,8 @@ public interface ModConstants
         String STRATAGEM = "stratagem";
         String STRATAGEMS = "stratagems";
         String TICK = "tick";
+        String NEXT_AVAILABLE_STRATAGEM_ID = "next_available_stratagem_id";
+        String ID = "id";
         String INBOUND_DURATION = "inbound_duration";
         String DURATION = "duration";
         String COOLDOWN = "cooldown";

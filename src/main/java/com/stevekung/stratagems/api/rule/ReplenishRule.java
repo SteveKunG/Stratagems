@@ -7,8 +7,10 @@ import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.packet.StratagemEntryData;
 import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.StratagemRules;
 
 import net.minecraft.core.Holder;
@@ -90,9 +92,9 @@ public class ReplenishRule implements StratagemRule
 
             if (replenishSoundOptional.isPresent() && count > 0)
             {
-                if (instance.side == StratagemInstance.Side.PLAYER && player != null)
+                if (instance.side == StratagemInstance.Side.PLAYER && player instanceof ServerPlayer serverPlayer)
                 {
-                    ((ServerPlayer)player).connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
+                    serverPlayer.connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
                 }
                 if (instance.side == StratagemInstance.Side.SERVER && server != null)
                 {
@@ -111,10 +113,16 @@ public class ReplenishRule implements StratagemRule
         if (instance.side == StratagemInstance.Side.PLAYER)
         {
             context.player().getStratagems().remove(instance.getStratagem());
+            ((ServerPlayer)context.player()).connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), context.player().getUUID())));
         }
         else
         {
-            context.server().overworld().getStratagemData().remove(instance.getStratagem());
+            context.server().overworld().getStratagemData().getInstances().remove(instance.getStratagem());
+
+            for (var serverPlayer : context.server().getPlayerList().getPlayers())
+            {
+                serverPlayer.connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance))));
+            }
         }
 
         LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
@@ -138,23 +146,23 @@ public class ReplenishRule implements StratagemRule
                 var player = context.player();
                 var server = context.server();
 
-                if (player != null && instance.side == StratagemInstance.Side.PLAYER)
+                if (player instanceof ServerPlayer serverPlayer && instance.side == StratagemInstance.Side.PLAYER)
                 {
-                    var playerStratagems = player.getStratagems();
+                    var playerStratagems = serverPlayer.getStratagems();
 
-                    if (playerStratagems.entrySet().stream().allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE && toReplenish.contains(entry.getKey())))
+                    if (playerStratagems.entrySet().stream().filter(entry -> toReplenish.contains(entry.getValue().getStratagem())).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
                     {
-                        instance.use(null, player);
-                        ((ServerPlayer)player).connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
+                        this.onUse(context);
+                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
                     }
                 }
                 if (server != null && instance.side == StratagemInstance.Side.SERVER)
                 {
                     var serverStratagems = server.overworld().getStratagemData();
 
-                    if (serverStratagems.getInstances().values().stream().allMatch(instancex -> instancex.state == StratagemState.UNAVAILABLE && toReplenish.contains(instancex.getStratagem())))
+                    if (serverStratagems.getInstances().entrySet().stream().filter(entry -> toReplenish.contains(entry.getValue().getStratagem())).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
                     {
-                        instance.use(server, player);
+                        this.onUse(context);
 
                         for (var serverPlayer : server.getPlayerList().getPlayers())
                         {

@@ -100,14 +100,14 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new StratagemInstance(holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.remainingUse(), entryData.state(), entryData.side());
+            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.remainingUse(), entryData.state(), entryData.side());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
                 switch (payload.action())
                 {
                     case UPDATE -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.replace(holder, instance);
-                    case ADD -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.putIfAbsent(holder, instance);
+                    case ADD -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.put(holder, instance);
                     case REMOVE -> ModConstants.CLIENT_SERVER_STRATAGEM_LIST.remove(holder);
                 }
             }
@@ -123,7 +123,7 @@ public class StratagemsClientMod implements ClientModInitializer
                         switch (payload.action())
                         {
                             case UPDATE -> player.getStratagems().replace(holder, instance);
-                            case ADD -> player.getStratagems().putIfAbsent(holder, instance);
+                            case ADD -> player.getStratagems().put(holder, instance);
                             case REMOVE -> player.getStratagems().remove(holder);
                         }
                     }

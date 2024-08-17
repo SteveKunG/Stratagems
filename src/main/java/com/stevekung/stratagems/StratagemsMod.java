@@ -68,7 +68,7 @@ public class StratagemsMod implements ModInitializer
 
             if (payload.side() == StratagemInstance.Side.PLAYER)
             {
-                playerStratagems.get(holder).use(server, player);
+                playerStratagems.get(holder).use(null, player);
                 ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID()));
             }
             else

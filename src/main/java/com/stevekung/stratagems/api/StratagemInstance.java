@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.IntFunction;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import com.stevekung.stratagems.api.references.ModRegistries;
@@ -22,9 +23,10 @@ import net.minecraft.util.ByIdMap;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public class StratagemInstance
+public class StratagemInstance implements Comparable<StratagemInstance>
 {
     private final Holder<Stratagem> stratagem;
+    public int id = 1;
     public int inboundDuration;
     public int duration;
     public int cooldown;
@@ -32,8 +34,9 @@ public class StratagemInstance
     public StratagemState state;
     public Side side;
 
-    public StratagemInstance(Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, Side side)
+    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, Side side)
     {
+        this.id = id;
         this.stratagem = stratagem;
         this.inboundDuration = inboundDuration;
         this.duration = duration;
@@ -63,6 +66,7 @@ public class StratagemInstance
         }
 
         this.stratagem.unwrapKey().ifPresent(resourceKey -> compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString()));
+        compoundTag.putInt(ModConstants.Tag.ID, this.id);
         compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
         compoundTag.putString(ModConstants.Tag.SIDE, this.side.getName());
     }
@@ -73,6 +77,7 @@ public class StratagemInstance
         var inboundDuration = 0;
         var duration = -1;
         var remainingUse = -1;
+        var id = compoundTag.getInt(ModConstants.Tag.ID);
         var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
         var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
 
@@ -93,7 +98,7 @@ public class StratagemInstance
             remainingUse = compoundTag.getInt(ModConstants.Tag.REMAINING_USE);
         }
 
-        return new StratagemInstance(stratagem, inboundDuration, duration, cooldown, remainingUse, state, side);
+        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, remainingUse, state, side);
     }
 
     public void resetStratagemTicks(StratagemProperties properties)
@@ -152,6 +157,13 @@ public class StratagemInstance
     public boolean isReady()
     {
         return this.state == StratagemState.READY;
+    }
+
+    @Override
+    public int compareTo(StratagemInstance instance)
+    {
+        var builder = new CompareToBuilder();
+        return builder.append(this.id, instance.id).build();
     }
 
     public enum Side

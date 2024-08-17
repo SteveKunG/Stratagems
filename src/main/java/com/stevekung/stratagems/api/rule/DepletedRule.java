@@ -51,7 +51,7 @@ public class DepletedRule implements StratagemRule
 
                     stratagems.forEach(instancex ->
                     {
-                        if (toReplenish.contains(instancex.getStratagem()))
+                        if (toReplenish.contains(instancex.getStratagem()) && instancex.state != StratagemState.UNAVAILABLE)
                         {
                             instancex.state = StratagemState.IN_USE;
                         }
@@ -83,7 +83,7 @@ public class DepletedRule implements StratagemRule
                         return;
                     }
 
-                    playerStratagems.put(replenisherStratagem, StratagemUtils.createInstanceWithDefaultValue(replenisherStratagem, StratagemInstance.Side.PLAYER));
+                    playerStratagems.put(replenisherStratagem, StratagemUtils.createInstanceForPlayer(replenisherStratagem, player.getUniqueStratagemId()));
                     LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
                 }
                 if (instance.side == StratagemInstance.Side.SERVER && server != null)
@@ -97,7 +97,7 @@ public class DepletedRule implements StratagemRule
                         return;
                     }
 
-                    serverStratagems.add(StratagemUtils.createInstanceWithDefaultValue(replenisherStratagem, StratagemInstance.Side.SERVER));
+                    serverStratagems.add(replenisherStratagem, StratagemInstance.Side.SERVER);
                     LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
                 }
             }

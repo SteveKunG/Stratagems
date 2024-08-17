@@ -8,16 +8,17 @@ import com.stevekung.stratagems.api.references.ModRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 
-public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, StratagemInstance.Side side)
+public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, StratagemInstance.Side side)
 {
     public StratagemEntryData(FriendlyByteBuf buffer)
     {
-        this(buffer.readResourceKey(ModRegistries.STRATAGEM), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readEnum(StratagemState.class), buffer.readEnum(StratagemInstance.Side.class));
+        this(buffer.readResourceKey(ModRegistries.STRATAGEM), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readEnum(StratagemState.class), buffer.readEnum(StratagemInstance.Side.class));
     }
 
     public void write(FriendlyByteBuf buffer)
     {
         buffer.writeResourceKey(this.stratagem);
+        buffer.writeInt(this.id);
         buffer.writeInt(this.inboundDuration);
         buffer.writeInt(this.duration);
         buffer.writeInt(this.cooldown);
@@ -28,6 +29,6 @@ public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int inboundDu
 
     public static StratagemEntryData fromInstance(StratagemInstance instance)
     {
-        return new StratagemEntryData(instance.getResourceKey(), instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side);
+        return new StratagemEntryData(instance.getResourceKey(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side);
     }
 }
