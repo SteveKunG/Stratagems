@@ -20,7 +20,6 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.StringUtil;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class StratagemUtils
