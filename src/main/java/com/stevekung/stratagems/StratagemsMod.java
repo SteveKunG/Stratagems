@@ -4,10 +4,14 @@ import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.packet.*;
-import com.stevekung.stratagems.api.references.*;
+import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
+import com.stevekung.stratagems.api.references.ModRegistries;
+import com.stevekung.stratagems.api.references.StratagemRules;
+import com.stevekung.stratagems.api.references.StratagemSounds;
 import com.stevekung.stratagems.command.StratagemCommands;
 import com.stevekung.stratagems.entity.StratagemBall;
 import com.stevekung.stratagems.registry.ModEntities;
+import com.stevekung.stratagems.registry.StratagemActionTypes;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -31,7 +35,7 @@ public class StratagemsMod implements ModInitializer
         StratagemSounds.init();
         ModEntities.init();
         ModEntityDataSerializers.init();
-        StratagemActions.init();
+        StratagemActionTypes.init();
         StratagemRules.init();
 
         DynamicRegistries.registerSynced(ModRegistries.STRATAGEM, Stratagem.DIRECT_CODEC, DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY);

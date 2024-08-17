@@ -6,7 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.api.action.StratagemAction;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.action.StratagemActionType;
-import com.stevekung.stratagems.api.references.StratagemActions;
+import com.stevekung.stratagems.registry.StratagemActionTypes;
 
 import net.minecraft.world.entity.LivingEntity;
 
@@ -17,7 +17,7 @@ public record ReinforceAction() implements StratagemAction
     @Override
     public StratagemActionType getType()
     {
-        return StratagemActions.REINFORCE;
+        return StratagemActionTypes.REINFORCE;
     }
 
     @Override

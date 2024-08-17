@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.api.action.StratagemAction;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.action.StratagemActionType;
-import com.stevekung.stratagems.api.references.StratagemActions;
+import com.stevekung.stratagems.registry.StratagemActionTypes;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -25,7 +25,7 @@ public record SpawnBombAction(Optional<Integer> fuse, Optional<BlockState> block
     @Override
     public StratagemActionType getType()
     {
-        return StratagemActions.SPAWN_BOMB;
+        return StratagemActionTypes.SPAWN_BOMB;
     }
 
     @Override

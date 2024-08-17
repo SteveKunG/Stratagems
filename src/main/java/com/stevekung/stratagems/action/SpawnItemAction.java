@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.api.action.StratagemAction;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.action.StratagemActionType;
-import com.stevekung.stratagems.api.references.StratagemActions;
+import com.stevekung.stratagems.registry.StratagemActionTypes;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -22,7 +22,7 @@ public record SpawnItemAction(ItemStack primary, Optional<ItemStack> secondary) 
     @Override
     public StratagemActionType getType()
     {
-        return StratagemActions.SPAWN_ITEM;
+        return StratagemActionTypes.SPAWN_ITEM;
     }
 
     @Override

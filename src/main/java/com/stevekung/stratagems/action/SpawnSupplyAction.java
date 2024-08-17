@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.api.action.StratagemAction;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.action.StratagemActionType;
-import com.stevekung.stratagems.api.references.StratagemActions;
+import com.stevekung.stratagems.registry.StratagemActionTypes;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -21,7 +21,7 @@ public record SpawnSupplyAction(ResourceKey<LootTable> lootTable) implements Str
     @Override
     public StratagemActionType getType()
     {
-        return StratagemActions.SPAWN_SUPPLY;
+        return StratagemActionTypes.SPAWN_SUPPLY;
     }
 
     @Override
