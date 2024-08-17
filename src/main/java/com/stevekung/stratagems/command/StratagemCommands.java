@@ -5,7 +5,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.packet.*;
+import com.stevekung.stratagems.api.packet.ClearStratagemsPacket;
+import com.stevekung.stratagems.api.packet.StratagemEntryData;
+import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.util.StratagemUtils;
 

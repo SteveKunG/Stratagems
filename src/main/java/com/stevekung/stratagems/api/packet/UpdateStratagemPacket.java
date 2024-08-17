@@ -7,8 +7,8 @@ import java.util.function.IntFunction;
 import org.jetbrains.annotations.Nullable;
 
 import com.stevekung.stratagems.api.ModConstants;
-import io.netty.buffer.ByteBuf;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

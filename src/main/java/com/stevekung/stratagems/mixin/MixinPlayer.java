@@ -89,6 +89,7 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
         }
     }
 
+    @Override
     public int getUniqueStratagemId()
     {
         return ++this.nextAvailableId;
