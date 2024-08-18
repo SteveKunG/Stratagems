@@ -25,7 +25,7 @@ public class DepletedRule implements StratagemRule
     @Override
     public boolean canUse(StratagemInstanceContext context)
     {
-        return context.instance().isReady() && context.instance().remainingUse > 0;
+        return context.instance().isReady() && context.instance().maxUse > 0;
     }
 
     @Override
@@ -37,34 +37,31 @@ public class DepletedRule implements StratagemRule
         var stratagem = instance.stratagem();
         var replenishOptional = stratagem.properties().replenish();
 
-        if (instance.remainingUse > 0)
+        if (instance.maxUse > 0)
         {
             // Set state from READY to IN_USE
             if (replenishOptional.isPresent())
             {
-                var toReplenishOptional = replenishOptional.get().toReplenish();
+                var category = replenishOptional.get().category();
+                var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
 
-                if (toReplenishOptional.isPresent())
+                stratagems.forEach(instancex ->
                 {
-                    var toReplenish = toReplenishOptional.get();
-                    var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
-
-                    stratagems.forEach(instancex ->
+                    var otherReplenishOptional = instancex.stratagem().properties().replenish();
+                    
+                    if (otherReplenishOptional.isPresent() && !otherReplenishOptional.get().toReplenish().isPresent() && otherReplenishOptional.get().category().equals(category) && instancex.state != StratagemState.UNAVAILABLE)
                     {
-                        if (toReplenish.contains(instancex.getStratagem()) && instancex.state != StratagemState.UNAVAILABLE)
-                        {
-                            instancex.state = StratagemState.IN_USE;
-                        }
-                    });
-                }
+                        instancex.state = StratagemState.IN_USE;
+                    }
+                });
             }
 
-            instance.remainingUse--;
-            LOGGER.info("{} stratagem has remainingUse: {}", stratagem.name().getString(), instance.remainingUse);
+            instance.maxUse--;
+            LOGGER.info("{} stratagem has maxUse: {}", stratagem.name().getString(), instance.maxUse);
         }
 
-        // Add replenisher stratagem when remaining use is lower than original
-        if (instance.remainingUse < stratagem.properties().remainingUse() && replenishOptional.isPresent())
+        // Add replenisher stratagem when max use is lower than original
+        if (instance.maxUse < stratagem.properties().maxUse() && replenishOptional.isPresent())
         {
             var replenisherOptional = replenishOptional.get().replenisher();
 
@@ -144,7 +141,7 @@ public class DepletedRule implements StratagemRule
                 }
                 if (instance.inboundDuration == 0)
                 {
-                    if (instance.remainingUse == 0)
+                    if (instance.maxUse == 0)
                     {
                         instance.state = StratagemState.UNAVAILABLE;
                         LOGGER.info("{} stratagem is now depleted!", stratagemName);

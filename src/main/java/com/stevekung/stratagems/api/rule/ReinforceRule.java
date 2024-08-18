@@ -26,18 +26,18 @@ public class ReinforceRule implements StratagemRule
     @Override
     public boolean canUse(StratagemInstanceContext context)
     {
-        return context.instance().remainingUse > 0;
+        return context.instance().maxUse > 0;
     }
 
     @Override
     public void onUse(StratagemInstanceContext context)
     {
-        if (context.instance().remainingUse > 0)
+        if (context.instance().maxUse > 0)
         {
             if (context.player() instanceof ServerPlayer serverPlayer && serverPlayer.serverLevel().players().stream().anyMatch(LivingEntity::isDeadOrDying))
             {
-                context.instance().remainingUse--;
-                LOGGER.info("{} stratagem has remainingUse: {}", context.instance().stratagem().name().getString(), context.instance().remainingUse);
+                context.instance().maxUse--;
+                LOGGER.info("{} stratagem has maxUse: {}", context.instance().stratagem().name().getString(), context.instance().maxUse);
             }
             else
             {
@@ -53,7 +53,7 @@ public class ReinforceRule implements StratagemRule
         var player = context.player();
         var level = player != null ? player.level() : context.server().overworld();
 
-        if (instance.state != StratagemState.COOLDOWN && instance.remainingUse == 0)
+        if (instance.state != StratagemState.COOLDOWN && instance.maxUse == 0)
         {
             instance.cooldown = instance.stratagem().properties().cooldown();
             instance.state = StratagemState.COOLDOWN;
@@ -74,8 +74,8 @@ public class ReinforceRule implements StratagemRule
 
             if (instance.cooldown == 0)
             {
-                instance.remainingUse++;
-                LOGGER.info("{} stratagem switch state from {} to {} with remainingUse: {}", instance.stratagem().name().getString(), instance.state, StratagemState.READY, instance.remainingUse);
+                instance.maxUse++;
+                LOGGER.info("{} stratagem switch state from {} to {} with maxUse: {}", instance.stratagem().name().getString(), instance.state, StratagemState.READY, instance.maxUse);
                 instance.state = StratagemState.READY;
             }
         }

@@ -7,13 +7,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.util.ExtraCodecs;
 
-public record StratagemProperties(int inboundDuration, int duration, int cooldown, int remainingUse, int beamColor, boolean canDepleted, boolean needThrow, Optional<StratagemReplenish> replenish)
+public record StratagemProperties(int inboundDuration, int duration, int cooldown, int maxUse, int beamColor, boolean canDepleted, boolean needThrow, Optional<StratagemReplenish> replenish)
 {
     public static final Codec<StratagemProperties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("inbound_duration").forGetter(StratagemProperties::inboundDuration),
             ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("duration", -1).forGetter(StratagemProperties::duration),
             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("cooldown").forGetter(StratagemProperties::cooldown),
-            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("remaining_use", -1).forGetter(StratagemProperties::remainingUse),
+            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("max_use", -1).forGetter(StratagemProperties::maxUse),
             Codec.INT.fieldOf("beam_color").forGetter(StratagemProperties::beamColor),
             Codec.BOOL.optionalFieldOf("can_depleted", false).forGetter(StratagemProperties::canDepleted),
             Codec.BOOL.optionalFieldOf("need_throw", true).forGetter(StratagemProperties::needThrow),
@@ -25,13 +25,13 @@ public record StratagemProperties(int inboundDuration, int duration, int cooldow
         return new StratagemProperties(inboundDuration, -1, cooldown, -1, beamColor, false, true, Optional.empty());
     }
 
-    public static StratagemProperties withReplenish(int inboundDuration, int cooldown, int remainingUse, int beamColor, StratagemReplenish replenish)
+    public static StratagemProperties withReplenish(int inboundDuration, int cooldown, int maxUse, int beamColor, StratagemReplenish replenish)
     {
-        return new StratagemProperties(inboundDuration, -1, cooldown, remainingUse, beamColor, true, true, Optional.of(replenish));
+        return new StratagemProperties(inboundDuration, -1, cooldown, maxUse, beamColor, true, true, Optional.of(replenish));
     }
 
-    public static StratagemProperties withDepleted(int inboundDuration, int cooldown, int remainingUse, int beamColor)
+    public static StratagemProperties withDepleted(int inboundDuration, int cooldown, int maxUse, int beamColor)
     {
-        return new StratagemProperties(inboundDuration, -1, cooldown, remainingUse, beamColor, false, true, Optional.empty());
+        return new StratagemProperties(inboundDuration, -1, cooldown, maxUse, beamColor, false, true, Optional.empty());
     }
 }

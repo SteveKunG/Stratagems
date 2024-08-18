@@ -30,18 +30,18 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public int inboundDuration;
     public int duration;
     public int cooldown;
-    public int remainingUse;
+    public int maxUse;
     public StratagemState state;
     public Side side;
 
-    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, Side side)
+    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, Side side)
     {
         this.id = id;
         this.stratagem = stratagem;
         this.inboundDuration = inboundDuration;
         this.duration = duration;
         this.cooldown = cooldown;
-        this.remainingUse = remainingUse;
+        this.maxUse = maxUse;
         this.state = state;
         this.side = side;
     }
@@ -60,9 +60,9 @@ public class StratagemInstance implements Comparable<StratagemInstance>
 
         compoundTag.putInt(ModConstants.Tag.COOLDOWN, this.cooldown);
 
-        if (this.remainingUse > 0)
+        if (this.maxUse > 0)
         {
-            compoundTag.putInt(ModConstants.Tag.REMAINING_USE, this.remainingUse);
+            compoundTag.putInt(ModConstants.Tag.MAX_USE, this.maxUse);
         }
 
         this.stratagem.unwrapKey().ifPresent(resourceKey -> compoundTag.putString(ModConstants.Tag.STRATAGEM, resourceKey.location().toString()));
@@ -76,7 +76,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
         var inboundDuration = 0;
         var duration = -1;
-        var remainingUse = -1;
+        var maxUse = -1;
         var id = compoundTag.getInt(ModConstants.Tag.ID);
         var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
         var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
@@ -93,12 +93,12 @@ public class StratagemInstance implements Comparable<StratagemInstance>
 
         var cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
 
-        if (compoundTag.contains(ModConstants.Tag.REMAINING_USE, Tag.TAG_INT))
+        if (compoundTag.contains(ModConstants.Tag.MAX_USE, Tag.TAG_INT))
         {
-            remainingUse = compoundTag.getInt(ModConstants.Tag.REMAINING_USE);
+            maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
         }
 
-        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, remainingUse, state, side);
+        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, maxUse, state, side);
     }
 
     public void resetStratagemTicks(StratagemProperties properties)
@@ -106,7 +106,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         this.inboundDuration = properties.inboundDuration();
         this.duration = properties.duration();
         this.cooldown = properties.cooldown();
-        this.remainingUse = properties.remainingUse();
+        this.maxUse = properties.maxUse();
     }
 
     public Holder<Stratagem> getStratagem()

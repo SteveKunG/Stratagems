@@ -110,7 +110,7 @@ public class ServerStratagemsData extends SavedData
     public void add(Holder<Stratagem> holder, Side side)
     {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.remainingUse(), StratagemState.READY, side);
+        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, side);
         this.instances.put(holder, instance);
     }
 

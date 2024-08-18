@@ -13,7 +13,7 @@
     "beam_color": -9185281,
     "cooldown": 2400,
     "inbound_duration": 0,
-    "remaining_use": 20
+    "max_use": 20
   },
   "display": {
     "type": "player_icon",

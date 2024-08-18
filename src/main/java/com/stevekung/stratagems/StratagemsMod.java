@@ -86,7 +86,7 @@ public class StratagemsMod implements ModInitializer
             }
         });
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> StratagemCommands.register(dispatcher, context));
+        CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) -> StratagemCommands.register(dispatcher, context));
 
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {

@@ -15,13 +15,14 @@
     "inbound_duration": 0,
     "need_throw": false,
     "replenish": {
+      "category": "tnt",
       "replenish_sound": "minecraft:block.beacon.activate",
       "to_replenish": "#stratagems:tnt_replenish"
     }
   },
   "display": {
     "type": "item",
-    "item_stack": {
+    "item": {
       "count": 1,
       "id": "minecraft:redstone_torch"
     }

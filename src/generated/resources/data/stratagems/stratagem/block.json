@@ -21,10 +21,10 @@
   "display": {
     "type": "item",
     "display_count_override": "64",
-    "item_stack": {
+    "item": {
       "count": 1,
       "id": "minecraft:stone"
     },
-    "use_remaining_as_count": false
+    "max_use_as_count": false
   }
 }

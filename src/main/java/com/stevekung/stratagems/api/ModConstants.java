@@ -67,7 +67,7 @@ public interface ModConstants
         String INBOUND_DURATION = "inbound_duration";
         String DURATION = "duration";
         String COOLDOWN = "cooldown";
-        String REMAINING_USE = "remaining_use";
+        String MAX_USE = "max_use";
         String STATE = "state";
         String SIDE = "side";
     }

@@ -101,7 +101,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.remainingUse(), entryData.state(), entryData.side());
+            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.maxUse(), entryData.state(), entryData.side());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
@@ -299,7 +299,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 guiGraphics.drawString(minecraft.font, stratagemName, 32, 20 + index * 30, nameColor);
 
-                if (instance.state == StratagemState.UNAVAILABLE && instance.remainingUse == 0)
+                if (instance.state == StratagemState.UNAVAILABLE && instance.maxUse == 0)
                 {
                     statusText = Component.translatable("stratagem.menu.unavailable");
                 }
@@ -420,11 +420,11 @@ public class StratagemsClientMod implements ClientModInitializer
             {
                 guiGraphics.renderItem(itemStack, 8, 22 + index * 30);
 
-                if (display.useRemainingAsCount())
+                if (display.maxUseAsCount())
                 {
-                    if (instance.remainingUse > 0)
+                    if (instance.maxUse > 0)
                     {
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, String.valueOf(instance.remainingUse));
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, String.valueOf(instance.maxUse));
                     }
                 }
                 else
@@ -438,11 +438,11 @@ public class StratagemsClientMod implements ClientModInitializer
                 var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
                 PlayerFaceRenderer.draw(guiGraphics, supplier.get(), 8, 22 + index * 30, 16);
 
-                if (display.useRemainingAsCount())
+                if (display.maxUseAsCount())
                 {
-                    if (instance.remainingUse > 0)
+                    if (instance.maxUse > 0)
                     {
-                        guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, String.valueOf(instance.remainingUse));
+                        guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, String.valueOf(instance.maxUse));
                     }
                 }
                 else

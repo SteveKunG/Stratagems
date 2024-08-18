@@ -24,7 +24,7 @@
   },
   "display": {
     "type": "item",
-    "item_stack": {
+    "item": {
       "count": 1,
       "id": "minecraft:bow"
     }

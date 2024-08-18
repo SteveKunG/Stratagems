@@ -8,7 +8,7 @@ import com.stevekung.stratagems.api.references.ModRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 
-public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int inboundDuration, int duration, int cooldown, int remainingUse, StratagemState state, StratagemInstance.Side side)
+public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, StratagemInstance.Side side)
 {
     public StratagemEntryData(FriendlyByteBuf buffer)
     {
@@ -22,13 +22,13 @@ public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int i
         buffer.writeInt(this.inboundDuration);
         buffer.writeInt(this.duration);
         buffer.writeInt(this.cooldown);
-        buffer.writeInt(this.remainingUse);
+        buffer.writeInt(this.maxUse);
         buffer.writeEnum(this.state);
         buffer.writeEnum(this.side);
     }
 
     public static StratagemEntryData fromInstance(StratagemInstance instance)
     {
-        return new StratagemEntryData(instance.getResourceKey(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.remainingUse, instance.state, instance.side);
+        return new StratagemEntryData(instance.getResourceKey(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.maxUse, instance.state, instance.side);
     }
 }

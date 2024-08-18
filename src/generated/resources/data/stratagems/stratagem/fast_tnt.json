@@ -13,21 +13,21 @@
   "properties": {
     "beam_color": -50116,
     "can_depleted": true,
-    "cooldown": 30,
-    "inbound_duration": 20,
-    "remaining_use": 3,
+    "cooldown": 60,
+    "inbound_duration": 40,
+    "max_use": 3,
     "replenish": {
-      "replenisher": "stratagems:tnt_rearm",
-      "to_replenish": "#stratagems:tnt_replenish"
+      "category": "tnt",
+      "replenisher": "stratagems:tnt_rearm"
     }
   },
   "display": {
     "type": "item",
     "display_count_override": "F",
-    "item_stack": {
+    "item": {
       "count": 1,
       "id": "minecraft:tnt"
     },
-    "use_remaining_as_count": false
+    "max_use_as_count": false
   }
 }

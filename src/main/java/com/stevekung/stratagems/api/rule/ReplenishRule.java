@@ -67,9 +67,9 @@ public class ReplenishRule implements StratagemRule
                 // replenished cooldown from replenishing properties
                 replenishedStratagem.cooldown = properties.cooldown();
 
-                if (replenishedProperties.remainingUse() > 0)
+                if (replenishedProperties.maxUse() > 0)
                 {
-                    replenishedStratagem.remainingUse = replenishedProperties.remainingUse();
+                    replenishedStratagem.maxUse = replenishedProperties.maxUse();
                 }
 
                 LOGGER.info("Replenished {} stratagem!", replenishedStratagem.stratagem().name().getString());
@@ -137,37 +137,39 @@ public class ReplenishRule implements StratagemRule
 
         if (replenishOptional.isPresent())
         {
-            var replenish = replenishOptional.get();
-            var toReplenishOptional = replenish.toReplenish();
+            var category = replenishOptional.get().category();
+            var player = context.player();
+            var server = context.server();
 
-            if (toReplenishOptional.isPresent())
+            if (player instanceof ServerPlayer serverPlayer && instance.side == StratagemInstance.Side.PLAYER)
             {
-                var toReplenish = toReplenishOptional.get();
-                var player = context.player();
-                var server = context.server();
+                var playerStratagems = serverPlayer.getStratagems();
 
-                if (player instanceof ServerPlayer serverPlayer && instance.side == StratagemInstance.Side.PLAYER)
+                if (playerStratagems.entrySet().stream().filter(entry ->
                 {
-                    var playerStratagems = serverPlayer.getStratagems();
-
-                    if (playerStratagems.entrySet().stream().filter(entry -> toReplenish.contains(entry.getValue().getStratagem())).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
-                    {
-                        this.onUse(context);
-                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
-                    }
+                    var otherReplenishOptional = entry.getValue().stratagem().properties().replenish();
+                    return otherReplenishOptional.isPresent() && !otherReplenishOptional.get().toReplenish().isPresent() && otherReplenishOptional.get().category().equals(category);
+                }).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
+                {
+                    this.onUse(context);
+                    serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
                 }
-                if (server != null && instance.side == StratagemInstance.Side.SERVER)
+            }
+            if (server != null && instance.side == StratagemInstance.Side.SERVER)
+            {
+                var serverStratagems = server.overworld().getStratagemData();
+
+                if (serverStratagems.getInstances().entrySet().stream().filter(entry ->
                 {
-                    var serverStratagems = server.overworld().getStratagemData();
+                    var otherReplenishOptional = entry.getValue().stratagem().properties().replenish();
+                    return otherReplenishOptional.isPresent() && !otherReplenishOptional.get().toReplenish().isPresent() && otherReplenishOptional.get().category().equals(category);
+                }).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
+                {
+                    this.onUse(context);
 
-                    if (serverStratagems.getInstances().entrySet().stream().filter(entry -> toReplenish.contains(entry.getValue().getStratagem())).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
+                    for (var serverPlayer : server.getPlayerList().getPlayers())
                     {
-                        this.onUse(context);
-
-                        for (var serverPlayer : server.getPlayerList().getPlayers())
-                        {
-                            serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values())));
-                        }
+                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values())));
                     }
                 }
             }
