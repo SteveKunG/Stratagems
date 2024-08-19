@@ -1,6 +1,7 @@
 package com.stevekung.stratagems;
 
 import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.ServerStratagemsData;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.packet.*;
@@ -91,7 +92,7 @@ public class StratagemsMod implements ModInitializer
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
             var serverStratagems = server.overworld().stratagemsData();
-            serverStratagems.setDirty();
+            ((ServerStratagemsData)serverStratagems).setDirty();
             server.overworld().getDataStorage().save();
             ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.instances().size(), serverStratagems.instances().values().stream().map(instance -> instance.getResourceKey().location()).toList());
         });

@@ -7,14 +7,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.stevekung.stratagems.api.PlayerStratagemsData;
-import com.stevekung.stratagems.api.accessor.PlayerStratagemsAccessor;
+import com.stevekung.stratagems.api.accessor.StratagemsDataAccessor;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 @Mixin(Player.class)
-public abstract class MixinPlayer extends LivingEntity implements PlayerStratagemsAccessor
+public abstract class MixinPlayer extends LivingEntity implements StratagemsDataAccessor
 {
     @Unique
     private PlayerStratagemsData stratagems;
