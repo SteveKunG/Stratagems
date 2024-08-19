@@ -13,6 +13,8 @@ public interface StratagemsData
 
     void add(Holder<Stratagem> holder);
 
+    void add(Holder<Stratagem> holder, int id);
+
     void remove(Holder<Stratagem> holder);
 
     void reset(Holder<Stratagem> holder);

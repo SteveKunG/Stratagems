@@ -19,9 +19,6 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     @Unique
     private PlayerStratagemsData stratagems;
 
-    @Unique
-    private int nextAvailableId = 1;
-
     MixinPlayer()
     {
         super(null, null);
@@ -55,11 +52,5 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     private void readAdditionalSaveData(CompoundTag compound, CallbackInfo info)
     {
         this.stratagems.load(compound);
-    }
-
-    @Override
-    public int getUniqueStratagemId()
-    {
-        return ++this.nextAvailableId;
     }
 }

@@ -15,7 +15,7 @@ public class PlayerStratagemsData implements StratagemsData
 {
     private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
     private final Player player;
-    private int nextAvailableId = 1;
+    private int nextAvailableId;
 
     public PlayerStratagemsData(Player player)
     {
@@ -34,13 +34,19 @@ public class PlayerStratagemsData implements StratagemsData
     @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
-        this.instances.get(holder).use(this.player.getServer(), player);
+        this.instanceByHolder(holder).use(this.player.getServer(), player);
     }
 
     @Override
     public void add(Holder<Stratagem> holder)
     {
-        this.instances.put(holder, StratagemUtils.createInstanceForPlayer(holder, this.getUniqueId()));
+        this.add(holder, this.getUniqueId());
+    }
+
+    @Override
+    public void add(Holder<Stratagem> holder, int id)
+    {
+        this.instances.put(holder, StratagemUtils.createInstanceForPlayer(holder, id));
     }
 
     @Override
@@ -52,7 +58,7 @@ public class PlayerStratagemsData implements StratagemsData
     @Override
     public void reset(Holder<Stratagem> holder)
     {
-        this.instances.get(holder).reset(this.player.getServer(), this.player);
+        this.instanceByHolder(holder).reset(this.player.getServer(), this.player);
     }
 
     @Override
@@ -62,6 +68,7 @@ public class PlayerStratagemsData implements StratagemsData
         {
             entry.getValue().reset(this.player.getServer(), this.player);
         }
+        this.nextAvailableId = 0;
     }
 
     @Override
@@ -82,7 +89,12 @@ public class PlayerStratagemsData implements StratagemsData
         return this.instances.get(holder);
     }
 
-    public void load(CompoundTag compound)
+    private int getUniqueId()
+    {
+        return this.nextAvailableId += 10;
+    }
+
+    public void save(CompoundTag compoundTag)
     {
         if (!this.instances.isEmpty())
         {
@@ -90,37 +102,32 @@ public class PlayerStratagemsData implements StratagemsData
 
             for (var instances : this.instances.values())
             {
-                var compoundTag = new CompoundTag();
-                instances.save(compoundTag);
-                listTag.add(compoundTag);
+                var instanceTag = new CompoundTag();
+                instances.save(instanceTag);
+                listTag.add(instanceTag);
             }
 
-            compound.put(ModConstants.Tag.STRATAGEMS, listTag);
+            compoundTag.put(ModConstants.Tag.STRATAGEMS, listTag);
         }
-        compound.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
+        compoundTag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
     }
 
-    public void save(CompoundTag compound)
+    public void load(CompoundTag compoundTag)
     {
-        if (compound.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
+        if (compoundTag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
         {
-            var listTag = compound.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
+            var listTag = compoundTag.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
 
             for (var i = 0; i < listTag.size(); i++)
             {
-                var compoundTag = listTag.getCompound(i);
-                var instance = StratagemInstance.load(compoundTag, this.player.level());
+                var instanceTag = listTag.getCompound(i);
+                var instance = StratagemInstance.load(instanceTag, this.player.level());
                 this.instances.put(instance.getStratagem(), instance);
             }
         }
-        if (compound.contains(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, Tag.TAG_INT))
+        if (compoundTag.contains(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, Tag.TAG_INT))
         {
-            this.nextAvailableId = compound.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
+            this.nextAvailableId = compoundTag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
         }
-    }
-
-    private int getUniqueId()
-    {
-        return ++this.nextAvailableId;
     }
 }

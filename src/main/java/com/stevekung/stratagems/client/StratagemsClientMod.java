@@ -299,7 +299,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 guiGraphics.drawString(minecraft.font, stratagemName, 32, 20 + index * 30, nameColor);
 
-                if (instance.state == StratagemState.UNAVAILABLE && instance.maxUse == 0)
+                if (instance.state == StratagemState.UNAVAILABLE)
                 {
                     statusText = Component.translatable("stratagem.menu.unavailable");
                 }

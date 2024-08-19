@@ -35,7 +35,6 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     public ServerStratagemsData(ServerLevel level)
     {
         this.level = level;
-        this.nextAvailableId = 1;
         this.setDirty();
     }
 
@@ -58,7 +57,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
-        var instance = this.instances.get(holder);
+        var instance = this.instanceByHolder(holder);
 
         if (instance.canUse(this.level.getServer(), player))
         {
@@ -71,49 +70,17 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         }
     }
 
-    public static ServerStratagemsData load(ServerLevel level, CompoundTag tag)
-    {
-        var data = new ServerStratagemsData(level);
-        data.tick = tag.getInt(ModConstants.Tag.TICK);
-        data.nextAvailableId = tag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
-
-        if (tag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
-        {
-            var listTag = tag.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
-
-            for (var i = 0; i < listTag.size(); i++)
-            {
-                var instance = StratagemInstance.load(listTag.getCompound(i), level);
-                data.instances.put(instance.getStratagem(), instance);
-            }
-        }
-
-        return data;
-    }
-
-    @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider)
-    {
-        var listTag = new ListTag();
-
-        for (var instance : this.instances.values())
-        {
-            var compoundTag = new CompoundTag();
-            instance.save(compoundTag);
-            listTag.add(compoundTag);
-        }
-
-        tag.put(ModConstants.Tag.STRATAGEMS, listTag);
-        tag.putInt(ModConstants.Tag.TICK, this.tick);
-        tag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
-        return tag;
-    }
-
     @Override
     public void add(Holder<Stratagem> holder)
     {
+        this.add(holder, this.getUniqueId());
+    }
+
+    @Override
+    public void add(Holder<Stratagem> holder, int id)
+    {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER);
+        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER);
         this.instances.put(holder, instance);
     }
 
@@ -126,7 +93,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     @Override
     public void reset(Holder<Stratagem> holder)
     {
-        this.instances.get(holder).reset(this.level.getServer(), null);
+        this.instanceByHolder(holder).reset(this.level.getServer(), null);
     }
 
     @Override
@@ -136,6 +103,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         {
             entry.getValue().reset(this.level.getServer(), null);
         }
+        this.nextAvailableId = 0;
     }
 
     @Override
@@ -156,9 +124,46 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         return this.instances.get(holder);
     }
 
+    @Override
+    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider)
+    {
+        var listTag = new ListTag();
+
+        for (var instance : this.instances.values())
+        {
+            var instanceTag = new CompoundTag();
+            instance.save(instanceTag);
+            listTag.add(instanceTag);
+        }
+
+        compoundTag.put(ModConstants.Tag.STRATAGEMS, listTag);
+        compoundTag.putInt(ModConstants.Tag.TICK, this.tick);
+        compoundTag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
+        return compoundTag;
+    }
+
+    public static ServerStratagemsData load(ServerLevel level, CompoundTag compoundTag)
+    {
+        var data = new ServerStratagemsData(level);
+        data.tick = compoundTag.getInt(ModConstants.Tag.TICK);
+        data.nextAvailableId = compoundTag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
+
+        if (compoundTag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
+        {
+            var listTag = compoundTag.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
+
+            for (var i = 0; i < listTag.size(); i++)
+            {
+                var instance = StratagemInstance.load(listTag.getCompound(i), level);
+                data.instances.put(instance.getStratagem(), instance);
+            }
+        }
+        return data;
+    }
+
     private int getUniqueId()
     {
-        return ++this.nextAvailableId;
+        return this.nextAvailableId += 10;
     }
 
     public static String getFileId()

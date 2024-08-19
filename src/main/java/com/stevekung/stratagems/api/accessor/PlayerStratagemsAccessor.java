@@ -8,9 +8,4 @@ public interface PlayerStratagemsAccessor
     {
         throw new AssertionError("Implemented via mixin");
     }
-
-    default int getUniqueStratagemId()
-    {
-        throw new AssertionError("Implemented via mixin");
-    }
 }
