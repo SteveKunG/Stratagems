@@ -161,7 +161,7 @@ public class StratagemsClientMod implements ClientModInitializer
         if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
         {
             manager.setMenuOpen(!manager.isMenuOpen());
-            manager.clearCode();
+            manager.clearSelected();
         }
 
         var arrowKeySound = false;
@@ -205,16 +205,14 @@ public class StratagemsClientMod implements ClientModInitializer
                     var instance = StratagemInputManager.getInstanceFromCode(inputCode, player);
                     var stratagem = instance.getStratagem().value();
 
-                    manager.setSide(instance.side);
-                    manager.setSelectedCode(inputCode);
-                    manager.setSelected(instance.getResourceKey());
+                    manager.setSelected(instance);
 
                     if (!stratagem.properties().needThrow())
                     {
-                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelected(), instance.side, player.getUUID()));
+                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelected().getResourceKey(), instance.side, player.getUUID()));
                         LOGGER.info("Select replenish {}", instance.getResourceKey().location());
                         manager.clearInputCode();
-                        manager.clearCode();
+                        manager.clearSelected();
                         manager.setMenuOpen(false);
                         return;
                     }
@@ -225,7 +223,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     manager.clearInputCode();
                     manager.setMenuOpen(false);
 
-                    LOGGER.info("Select {}", manager.getSelected().location());
+                    LOGGER.info("Select {}", manager.getSelected().stratagem().name().getString());
                 }
             }
         }
@@ -236,9 +234,9 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (manager.hasSelected() && minecraft.options.keyAttack.isDown())
         {
-            LOGGER.info("Throwing {}", manager.getSelected().location());
-            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelected(), manager.getSide()));
-            manager.clearCode();
+            LOGGER.info("Throwing {}", manager.getSelected().stratagem().name().getString());
+            ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelected().getResourceKey(), manager.getSelected().side));
+            manager.clearSelected();
         }
 
         if (fail)
@@ -280,7 +278,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         for (var instance : StratagemInputManager.all(player))
         {
-            if (shouldRender(instance, manager))
+            if (shouldRender(instance))
             {
                 var stratagem = instance.stratagem();
                 var stratagemName = stratagem.name();
@@ -304,9 +302,9 @@ public class StratagemsClientMod implements ClientModInitializer
                     statusText = Component.translatable("stratagem.menu.unavailable");
                 }
 
-                if (manager.hasSelectedCode())
+                if (manager.hasSelected() && instance.side == manager.getSelected().side)
                 {
-                    var equals = code.equals(manager.getSelectedCode());
+                    var equals = code.equals(manager.getSelected().getCode());
 
                     if (equals)
                     {
@@ -388,11 +386,12 @@ public class StratagemsClientMod implements ClientModInitializer
         guiGraphics.fill(4, 12, 84 + max, 56 + index * 25, -1, grayAlpha);
     }
 
-    private static boolean shouldRender(StratagemInstance instance, StratagemInputManager manager)
+    private static boolean shouldRender(StratagemInstance instance)
     {
+        var manager = StratagemInputManager.getInstance();
         var stratagem = instance.stratagem();
         var code = stratagem.code();
-        var equals = manager.hasSelectedCode() && code.equals(manager.getSelectedCode());
+        var equals = manager.hasSelected() && code.equals(manager.getSelected().getCode()) && instance.side == manager.getSelected().side;
 
         if (equals || instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
         {

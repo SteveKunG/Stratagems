@@ -4,29 +4,27 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.references.StratagemSounds;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 
 public class StratagemInputManager
 {
-    private static final StratagemInputManager INSTANCE = new StratagemInputManager();
+    private static StratagemInputManager INSTANCE;
 
     private boolean menuOpen;
     private String inputCode = "";
-    private String selectedCode;
-    private ResourceKey<Stratagem> selected;
-    private StratagemInstance.Side side;
+    @Nullable
+    private StratagemInstance selected;
 
     private final Minecraft minecraft;
 
@@ -37,6 +35,10 @@ public class StratagemInputManager
 
     public static StratagemInputManager getInstance()
     {
+        if (INSTANCE == null)
+        {
+            INSTANCE = new StratagemInputManager();
+        }
         return INSTANCE;
     }
 
@@ -85,26 +87,9 @@ public class StratagemInputManager
         this.inputCode += inputCode;
     }
 
-    public String getSelectedCode()
+    public void clearSelected()
     {
-        return this.selectedCode;
-    }
-
-    public boolean hasSelectedCode()
-    {
-        return StringUtils.isNotEmpty(this.selectedCode);
-    }
-
-    public void setSelectedCode(String selectedCode)
-    {
-        this.selectedCode = selectedCode;
-    }
-
-    public void clearCode()
-    {
-        this.selectedCode = null;
         this.selected = null;
-        this.side = null;
         this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
     }
 
@@ -113,24 +98,15 @@ public class StratagemInputManager
         return this.selected != null;
     }
 
-    public ResourceKey<Stratagem> getSelected()
+    @Nullable
+    public StratagemInstance getSelected()
     {
         return this.selected;
     }
 
-    public void setSelected(ResourceKey<Stratagem> selected)
+    public void setSelected(StratagemInstance selected)
     {
         this.selected = selected;
-    }
-
-    public StratagemInstance.Side getSide()
-    {
-        return this.side;
-    }
-
-    public void setSide(StratagemInstance.Side side)
-    {
-        this.side = side;
     }
 
     public static List<StratagemInstance> all(Player player)
