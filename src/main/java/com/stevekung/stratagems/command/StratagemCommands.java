@@ -103,7 +103,7 @@ public class StratagemCommands
     {
         var server = source.getServer();
         var isPlayer = serverPlayer != null;
-        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.stratagemsData();
+        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.overworld().stratagemsData();
         var stratagem = holder.value();
 
         if (StratagemUtils.anyMatch(stratagemsData, holder))
@@ -138,7 +138,7 @@ public class StratagemCommands
     private static int removeAllStratagems(CommandSourceStack source)
     {
         var server = source.getServer();
-        server.stratagemsData().clear();
+        server.overworld().stratagemsData().clear();
 
         for (var player : server.getPlayerList().getPlayers())
         {
@@ -155,7 +155,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagem = holder.value();
         var isPlayer = serverPlayer != null;
-        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.stratagemsData();
+        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.overworld().stratagemsData();
 
         if (StratagemUtils.noneMatch(stratagemsData, holder))
         {
@@ -190,7 +190,7 @@ public class StratagemCommands
     private static int removeAllServerStratagem(CommandSourceStack source)
     {
         var server = source.getServer();
-        server.stratagemsData().clear();
+        server.overworld().stratagemsData().clear();
 
         for (var player : source.getServer().getPlayerList().getPlayers())
         {
@@ -217,7 +217,7 @@ public class StratagemCommands
     private static int resetAllStratagem(CommandSourceStack source)
     {
         var server = source.getServer();
-        var serverStratagems = server.stratagemsData();
+        var serverStratagems = server.overworld().stratagemsData();
 
         serverStratagems.reset();
 
@@ -239,7 +239,7 @@ public class StratagemCommands
     private static int resetStratagem(CommandSourceStack source, Holder<Stratagem> holder, @Nullable ServerPlayer serverPlayer) throws CommandSyntaxException
     {
         var server = source.getServer();
-        var stratagemsData = server.stratagemsData();
+        var stratagemsData = server.overworld().stratagemsData();
         var isPlayer = serverPlayer != null;
         var stratagem = holder.value();
 
@@ -272,7 +272,7 @@ public class StratagemCommands
     private static int resetAllServerStratagem(CommandSourceStack source)
     {
         var server = source.getServer();
-        var serverStratagems = server.stratagemsData();
+        var serverStratagems = server.overworld().stratagemsData();
         var instances = serverStratagems.instances();
 
         serverStratagems.reset();
@@ -317,7 +317,7 @@ public class StratagemCommands
     private static int listServerStratagems(CommandSourceStack source) throws CommandSyntaxException
     {
         var server = source.getServer();
-        var instances = server.stratagemsData().instances();
+        var instances = server.overworld().stratagemsData().instances();
 
         if (instances.isEmpty())
         {
@@ -334,7 +334,7 @@ public class StratagemCommands
     {
         var server = source.getServer();
         var isPlayer = serverPlayer != null;
-        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.stratagemsData();
+        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.overworld().stratagemsData();
         var stratagem = holder.value();
 
         if (StratagemUtils.noneMatch(stratagemsData, holder))

@@ -129,7 +129,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {
                 var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
-                var serverStratagems = serverLevel.getServer().stratagemsData();
+                var serverStratagems = serverLevel.getServer().overworld().stratagemsData();
                 var playerStratagems = serverPlayer.stratagemsData();
 
                 if (this.getSide() == StratagemInstance.Side.SERVER)

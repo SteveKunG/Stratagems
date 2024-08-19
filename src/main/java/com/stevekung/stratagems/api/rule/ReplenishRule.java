@@ -42,7 +42,7 @@ public class ReplenishRule implements StratagemRule
         var instance = context.instance();
         var player = context.player();
         var server = context.server();
-        var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.stratagemsData().instances().values();
+        var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.overworld().stratagemsData().instances().values();
         var properties = instance.stratagem().properties();
         var replenishOptional = properties.replenish();
         var count = 0;
@@ -81,7 +81,7 @@ public class ReplenishRule implements StratagemRule
                 }
                 else
                 {
-                    server.stratagemsData().remove(instance.getStratagem());
+                    server.overworld().stratagemsData().remove(instance.getStratagem());
                 }
 
                 LOGGER.info("Remove {} replenisher stratagem!", instance.stratagem().name().getString());
@@ -117,7 +117,7 @@ public class ReplenishRule implements StratagemRule
         }
         else
         {
-            context.server().stratagemsData().remove(instance.getStratagem());
+            context.server().overworld().stratagemsData().remove(instance.getStratagem());
 
             for (var serverPlayer : context.server().getPlayerList().getPlayers())
             {
@@ -157,7 +157,7 @@ public class ReplenishRule implements StratagemRule
             }
             if (server != null && instance.side == StratagemInstance.Side.SERVER)
             {
-                var serverStratagems = server.stratagemsData();
+                var serverStratagems = server.overworld().stratagemsData();
 
                 if (serverStratagems.instances().entrySet().stream().filter(entry ->
                 {

@@ -66,7 +66,7 @@ public class StratagemsMod implements ModInitializer
         {
             var server = context.server();
             var player = server.getPlayerList().getPlayer(payload.uuid());
-            var serverStratagems = server.stratagemsData();
+            var serverStratagems = server.overworld().stratagemsData();
             var playerStratagems = player.stratagemsData();
             var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
@@ -90,7 +90,7 @@ public class StratagemsMod implements ModInitializer
 
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
-            var serverStratagems = server.stratagemsData();
+            var serverStratagems = server.overworld().stratagemsData();
             serverStratagems.setDirty();
             server.overworld().getDataStorage().save();
             ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.instances().size(), serverStratagems.instances().values().stream().map(instance -> instance.getResourceKey().location()).toList());
@@ -100,7 +100,7 @@ public class StratagemsMod implements ModInitializer
         {
             var player = handler.getPlayer();
             var playerStratagems = player.stratagemsData().instances().values();
-            var serverStratagems = server.stratagemsData().instances().values();
+            var serverStratagems = server.overworld().stratagemsData().instances().values();
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
             ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
@@ -114,7 +114,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                server.stratagemsData().tick();
+                server.overworld().stratagemsData().tick();
             }
 
             server.getProfiler().pop();
