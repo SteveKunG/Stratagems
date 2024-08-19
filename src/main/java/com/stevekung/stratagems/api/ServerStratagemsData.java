@@ -18,14 +18,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
 
-public class ServerStratagemsData extends SavedData
+public class ServerStratagemsData extends SavedData implements StratagemsData
 {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "server_stratagems";
     private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
     private final ServerLevel level;
     private int tick;
-    private int nextAvailableID;
+    private int nextAvailableId;
 
     public static SavedData.Factory<ServerStratagemsData> factory(ServerLevel level)
     {
@@ -35,10 +35,11 @@ public class ServerStratagemsData extends SavedData
     public ServerStratagemsData(ServerLevel level)
     {
         this.level = level;
-        this.nextAvailableID = 1;
+        this.nextAvailableId = 1;
         this.setDirty();
     }
 
+    @Override
     public void tick()
     {
         this.tick++;
@@ -54,6 +55,7 @@ public class ServerStratagemsData extends SavedData
         }
     }
 
+    @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
         var instance = this.instances.get(holder);
@@ -73,7 +75,7 @@ public class ServerStratagemsData extends SavedData
     {
         var data = new ServerStratagemsData(level);
         data.tick = tag.getInt(ModConstants.Tag.TICK);
-        data.nextAvailableID = tag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
+        data.nextAvailableId = tag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
 
         if (tag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
         {
@@ -103,27 +105,31 @@ public class ServerStratagemsData extends SavedData
 
         tag.put(ModConstants.Tag.STRATAGEMS, listTag);
         tag.putInt(ModConstants.Tag.TICK, this.tick);
-        tag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableID);
+        tag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
         return tag;
     }
 
-    public void add(Holder<Stratagem> holder, Side side)
+    @Override
+    public void add(Holder<Stratagem> holder)
     {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, side);
+        var instance = new StratagemInstance(this.getUniqueId(), holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER);
         this.instances.put(holder, instance);
     }
 
+    @Override
     public void remove(Holder<Stratagem> holder)
     {
         this.instances.remove(holder);
     }
 
+    @Override
     public void reset(Holder<Stratagem> holder)
     {
         this.instances.get(holder).reset(this.level.getServer(), null);
     }
 
+    @Override
     public void reset()
     {
         for (var entry : this.instances.entrySet())
@@ -132,19 +138,27 @@ public class ServerStratagemsData extends SavedData
         }
     }
 
+    @Override
     public void clear()
     {
         this.instances.clear();
     }
 
-    public Map<Holder<Stratagem>, StratagemInstance> getInstances()
+    @Override
+    public Map<Holder<Stratagem>, StratagemInstance> instances()
     {
         return this.instances;
     }
 
+    @Override
+    public StratagemInstance instanceByHolder(Holder<Stratagem> holder)
+    {
+        return this.instances.get(holder);
+    }
+
     private int getUniqueId()
     {
-        return ++this.nextAvailableID;
+        return ++this.nextAvailableId;
     }
 
     public static String getFileId()

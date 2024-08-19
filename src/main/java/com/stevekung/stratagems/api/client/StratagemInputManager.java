@@ -135,6 +135,6 @@ public class StratagemInputManager
 
     public static List<StratagemInstance> all(Player player)
     {
-        return Lists.newArrayList(Iterables.concat(Ordering.natural().sortedCopy(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values()), Ordering.natural().sortedCopy(player.getStratagems().values())));
+        return Lists.newArrayList(Iterables.concat(Ordering.natural().sortedCopy(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values()), Ordering.natural().sortedCopy(player.stratagemsData().instances().values())));
     }
 }

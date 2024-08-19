@@ -29,7 +29,7 @@
     },
     "custom": {
         "loom:injected_interfaces": {
-            "net/minecraft/class_3218": [
+            "net/minecraft/server/MinecraftServer": [
                 "com/stevekung/stratagems/api/accessor/ServerStratagemsDataAccessor"
             ],
             "net/minecraft/class_1657": [

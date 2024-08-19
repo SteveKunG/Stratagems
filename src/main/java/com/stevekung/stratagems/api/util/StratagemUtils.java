@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.StratagemsData;
 import com.stevekung.stratagems.api.packet.StratagemEntryData;
 import com.stevekung.stratagems.api.references.ModRegistries;
 
@@ -29,14 +30,14 @@ public class StratagemUtils
         return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, level.tickRateManager().tickrate());
     }
 
-    public static boolean anyMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> holder)
+    public static boolean anyMatch(StratagemsData data, Holder<Stratagem> holder)
     {
-        return list.stream().map(StratagemInstance::getStratagem).anyMatch(holderx -> holder == holderx);
+        return data.instances().values().stream().map(StratagemInstance::getStratagem).anyMatch(holderx -> holderx == holder);
     }
 
-    public static boolean noneMatchHolder(Collection<StratagemInstance> list, Holder<Stratagem> holder)
+    public static boolean noneMatch(StratagemsData data, Holder<Stratagem> holder)
     {
-        return list.stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holder == holderx);
+        return data.instances().values().stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holderx == holder);
     }
 
     public static Map<Holder<Stratagem>, StratagemInstance> mapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)

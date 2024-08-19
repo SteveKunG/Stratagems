@@ -1,23 +1,15 @@
 package com.stevekung.stratagems.mixin;
 
-import java.util.Map;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.google.common.collect.Maps;
-import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.Stratagem;
-import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.PlayerStratagemsData;
 import com.stevekung.stratagems.api.accessor.PlayerStratagemsAccessor;
 
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
@@ -25,7 +17,7 @@ import net.minecraft.world.entity.player.Player;
 public abstract class MixinPlayer extends LivingEntity implements PlayerStratagemsAccessor
 {
     @Unique
-    private final Map<Holder<Stratagem>, StratagemInstance> stratagems = Maps.newLinkedHashMap();
+    private PlayerStratagemsData stratagems;
 
     @Unique
     private int nextAvailableId = 1;
@@ -36,57 +28,33 @@ public abstract class MixinPlayer extends LivingEntity implements PlayerStratage
     }
 
     @Override
-    public Map<Holder<Stratagem>, StratagemInstance> getStratagems()
+    public PlayerStratagemsData stratagemsData()
     {
         return this.stratagems;
+    }
+
+    @Inject(method = "<init>*", at = @At("TAIL"))
+    private void init(CallbackInfo info)
+    {
+        this.stratagems = new PlayerStratagemsData(Player.class.cast(this));
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tick(CallbackInfo info)
     {
-        for (var entry : this.stratagems.entrySet())
-        {
-            entry.getValue().tick(this.getServer(), Player.class.cast(this));
-        }
+        this.stratagems.tick();
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void addStratagemSaveData(CompoundTag compound, CallbackInfo info)
     {
-        if (!this.stratagems.isEmpty())
-        {
-            var listTag = new ListTag();
-
-            for (var instances : this.stratagems.values())
-            {
-                var compoundTag = new CompoundTag();
-                instances.save(compoundTag);
-                listTag.add(compoundTag);
-            }
-
-            compound.put(ModConstants.Tag.STRATAGEMS, listTag);
-        }
-        compound.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
+        this.stratagems.save(compound);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readAdditionalSaveData(CompoundTag compound, CallbackInfo info)
     {
-        if (compound.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
-        {
-            var listTag = compound.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
-
-            for (var i = 0; i < listTag.size(); i++)
-            {
-                var compoundTag = listTag.getCompound(i);
-                var instance = StratagemInstance.load(compoundTag, this.level());
-                this.stratagems.put(instance.getStratagem(), instance);
-            }
-        }
-        if (compound.contains(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, Tag.TAG_INT))
-        {
-            this.nextAvailableId = compound.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
-        }
+        this.stratagems.load(compound);
     }
 
     @Override

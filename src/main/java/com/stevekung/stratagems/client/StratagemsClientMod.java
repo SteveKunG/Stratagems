@@ -57,8 +57,8 @@ public class StratagemsClientMod implements ClientModInitializer
             if (player.getUUID().equals(payload.uuid()))
             {
                 LOGGER.info("Add stratagem from packet to {}", level.getPlayerByUUID(payload.uuid()).getName().getString());
-                player.getStratagems().clear();
-                player.getStratagems().putAll(StratagemUtils.entryToMap(playerStratagems, level));
+                player.stratagemsData().clear();
+                player.stratagemsData().instances().putAll(StratagemUtils.entryToMap(playerStratagems, level));
             }
         });
 
@@ -82,7 +82,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     if (player.getUUID().equals(payload.uuid()))
                     {
-                        player.getStratagems().clear();
+                        player.stratagemsData().clear();
                     }
                 }
                 else
@@ -123,9 +123,9 @@ public class StratagemsClientMod implements ClientModInitializer
                     {
                         switch (payload.action())
                         {
-                            case UPDATE -> player.getStratagems().replace(holder, instance);
-                            case ADD -> player.getStratagems().put(holder, instance);
-                            case REMOVE -> player.getStratagems().remove(holder);
+                            case UPDATE -> player.stratagemsData().instances().replace(holder, instance);
+                            case ADD -> player.stratagemsData().instances().put(holder, instance);
+                            case REMOVE -> player.stratagemsData().remove(holder);
                         }
                     }
                 }

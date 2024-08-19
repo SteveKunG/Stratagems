@@ -19,7 +19,7 @@ public class MixinPlayerList
     @Inject(method = "respawn", at = @At("TAIL"))
     private void respawn(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, CallbackInfoReturnable<ServerPlayer> info, @Local(index = 6, ordinal = 1) ServerPlayer serverPlayer)
     {
-        serverPlayer.getStratagems().putAll(player.getStratagems());
-        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(serverPlayer.getStratagems().values(), serverPlayer.getUUID())));
+        serverPlayer.stratagemsData().instances().putAll(player.stratagemsData().instances());
+        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(serverPlayer.stratagemsData().instances().values(), serverPlayer.getUUID())));
     }
 }

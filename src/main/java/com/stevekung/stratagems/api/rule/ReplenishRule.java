@@ -42,7 +42,7 @@ public class ReplenishRule implements StratagemRule
         var instance = context.instance();
         var player = context.player();
         var server = context.server();
-        var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
+        var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.stratagemsData().instances().values();
         var properties = instance.stratagem().properties();
         var replenishOptional = properties.replenish();
         var count = 0;
@@ -77,11 +77,11 @@ public class ReplenishRule implements StratagemRule
                 // Remove this replenished stratagem
                 if (instance.side == StratagemInstance.Side.PLAYER)
                 {
-                    player.getStratagems().remove(instance.getStratagem());
+                    player.stratagemsData().remove(instance.getStratagem());
                 }
                 else
                 {
-                    server.overworld().getStratagemData().remove(instance.getStratagem());
+                    server.stratagemsData().remove(instance.getStratagem());
                 }
 
                 LOGGER.info("Remove {} replenisher stratagem!", instance.stratagem().name().getString());
@@ -112,12 +112,12 @@ public class ReplenishRule implements StratagemRule
         // Remove this replenished stratagem
         if (instance.side == StratagemInstance.Side.PLAYER)
         {
-            context.player().getStratagems().remove(instance.getStratagem());
+            context.player().stratagemsData().remove(instance.getStratagem());
             ((ServerPlayer)context.player()).connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), context.player().getUUID())));
         }
         else
         {
-            context.server().overworld().getStratagemData().getInstances().remove(instance.getStratagem());
+            context.server().stratagemsData().remove(instance.getStratagem());
 
             for (var serverPlayer : context.server().getPlayerList().getPlayers())
             {
@@ -143,33 +143,33 @@ public class ReplenishRule implements StratagemRule
 
             if (player instanceof ServerPlayer serverPlayer && instance.side == StratagemInstance.Side.PLAYER)
             {
-                var playerStratagems = serverPlayer.getStratagems();
+                var playerStratagems = serverPlayer.stratagemsData();
 
-                if (playerStratagems.entrySet().stream().filter(entry ->
+                if (playerStratagems.instances().entrySet().stream().filter(entry ->
                 {
                     var otherReplenishOptional = entry.getValue().stratagem().properties().replenish();
-                    return otherReplenishOptional.isPresent() && !otherReplenishOptional.get().toReplenish().isPresent() && otherReplenishOptional.get().category().equals(category);
+                    return otherReplenishOptional.isPresent() && otherReplenishOptional.get().toReplenish().isEmpty() && otherReplenishOptional.get().category().equals(category);
                 }).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
                 {
                     this.onUse(context);
-                    serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID())));
+                    serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(playerStratagems.instances().values(), player.getUUID())));
                 }
             }
             if (server != null && instance.side == StratagemInstance.Side.SERVER)
             {
-                var serverStratagems = server.overworld().getStratagemData();
+                var serverStratagems = server.stratagemsData();
 
-                if (serverStratagems.getInstances().entrySet().stream().filter(entry ->
+                if (serverStratagems.instances().entrySet().stream().filter(entry ->
                 {
                     var otherReplenishOptional = entry.getValue().stratagem().properties().replenish();
-                    return otherReplenishOptional.isPresent() && !otherReplenishOptional.get().toReplenish().isPresent() && otherReplenishOptional.get().category().equals(category);
+                    return otherReplenishOptional.isPresent() && otherReplenishOptional.get().toReplenish().isEmpty() && otherReplenishOptional.get().category().equals(category);
                 }).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
                 {
                     this.onUse(context);
 
                     for (var serverPlayer : server.getPlayerList().getPlayers())
                     {
-                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values())));
+                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(serverStratagems.instances().values())));
                     }
                 }
             }

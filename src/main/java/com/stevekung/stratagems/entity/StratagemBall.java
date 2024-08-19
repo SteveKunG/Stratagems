@@ -129,8 +129,8 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {
                 var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
-                var serverStratagems = serverLevel.getServer().overworld().getStratagemData();
-                var playerStratagems = serverPlayer.getStratagems().get(this.getVariant());
+                var serverStratagems = serverLevel.getServer().stratagemsData();
+                var playerStratagems = serverPlayer.stratagemsData();
 
                 if (this.getSide() == StratagemInstance.Side.SERVER)
                 {
@@ -139,7 +139,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
 
                     for (var player : PlayerLookup.all(this.getServer()))
                     {
-                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values()));
+                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.instances().values()));
                     }
                 }
                 else
@@ -150,8 +150,8 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
                     }
 
                     this.getVariant().value().action().action(stratagemContext);
-                    playerStratagems.use(this.getServer(), serverPlayer);
-                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.getStratagems().values(), serverPlayer.getUUID()));
+                    playerStratagems.use(this.getVariant(), serverPlayer);
+                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.stratagemsData().instances().values(), serverPlayer.getUUID()));
                 }
             }
             else

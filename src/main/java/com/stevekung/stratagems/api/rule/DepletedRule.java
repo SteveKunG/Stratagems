@@ -43,13 +43,13 @@ public class DepletedRule implements StratagemRule
             if (replenishOptional.isPresent())
             {
                 var category = replenishOptional.get().category();
-                var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.getStratagems().values() : server.overworld().getStratagemData().getInstances().values();
+                var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.stratagemsData().instances().values();
 
                 stratagems.forEach(instancex ->
                 {
                     var otherReplenishOptional = instancex.stratagem().properties().replenish();
                     
-                    if (otherReplenishOptional.isPresent() && !otherReplenishOptional.get().toReplenish().isPresent() && otherReplenishOptional.get().category().equals(category) && instancex.state != StratagemState.UNAVAILABLE)
+                    if (otherReplenishOptional.isPresent() && otherReplenishOptional.get().toReplenish().isEmpty() && otherReplenishOptional.get().category().equals(category) && instancex.state != StratagemState.UNAVAILABLE)
                     {
                         instancex.state = StratagemState.IN_USE;
                     }
@@ -71,30 +71,30 @@ public class DepletedRule implements StratagemRule
 
                 if (instance.side == StratagemInstance.Side.PLAYER && player != null)
                 {
-                    var playerStratagems = player.getStratagems();
+                    var playerStratagems = player.stratagemsData();
                     var replenisherStratagem = player.level().registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
 
-                    if (StratagemUtils.anyMatchHolder(playerStratagems.values(), replenisherStratagem))
+                    if (StratagemUtils.anyMatch(playerStratagems, replenisherStratagem))
                     {
                         LOGGER.info("{} player replenisher stratagem already exist", replenisherStratagem.value().name().getString());
                         return;
                     }
 
-                    playerStratagems.put(replenisherStratagem, StratagemUtils.createInstanceForPlayer(replenisherStratagem, player.getUniqueStratagemId()));
+                    playerStratagems.add(replenisherStratagem);
                     LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
                 }
                 if (instance.side == StratagemInstance.Side.SERVER && server != null)
                 {
-                    var serverStratagems = server.overworld().getStratagemData();
+                    var serverStratagems = server.stratagemsData();
                     var replenisherStratagem = server.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
 
-                    if (StratagemUtils.anyMatchHolder(serverStratagems.getInstances().values(), replenisherStratagem))
+                    if (StratagemUtils.anyMatch(serverStratagems, replenisherStratagem))
                     {
                         LOGGER.info("{} server replenisher stratagem already exist", replenisherStratagem.value().name().getString());
                         return;
                     }
 
-                    serverStratagems.add(replenisherStratagem, StratagemInstance.Side.SERVER);
+                    serverStratagems.add(replenisherStratagem);
                     LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
                 }
             }

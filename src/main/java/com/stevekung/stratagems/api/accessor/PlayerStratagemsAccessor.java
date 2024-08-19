@@ -1,15 +1,10 @@
 package com.stevekung.stratagems.api.accessor;
 
-import java.util.Map;
-
-import com.stevekung.stratagems.api.Stratagem;
-import com.stevekung.stratagems.api.StratagemInstance;
-
-import net.minecraft.core.Holder;
+import com.stevekung.stratagems.api.PlayerStratagemsData;
 
 public interface PlayerStratagemsAccessor
 {
-    default Map<Holder<Stratagem>, StratagemInstance> getStratagems()
+    default PlayerStratagemsData stratagemsData()
     {
         throw new AssertionError("Implemented via mixin");
     }

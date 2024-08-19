@@ -66,14 +66,14 @@ public class StratagemsMod implements ModInitializer
         {
             var server = context.server();
             var player = server.getPlayerList().getPlayer(payload.uuid());
-            var serverStratagems = server.overworld().getStratagemData();
-            var playerStratagems = player.getStratagems();
+            var serverStratagems = server.stratagemsData();
+            var playerStratagems = player.stratagemsData();
             var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
             if (payload.side() == StratagemInstance.Side.PLAYER)
             {
-                playerStratagems.get(holder).use(null, player);
-                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems.values(), player.getUUID()));
+                playerStratagems.use(holder, player);
+                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems.instances().values(), player.getUUID()));
             }
             else
             {
@@ -81,7 +81,7 @@ public class StratagemsMod implements ModInitializer
 
                 for (var serverPlayer : PlayerLookup.all(server))
                 {
-                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.getInstances().values()));
+                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.instances().values()));
                 }
             }
         });
@@ -90,20 +90,20 @@ public class StratagemsMod implements ModInitializer
 
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
-            var serverStratagems = server.overworld().getStratagemData();
+            var serverStratagems = server.stratagemsData();
             serverStratagems.setDirty();
             server.overworld().getDataStorage().save();
-            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.getInstances().size(), serverStratagems.getInstances().values().stream().map(instance -> instance.getResourceKey().location()).toList());
+            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.instances().size(), serverStratagems.instances().values().stream().map(instance -> instance.getResourceKey().location()).toList());
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
         {
             var player = handler.getPlayer();
-            var playerStratagems = player.getStratagems().values();
-            var serverStratagems = server.overworld().getStratagemData().getInstances();
+            var playerStratagems = player.stratagemsData().instances().values();
+            var serverStratagems = server.stratagemsData().instances().values();
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
-            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.values()));
+            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
             ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
             ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
         });
@@ -114,7 +114,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                server.overworld().getStratagemData().tick();
+                server.stratagemsData().tick();
             }
 
             server.getProfiler().pop();
