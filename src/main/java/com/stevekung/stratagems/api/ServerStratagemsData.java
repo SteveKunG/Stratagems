@@ -82,18 +82,21 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         var properties = holder.value().properties();
         var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER);
         this.instances.put(holder, instance);
+        this.setDirty();
     }
 
     @Override
     public void remove(Holder<Stratagem> holder)
     {
         this.instances.remove(holder);
+        this.setDirty();
     }
 
     @Override
     public void reset(Holder<Stratagem> holder)
     {
         this.instanceByHolder(holder).reset(this.level.getServer(), null);
+        this.setDirty();
     }
 
     @Override
@@ -103,6 +106,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         {
             entry.getValue().reset(this.level.getServer(), null);
         }
+        this.setDirty();
         this.nextAvailableId = 0;
     }
 
@@ -110,6 +114,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     public void clear()
     {
         this.instances.clear();
+        this.setDirty();
     }
 
     @Override
