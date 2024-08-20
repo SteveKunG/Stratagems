@@ -42,7 +42,7 @@
   "commands.stratagem.reset.server.everything.success": "All Server Stratagems have been reset",
   "commands.stratagem.reset.player.everything.success": "All %s Stratagems have been reset",
   "commands.stratagem.reset.server.success": "Server %s Stratagem have been reset",
-  "commands.stratagem.reset.player.success": "%s's Stratagems have been reset",
+  "commands.stratagem.reset.player.success": "%s's %s stratagem have been reset",
   "commands.stratagem.reset.player.specific.failed": "Failed to reset player stratagem",
   "commands.stratagem.reset.server.specific.failed": "Failed to reset server stratagem",
 

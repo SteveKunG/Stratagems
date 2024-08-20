@@ -47,7 +47,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
 
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().tick(this.level.getServer(), null);
+            entry.getValue().tick(this.level.getServer(), null, true);
         }
 
         if (this.tick % 100 == 0)
@@ -61,9 +61,9 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     {
         var instance = this.instanceByHolder(holder);
 
-        if (instance.canUse(this.level.getServer(), player))
+        if (instance.canUse(this.level.getServer(), player, true))
         {
-            instance.use(this.level.getServer(), player);
+            instance.use(this.level.getServer(), player, true);
             this.setDirty();
         }
         else
@@ -97,7 +97,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     @Override
     public void reset(Holder<Stratagem> holder)
     {
-        this.instanceByHolder(holder).reset(this.level.getServer(), null);
+        this.instanceByHolder(holder).reset(this.level.getServer(), null, true);
         this.setDirty();
     }
 
@@ -106,7 +106,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().reset(this.level.getServer(), null);
+            entry.getValue().reset(this.level.getServer(), null, true);
         }
         this.setDirty();
         this.nextAvailableId = 0;

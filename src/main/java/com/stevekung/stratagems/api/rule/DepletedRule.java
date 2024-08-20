@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.references.ModRegistries;
@@ -43,7 +42,7 @@ public class DepletedRule implements StratagemRule
             if (replenishOptional.isPresent())
             {
                 var category = replenishOptional.get().category();
-                var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().listInstances() : server.overworld().stratagemsData().listInstances();
+                var stratagemsData = context.isServer() ? server.overworld().stratagemsData().listInstances() : player.stratagemsData().listInstances();
 
                 stratagemsData.forEach(instancex ->
                 {
@@ -66,12 +65,12 @@ public class DepletedRule implements StratagemRule
             var replenish = replenishOptional.get();
             var category = replenish.category();
             var replenisherOptional = replenish.replenisher();
-            var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
+            var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
             if (replenisherOptional.isPresent())
             {
                 var replenisherKey = replenisherOptional.get();
-                var registryAccess = instance.side == StratagemInstance.Side.PLAYER ? player.level().registryAccess() : server.registryAccess();
+                var registryAccess = context.isServer() ? server.registryAccess() : player.level().registryAccess();
                 var replenisherStratagem = registryAccess.registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
                 var sameCategoryId = stratagemsData.stream().filter(instancex -> instancex.stratagem().properties().replenish().map(stratagemReplenish -> stratagemReplenish.category().equals(category)).orElse(false)).mapToInt(instancex -> instancex.id).findFirst().getAsInt();
 
@@ -80,13 +79,13 @@ public class DepletedRule implements StratagemRule
                     // Add replenish stratagem on top of this instance
                     stratagemsData.add(replenisherStratagem, sameCategoryId - 1);
 
-                    if (instance.side == StratagemInstance.Side.PLAYER)
+                    if (context.isServer())
                     {
-                        LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
+                        LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
                     }
                     else
                     {
-                        LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
+                        LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
                     }
                 }
             }
@@ -101,7 +100,7 @@ public class DepletedRule implements StratagemRule
         var stratagem = instance.stratagem();
         var stratagemName = stratagem.name().getString();
         var properties = stratagem.properties();
-        var level = player != null ? player.level() : context.server().overworld();
+        var level = context.isServer() ? context.server().overworld() : player.level();
 
         if (!instance.isReady())
         {
@@ -161,7 +160,6 @@ public class DepletedRule implements StratagemRule
                 {
                     LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.READY);
                     instance.state = StratagemState.READY;
-
                     instance.inboundDuration = properties.inboundDuration();
 
                     if (properties.duration() > 0)

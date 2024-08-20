@@ -37,10 +37,9 @@ public class DefaultRule implements StratagemRule
     public void tick(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var player = context.player();
         var stratagem = instance.stratagem();
         var stratagemName = stratagem.name().getString();
-        var level = player != null ? player.level() : context.server().overworld();
+        var level = context.isServer() ? context.server().overworld() : context.player().level();
 
         if (!instance.isReady())
         {

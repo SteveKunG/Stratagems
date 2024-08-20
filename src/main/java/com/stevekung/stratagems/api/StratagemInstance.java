@@ -114,24 +114,24 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         return this.stratagem;
     }
 
-    public void tick(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
+    public void tick(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
     {
-        this.getRule().tick(StratagemInstanceContext.create(this, minecraftServer, player));
+        this.getRule().tick(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
     }
 
-    public void use(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
+    public void use(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
     {
-        this.getRule().onUse(StratagemInstanceContext.create(this, minecraftServer, player));
+        this.getRule().onUse(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
     }
 
-    public void reset(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
+    public void reset(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
     {
-        this.getRule().onReset(StratagemInstanceContext.create(this, minecraftServer, player));
+        this.getRule().onReset(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
     }
 
-    public boolean canUse(@Nullable MinecraftServer minecraftServer, @Nullable Player player)
+    public boolean canUse(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
     {
-        return this.getRule().canUse(StratagemInstanceContext.create(this, minecraftServer, player));
+        return this.getRule().canUse(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
     }
 
     public String getCode()

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
-import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.packet.StratagemEntryData;
@@ -42,7 +41,7 @@ public class ReplenishRule implements StratagemRule
         var instance = context.instance();
         var player = context.player();
         var server = context.server();
-        var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
+        var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
         var properties = instance.stratagem().properties();
         var replenishOptional = properties.replenish();
         var count = 0;
@@ -85,13 +84,13 @@ public class ReplenishRule implements StratagemRule
 
             if (replenishSoundOptional.isPresent() && count > 0)
             {
-                if (instance.side == StratagemInstance.Side.PLAYER && player instanceof ServerPlayer serverPlayer)
-                {
-                    serverPlayer.connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
-                }
-                if (instance.side == StratagemInstance.Side.SERVER && server != null)
+                if (context.isServer())
                 {
                     server.getPlayerList().getPlayers().forEach(playerx -> playerx.connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, playerx.getX(), playerx.getY(), playerx.getZ(), 1.0f, 1.0f, playerx.level().getRandom().nextLong())));
+                }
+                else
+                {
+                    ((ServerPlayer)player).connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
                 }
             }
         }
@@ -101,21 +100,21 @@ public class ReplenishRule implements StratagemRule
     public void onReset(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? context.player().stratagemsData() : context.server().overworld().stratagemsData();
+        var stratagemsData = context.isServer() ? context.server().overworld().stratagemsData() : context.player().stratagemsData();
 
         // Remove this replenished stratagem
         stratagemsData.remove(instance.getStratagem());
 
-        if (instance.side == StratagemInstance.Side.PLAYER)
-        {
-            ((ServerPlayer) context.player()).connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), context.player().getUUID())));
-        }
-        else
+        if (context.isServer())
         {
             for (var serverPlayer : context.server().getPlayerList().getPlayers())
             {
                 serverPlayer.connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance))));
             }
+        }
+        else
+        {
+            ((ServerPlayer)context.player()).connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), context.player().getUUID())));
         }
 
         LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
@@ -125,15 +124,15 @@ public class ReplenishRule implements StratagemRule
     public void tick(StratagemInstanceContext context)
     {
         var instance = context.instance();
+        var player = context.player();
+        var server = context.server();
         var properties = instance.stratagem().properties();
         var replenishOptional = properties.replenish();
 
         if (replenishOptional.isPresent())
         {
             var category = replenishOptional.get().category();
-            var player = context.player();
-            var server = context.server();
-            var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
+            var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
             if (stratagemsData.stream().filter(instancex ->
             {
@@ -143,19 +142,16 @@ public class ReplenishRule implements StratagemRule
             {
                 this.onUse(context);
 
-                if (instance.side == StratagemInstance.Side.PLAYER)
-                {
-                    if (player instanceof ServerPlayer serverPlayer)
-                    {
-                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID())));
-                    }
-                }
-                else
+                if (context.isServer())
                 {
                     for (var serverPlayer : server.getPlayerList().getPlayers())
                     {
                         serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(stratagemsData)));
                     }
+                }
+                else
+                {
+                    ((ServerPlayer)player).connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID())));
                 }
             }
         }

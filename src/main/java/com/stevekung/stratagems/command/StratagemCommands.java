@@ -230,11 +230,15 @@ public class StratagemCommands
             updateServerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
         }
 
-        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.stratagemsData().listInstances().forEach(instance ->
+        server.getPlayerList().getPlayers().forEach(serverPlayer ->
         {
-            instance.reset(server, serverPlayer);
-            updatePlayerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
-        }));
+            serverPlayer.stratagemsData().reset();
+
+            for (var instance : serverPlayer.stratagemsData().listInstances())
+            {
+                updatePlayerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
+            }
+        });
 
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.everything.success"), true);
         return 1;
@@ -264,7 +268,7 @@ public class StratagemCommands
 
         if (isPlayer)
         {
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.success", serverPlayer.getDisplayName()), true);
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.success", serverPlayer.getDisplayName(), StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
         }
         else
         {
@@ -293,7 +297,7 @@ public class StratagemCommands
     {
         for (var instance : serverPlayer.stratagemsData().listInstances())
         {
-            instance.reset(source.getServer(), serverPlayer);
+            instance.reset(source.getServer(), serverPlayer, false);
             updatePlayerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
         }
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.player.everything.success", serverPlayer.getDisplayName()), true);

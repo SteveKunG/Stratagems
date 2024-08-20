@@ -29,14 +29,14 @@ public class PlayerStratagemsData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().tick(this.player.getServer(), this.player);
+            entry.getValue().tick(this.player.getServer(), this.player, false);
         }
     }
 
     @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
-        this.instanceByHolder(holder).use(this.player.getServer(), player);
+        this.instanceByHolder(holder).use(this.player.getServer(), player, false);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class PlayerStratagemsData implements StratagemsData
     @Override
     public void reset(Holder<Stratagem> holder)
     {
-        this.instanceByHolder(holder).reset(this.player.getServer(), this.player);
+        this.instanceByHolder(holder).reset(this.player.getServer(), this.player, false);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class PlayerStratagemsData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().reset(this.player.getServer(), this.player);
+            entry.getValue().reset(this.player.getServer(), this.player, false);
         }
         this.nextAvailableId = 0;
     }
