@@ -67,22 +67,20 @@ public class StratagemsMod implements ModInitializer
         {
             var server = context.server();
             var player = server.getPlayerList().getPlayer(payload.uuid());
-            var serverStratagems = server.overworld().stratagemsData();
-            var playerStratagems = player.stratagemsData();
+            var stratagemsData = payload.side() == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
             var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
+
+            stratagemsData.use(holder, player);
 
             if (payload.side() == StratagemInstance.Side.PLAYER)
             {
-                playerStratagems.use(holder, player);
-                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems.instances().values(), player.getUUID()));
+                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID()));
             }
             else
             {
-                serverStratagems.use(holder, player);
-
                 for (var serverPlayer : PlayerLookup.all(server))
                 {
-                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(serverStratagems.instances().values()));
+                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(stratagemsData));
                 }
             }
         });
@@ -100,13 +98,13 @@ public class StratagemsMod implements ModInitializer
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
         {
             var player = handler.getPlayer();
-            var playerStratagems = player.stratagemsData().instances().values();
-            var serverStratagems = server.overworld().stratagemsData().instances().values();
+            var playerStratagems = player.stratagemsData();
+            var serverStratagems = server.overworld().stratagemsData();
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
             ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
-            ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
-            ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
+            ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.instances().size());
+            ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.instances().size());
         });
 
         ServerTickEvents.START_SERVER_TICK.register(server ->

@@ -43,9 +43,9 @@ public class DepletedRule implements StratagemRule
             if (replenishOptional.isPresent())
             {
                 var category = replenishOptional.get().category();
-                var stratagems = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.overworld().stratagemsData().instances().values();
+                var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.overworld().stratagemsData().instances().values();
 
-                stratagems.forEach(instancex ->
+                stratagemsData.forEach(instancex ->
                 {
                     var otherReplenishOptional = instancex.stratagem().properties().replenish();
 

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.StratagemsData;
 import com.stevekung.stratagems.api.util.StratagemUtils;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -33,8 +33,8 @@ public record UpdatePlayerStratagemsPacket(Collection<StratagemEntryData> player
         return TYPE;
     }
 
-    public static UpdatePlayerStratagemsPacket create(Collection<StratagemInstance> playerInstances, UUID uuid)
+    public static UpdatePlayerStratagemsPacket create(StratagemsData stratagemsData, UUID uuid)
     {
-        return new UpdatePlayerStratagemsPacket(StratagemUtils.mapToEntry(playerInstances), uuid);
+        return new UpdatePlayerStratagemsPacket(StratagemUtils.mapToEntry(stratagemsData.instances().values()), uuid);
     }
 }

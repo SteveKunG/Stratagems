@@ -129,29 +129,21 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {
                 var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
-                var serverStratagems = serverLevel.getServer().overworld().stratagemsData();
-                var playerStratagems = serverPlayer.stratagemsData();
+                var stratagemsData = this.getSide() == StratagemInstance.Side.SERVER ? serverLevel.getServer().overworld().stratagemsData() : serverPlayer.stratagemsData();
+
+                this.getVariant().value().action().action(stratagemContext);
+                stratagemsData.use(this.getVariant(), serverPlayer);
 
                 if (this.getSide() == StratagemInstance.Side.SERVER)
                 {
-                    this.getVariant().value().action().action(stratagemContext);
-                    serverStratagems.use(this.getVariant(), serverPlayer);
-
                     for (var player : PlayerLookup.all(this.getServer()))
                     {
-                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems.instances().values()));
+                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(stratagemsData));
                     }
                 }
                 else
                 {
-                    if (playerStratagems == null)
-                    {
-                        return;
-                    }
-
-                    this.getVariant().value().action().action(stratagemContext);
-                    playerStratagems.use(this.getVariant(), serverPlayer);
-                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(serverPlayer.stratagemsData().instances().values(), serverPlayer.getUUID()));
+                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(stratagemsData, serverPlayer.getUUID()));
                 }
             }
             else

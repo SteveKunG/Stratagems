@@ -239,8 +239,8 @@ public class StratagemCommands
     private static int resetStratagem(CommandSourceStack source, Holder<Stratagem> holder, @Nullable ServerPlayer serverPlayer) throws CommandSyntaxException
     {
         var server = source.getServer();
-        var stratagemsData = server.overworld().stratagemsData();
         var isPlayer = serverPlayer != null;
+        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.overworld().stratagemsData();
         var stratagem = holder.value();
 
         if (StratagemUtils.noneMatch(stratagemsData, holder))

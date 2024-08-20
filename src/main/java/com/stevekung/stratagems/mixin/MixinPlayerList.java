@@ -20,6 +20,6 @@ public class MixinPlayerList
     private void respawn(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, CallbackInfoReturnable<ServerPlayer> info, @Local(index = 6, ordinal = 1) ServerPlayer serverPlayer)
     {
         serverPlayer.stratagemsData().instances().putAll(player.stratagemsData().instances());
-        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(serverPlayer.stratagemsData().instances().values(), serverPlayer.getUUID())));
+        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(serverPlayer.stratagemsData(), serverPlayer.getUUID())));
     }
 }

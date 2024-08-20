@@ -3,7 +3,7 @@ package com.stevekung.stratagems.api.packet;
 import java.util.Collection;
 
 import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.StratagemsData;
 import com.stevekung.stratagems.api.util.StratagemUtils;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -31,8 +31,8 @@ public record UpdateServerStratagemsPacket(Collection<StratagemEntryData> server
         return TYPE;
     }
 
-    public static UpdateServerStratagemsPacket create(Collection<StratagemInstance> serverInstances)
+    public static UpdateServerStratagemsPacket create(StratagemsData stratagemsData)
     {
-        return new UpdateServerStratagemsPacket(StratagemUtils.mapToEntry(serverInstances));
+        return new UpdateServerStratagemsPacket(StratagemUtils.mapToEntry(stratagemsData.instances().values()));
     }
 }
