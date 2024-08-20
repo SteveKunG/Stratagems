@@ -35,6 +35,6 @@ public record UpdatePlayerStratagemsPacket(Collection<StratagemEntryData> player
 
     public static UpdatePlayerStratagemsPacket create(StratagemsData stratagemsData, UUID uuid)
     {
-        return new UpdatePlayerStratagemsPacket(StratagemUtils.mapToEntry(stratagemsData.instances().values()), uuid);
+        return new UpdatePlayerStratagemsPacket(StratagemUtils.mapToEntry(stratagemsData), uuid);
     }
 }

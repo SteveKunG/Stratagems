@@ -52,7 +52,7 @@ public class ReplenishRule implements StratagemRule
             var stratagemReplenish = replenishOptional.get();
             var toReplenishSet = stratagemReplenish.toReplenish().get();
 
-            for (var replenishedStratagem : stratagemsData.instances().values().stream().filter(stratagem -> toReplenishSet.contains(stratagem.getStratagem())).toList())
+            for (var replenishedStratagem : stratagemsData.stream().filter(stratagem -> toReplenishSet.contains(stratagem.getStratagem())).toList())
             {
                 replenishedStratagem.state = StratagemState.COOLDOWN;
 
@@ -135,11 +135,11 @@ public class ReplenishRule implements StratagemRule
             var server = context.server();
             var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
 
-            if (stratagemsData.instances().entrySet().stream().filter(entry ->
+            if (stratagemsData.stream().filter(instancex ->
             {
-                var otherReplenishOptional = entry.getValue().stratagem().properties().replenish();
+                var otherReplenishOptional = instancex.stratagem().properties().replenish();
                 return otherReplenishOptional.isPresent() && otherReplenishOptional.get().toReplenish().isEmpty() && otherReplenishOptional.get().category().equals(category);
-            }).allMatch(entry -> entry.getValue().state == StratagemState.UNAVAILABLE))
+            }).allMatch(instancex -> instancex.state == StratagemState.UNAVAILABLE))
             {
                 this.onUse(context);
 

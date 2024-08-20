@@ -1,6 +1,8 @@
 package com.stevekung.stratagems.api;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Player;
@@ -24,6 +26,14 @@ public interface StratagemsData
     void clear();
 
     Map<Holder<Stratagem>, StratagemInstance> instances();
+
+    Collection<StratagemInstance> listInstances();
+
+    int size();
+
+    boolean isEmpty();
+
+    Stream<StratagemInstance> stream();
 
     StratagemInstance instanceByHolder(Holder<Stratagem> holder);
 }

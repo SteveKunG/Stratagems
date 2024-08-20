@@ -32,12 +32,12 @@ public class StratagemUtils
 
     public static boolean anyMatch(StratagemsData data, Holder<Stratagem> holder)
     {
-        return data.instances().values().stream().map(StratagemInstance::getStratagem).anyMatch(holderx -> holderx == holder);
+        return data.stream().map(StratagemInstance::getStratagem).anyMatch(holderx -> holderx == holder);
     }
 
     public static boolean noneMatch(StratagemsData data, Holder<Stratagem> holder)
     {
-        return data.instances().values().stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holderx == holder);
+        return data.stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holderx == holder);
     }
 
     public static Map<Holder<Stratagem>, StratagemInstance> mapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
@@ -45,9 +45,9 @@ public class StratagemUtils
         return entries.stream().map(entry -> new StratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.maxUse(), entry.state(), entry.side())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
     }
 
-    public static List<StratagemEntryData> mapToEntry(Collection<StratagemInstance> list)
+    public static List<StratagemEntryData> mapToEntry(StratagemsData stratagemsData)
     {
-        return list.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.maxUse, instance.state, instance.side)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
+        return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.maxUse, instance.state, instance.side)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
     public static Map<Holder<Stratagem>, StratagemInstance> entryToMap(Collection<StratagemEntryData> list, Level level)

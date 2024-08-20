@@ -33,6 +33,6 @@ public record UpdateServerStratagemsPacket(Collection<StratagemEntryData> server
 
     public static UpdateServerStratagemsPacket create(StratagemsData stratagemsData)
     {
-        return new UpdateServerStratagemsPacket(StratagemUtils.mapToEntry(stratagemsData.instances().values()));
+        return new UpdateServerStratagemsPacket(StratagemUtils.mapToEntry(stratagemsData));
     }
 }

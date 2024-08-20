@@ -1,6 +1,8 @@
 package com.stevekung.stratagems.api;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
 import com.stevekung.stratagems.api.util.StratagemUtils;
@@ -84,6 +86,30 @@ public class PlayerStratagemsData implements StratagemsData
     }
 
     @Override
+    public Collection<StratagemInstance> listInstances()
+    {
+        return this.instances.values();
+    }
+
+    @Override
+    public int size()
+    {
+        return this.instances.size();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return this.instances.isEmpty();
+    }
+
+    @Override
+    public Stream<StratagemInstance> stream()
+    {
+        return this.listInstances().stream();
+    }
+
+    @Override
     public StratagemInstance instanceByHolder(Holder<Stratagem> holder)
     {
         return this.instances.get(holder);
@@ -100,7 +126,7 @@ public class PlayerStratagemsData implements StratagemsData
         {
             var listTag = new ListTag();
 
-            for (var instances : this.instances.values())
+            for (var instances : this.listInstances())
             {
                 var instanceTag = new CompoundTag();
                 instances.save(instanceTag);

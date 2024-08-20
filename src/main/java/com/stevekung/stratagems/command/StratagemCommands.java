@@ -221,12 +221,12 @@ public class StratagemCommands
 
         serverStratagems.reset();
 
-        for (var entry : serverStratagems.instances().entrySet())
+        for (var instance : serverStratagems.listInstances())
         {
-            updateServerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, entry.getValue());
+            updateServerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
         }
 
-        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.stratagemsData().instances().values().forEach(instance ->
+        server.getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.stratagemsData().listInstances().forEach(instance ->
         {
             instance.reset(server, serverPlayer);
             updatePlayerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
@@ -272,14 +272,13 @@ public class StratagemCommands
     private static int resetAllServerStratagem(CommandSourceStack source)
     {
         var server = source.getServer();
-        var serverStratagems = server.overworld().stratagemsData();
-        var instances = serverStratagems.instances();
+        var stratagemsData = server.overworld().stratagemsData();
 
-        serverStratagems.reset();
+        stratagemsData.reset();
 
-        for (var entry : instances.entrySet())
+        for (var instance : stratagemsData.listInstances())
         {
-            updateServerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, entry.getValue());
+            updateServerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
         }
 
         source.sendSuccess(() -> Component.translatable("commands.stratagem.reset.server.everything.success"), true);
@@ -288,9 +287,8 @@ public class StratagemCommands
 
     private static int resetAllPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer)
     {
-        for (var entry : serverPlayer.stratagemsData().instances().entrySet())
+        for (var instance : serverPlayer.stratagemsData().listInstances())
         {
-            var instance = entry.getValue();
             instance.reset(source.getServer(), serverPlayer);
             updatePlayerStratagemPacket(source, UpdateStratagemPacket.Action.UPDATE, instance);
         }
@@ -300,33 +298,33 @@ public class StratagemCommands
 
     private static int listPlayerStratagems(CommandSourceStack source, ServerPlayer serverPlayer)
     {
-        var playerStratagems = serverPlayer.stratagemsData();
+        var stratagemsData = serverPlayer.stratagemsData();
 
-        if (playerStratagems.instances().isEmpty())
+        if (stratagemsData.isEmpty())
         {
             source.sendFailure(Component.translatable("commands.stratagem.list.player.empty", serverPlayer.getDisplayName()));
             return 0;
         }
         else
         {
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.player", serverPlayer.getDisplayName(), playerStratagems.instances().size(), StratagemUtils.decorateStratagemList(playerStratagems.instances().values())), true);
-            return playerStratagems.instances().size();
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.player", serverPlayer.getDisplayName(), stratagemsData.size(), StratagemUtils.decorateStratagemList(stratagemsData.listInstances())), true);
+            return stratagemsData.size();
         }
     }
 
     private static int listServerStratagems(CommandSourceStack source) throws CommandSyntaxException
     {
         var server = source.getServer();
-        var instances = server.overworld().stratagemsData().instances();
+        var stratagemsData = server.overworld().stratagemsData();
 
-        if (instances.isEmpty())
+        if (stratagemsData.isEmpty())
         {
             throw ERROR_LIST_EMPTY_SERVER.create();
         }
         else
         {
-            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.server", instances.size(), StratagemUtils.decorateStratagemList(instances.values())), true);
-            return instances.size();
+            source.sendSuccess(() -> Component.translatable("commands.stratagem.list.server", stratagemsData.size(), StratagemUtils.decorateStratagemList(stratagemsData.listInstances())), true);
+            return stratagemsData.size();
         }
     }
 

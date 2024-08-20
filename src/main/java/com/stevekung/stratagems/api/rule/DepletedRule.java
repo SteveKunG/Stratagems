@@ -43,7 +43,7 @@ public class DepletedRule implements StratagemRule
             if (replenishOptional.isPresent())
             {
                 var category = replenishOptional.get().category();
-                var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().instances().values() : server.overworld().stratagemsData().instances().values();
+                var stratagemsData = instance.side == StratagemInstance.Side.PLAYER ? player.stratagemsData().listInstances() : server.overworld().stratagemsData().listInstances();
 
                 stratagemsData.forEach(instancex ->
                 {
@@ -73,16 +73,7 @@ public class DepletedRule implements StratagemRule
                 var replenisherKey = replenisherOptional.get();
                 var registryAccess = instance.side == StratagemInstance.Side.PLAYER ? player.level().registryAccess() : server.registryAccess();
                 var replenisherStratagem = registryAccess.registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
-                var sameCategoryId = stratagemsData.instances().values().stream().filter(instancex ->
-                {
-                    var replenishOptionalx = instancex.stratagem().properties().replenish();
-
-                    if (replenishOptionalx.isPresent())
-                    {
-                        return replenishOptionalx.get().category().equals(category);
-                    }
-                    return false;
-                }).mapToInt(instancex -> instancex.id).findFirst().getAsInt();
+                var sameCategoryId = stratagemsData.stream().filter(instancex -> instancex.stratagem().properties().replenish().map(stratagemReplenish -> stratagemReplenish.category().equals(category)).orElse(false)).mapToInt(instancex -> instancex.id).findFirst().getAsInt();
 
                 if (!StratagemUtils.anyMatch(stratagemsData, replenisherStratagem))
                 {

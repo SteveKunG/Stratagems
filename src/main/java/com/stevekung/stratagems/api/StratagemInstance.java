@@ -26,13 +26,13 @@ import net.minecraft.world.level.Level;
 public class StratagemInstance implements Comparable<StratagemInstance>
 {
     private final Holder<Stratagem> stratagem;
-    public int id = 1;
+    public final int id;
     public int inboundDuration;
     public int duration;
     public int cooldown;
     public int maxUse;
     public StratagemState state;
-    public Side side;
+    public final Side side;
 
     public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, Side side)
     {

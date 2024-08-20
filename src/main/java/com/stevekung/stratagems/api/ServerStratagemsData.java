@@ -1,6 +1,8 @@
 package com.stevekung.stratagems.api;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -124,6 +126,30 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     }
 
     @Override
+    public Collection<StratagemInstance> listInstances()
+    {
+        return this.instances.values();
+    }
+
+    @Override
+    public int size()
+    {
+        return this.instances.size();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return this.instances.isEmpty();
+    }
+
+    @Override
+    public Stream<StratagemInstance> stream()
+    {
+        return this.listInstances().stream();
+    }
+
+    @Override
     public StratagemInstance instanceByHolder(Holder<Stratagem> holder)
     {
         return this.instances.get(holder);
@@ -134,7 +160,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     {
         var listTag = new ListTag();
 
-        for (var instance : this.instances.values())
+        for (var instance : this.listInstances())
         {
             var instanceTag = new CompoundTag();
             instance.save(instanceTag);

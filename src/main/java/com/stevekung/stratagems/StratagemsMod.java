@@ -92,7 +92,7 @@ public class StratagemsMod implements ModInitializer
             var serverStratagems = server.overworld().stratagemsData();
             ((ServerStratagemsData)serverStratagems).setDirty();
             server.overworld().getDataStorage().save();
-            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.instances().size(), serverStratagems.instances().values().stream().map(instance -> instance.getResourceKey().location()).toList());
+            ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.size(), serverStratagems.stream().map(instance -> instance.getResourceKey().location()).toList());
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
@@ -103,8 +103,8 @@ public class StratagemsMod implements ModInitializer
 
             ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(playerStratagems, player.getUUID()));
             ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(serverStratagems));
-            ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.instances().size());
-            ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.instances().size());
+            ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
+            ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
         });
 
         ServerTickEvents.START_SERVER_TICK.register(server ->
