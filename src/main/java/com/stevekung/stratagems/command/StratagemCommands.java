@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.packet.ClearStratagemsPacket;
 import com.stevekung.stratagems.api.packet.StratagemEntryData;
 import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
@@ -18,6 +19,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -67,11 +70,12 @@ public class StratagemCommands
                         .then(Commands.literal("player")
                                 .then(Commands.argument("player", EntityArgument.players())
                                         .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
-                                                .executes(commandContext -> useStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), EntityArgument.getPlayer(commandContext, "player"))))))
+                                                .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                                                        .executes(commandContext -> useStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), EntityArgument.getPlayer(commandContext, "player")))))))
                         .then(Commands.literal("server")
                                 .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
-                                        .executes(commandContext -> useStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), null)))))
-
+                                        .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                                                .executes(commandContext -> useStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), null))))))
 
                 .then(Commands.literal("reset")
                         .then(Commands.literal("*")
@@ -328,7 +332,7 @@ public class StratagemCommands
         }
     }
 
-    private static int useStratagem(CommandSourceStack source, Holder<Stratagem> holder, @Nullable ServerPlayer serverPlayer) throws CommandSyntaxException
+    private static int useStratagem(CommandSourceStack source, Holder<Stratagem> holder, BlockPos blockPos, @Nullable ServerPlayer serverPlayer) throws CommandSyntaxException
     {
         var server = source.getServer();
         var isPlayer = serverPlayer != null;
@@ -347,6 +351,8 @@ public class StratagemCommands
             }
         }
 
+        var stratagemContext = new StratagemActionContext(serverPlayer, source.getLevel(), blockPos, source.getLevel().random);
+        holder.value().action().action(stratagemContext);
         stratagemsData.use(holder, source.getPlayer());
         sendStratagemPacket(source, serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
 
