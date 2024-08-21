@@ -209,7 +209,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     if (!stratagem.properties().needThrow())
                     {
-                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelected().getResourceKey(), instance.side, player.getUUID()));
+                        ClientPlayNetworking.send(new UseReplenishStratagemPacket(manager.getSelected().getResourceKey(), player.level().dimension(), player.blockPosition(), instance.side, player.getUUID()));
                         LOGGER.info("Select replenish {}", instance.getResourceKey().location());
                         manager.clearInputCode();
                         manager.clearSelected();
