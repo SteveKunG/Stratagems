@@ -23,6 +23,14 @@
   "stratagem.menu.unavailable": "Unavailable",
   "stratagem.menu.tminus": "T-",
 
+  "stratagem.state.ready": "Ready",
+  "stratagem.state.in_use": "In use",
+  "stratagem.state.inbound": "Inbound",
+  "stratagem.state.cooldown": "Cooldown",
+  "stratagem.state.impact": "Impact",
+  "stratagem.state.unavailable": "Unavailable",
+  "stratagem.state.blocked": "Blocked",
+
   "commands.stratagem.add.player.success": "Added %s stratagem to %s",
   "commands.stratagem.add.server.success": "Added %s stratagem to server",
   "commands.stratagem.add.player.failed": "%s already has the stratagem",

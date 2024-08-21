@@ -364,7 +364,7 @@ public class StratagemCommands
         else
         {
             var instance = stratagemsData.instanceByHolder(holder);
-            source.sendFailure(Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state));
+            source.sendFailure(Component.translatable("commands.stratagem.use.failed", StratagemUtils.decorateStratagemName(stratagem.name(), holder), instance.state.getTranslationName()));
             return 0;
         }
 

@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import com.mojang.serialization.Codec;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 
 public enum StratagemState implements StringRepresentable
@@ -34,6 +35,11 @@ public enum StratagemState implements StringRepresentable
     public String getName()
     {
         return this.name().toLowerCase(Locale.ROOT);
+    }
+
+    public Component getTranslationName()
+    {
+        return Component.translatable("stratagem.state." + this.name().toLowerCase(Locale.ROOT));
     }
 
     @Override

@@ -94,7 +94,7 @@ public class StratagemsMod implements ModInitializer
             else
             {
                 var instance = stratagemsData.instanceByHolder(holder);
-                ModConstants.LOGGER.info("{}", Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state).getString());
+                ModConstants.LOGGER.info("{}", Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state.getTranslationName()).getString());
             }
         });
 
