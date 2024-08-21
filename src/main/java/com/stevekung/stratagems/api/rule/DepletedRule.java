@@ -6,9 +6,14 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.references.StratagemRules;
 import com.stevekung.stratagems.api.util.StratagemUtils;
+
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.server.level.ServerPlayer;
 
 public class DepletedRule implements StratagemRule
 {
@@ -81,10 +86,18 @@ public class DepletedRule implements StratagemRule
 
                     if (context.isServer())
                     {
+                        for (var serverPlayer : server.getPlayerList().getPlayers())
+                        {
+                            serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(stratagemsData)));
+                        }
                         LOGGER.info("Add {} server replenisher stratagem", replenisherStratagem.value().name().getString());
                     }
                     else
                     {
+                        if (player instanceof ServerPlayer serverPlayer)
+                        {
+                            serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID())));
+                        }
                         LOGGER.info("Add {} replenisher stratagem to {}", replenisherStratagem.value().name().getString(), player.getName().getString());
                     }
                 }
