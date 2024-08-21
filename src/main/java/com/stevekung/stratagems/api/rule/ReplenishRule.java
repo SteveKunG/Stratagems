@@ -90,7 +90,10 @@ public class ReplenishRule implements StratagemRule
                 }
                 else
                 {
-                    ((ServerPlayer)player).connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
+                    if (player instanceof ServerPlayer serverPlayer)
+                    {
+                        serverPlayer.connection.send(new ClientboundSoundPacket(Holder.direct(replenishSoundOptional.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1.0f, 1.0f, player.level().getRandom().nextLong()));
+                    }
                 }
             }
         }
@@ -100,7 +103,8 @@ public class ReplenishRule implements StratagemRule
     public void onReset(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var stratagemsData = context.isServer() ? context.server().overworld().stratagemsData() : context.player().stratagemsData();
+        var player = context.player();
+        var stratagemsData = context.isServer() ? context.server().overworld().stratagemsData() : player.stratagemsData();
 
         // Remove this replenished stratagem
         stratagemsData.remove(instance.getStratagem());
@@ -114,7 +118,10 @@ public class ReplenishRule implements StratagemRule
         }
         else
         {
-            ((ServerPlayer)context.player()).connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), context.player().getUUID())));
+            if (player instanceof ServerPlayer serverPlayer)
+            {
+                serverPlayer.connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), player.getUUID())));
+            }
         }
 
         LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
@@ -151,7 +158,10 @@ public class ReplenishRule implements StratagemRule
                 }
                 else
                 {
-                    ((ServerPlayer)player).connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID())));
+                    if (player instanceof ServerPlayer serverPlayer)
+                    {
+                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID())));
+                    }
                 }
             }
         }
