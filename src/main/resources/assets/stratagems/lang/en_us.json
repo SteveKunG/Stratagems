@@ -35,6 +35,7 @@
 
   "commands.stratagem.use.server.success": "Used %s Server Stratagem",
   "commands.stratagem.use.player.success": "Used %s %s's Stratagem",
+  "commands.stratagem.use.failed": "Cannot use %s stratagem because it's in %s state!",
   "commands.stratagem.use.player.specific.failed": "Stratagem doesn't exists on the player",
   "commands.stratagem.use.server.specific.failed": "Stratagem doesn't exists on the server",
 

@@ -11,6 +11,8 @@ public interface StratagemsData
 {
     void tick();
 
+    boolean canUse(Holder<Stratagem> holder, Player player);
+
     void use(Holder<Stratagem> holder, Player player);
 
     void add(Holder<Stratagem> holder);

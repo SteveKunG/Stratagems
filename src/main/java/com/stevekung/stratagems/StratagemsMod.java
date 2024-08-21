@@ -4,6 +4,7 @@ import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.ServerStratagemsData;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.packet.*;
 import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
 import com.stevekung.stratagems.api.references.ModRegistries;
@@ -25,6 +26,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
@@ -66,22 +68,33 @@ public class StratagemsMod implements ModInitializer
         ServerPlayNetworking.registerGlobalReceiver(UseReplenishStratagemPacket.TYPE, (payload, context) ->
         {
             var server = context.server();
+            var level = context.server().getLevel(payload.dimension());
             var player = server.getPlayerList().getPlayer(payload.uuid());
             var stratagemsData = payload.side() == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
             var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
-            stratagemsData.use(holder, player);
-
-            if (payload.side() == StratagemInstance.Side.PLAYER)
+            if (stratagemsData.canUse(holder, player))
             {
-                ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID()));
+                var stratagemContext = new StratagemActionContext(player, level, payload.blockPos(), level.random);
+                holder.value().action().action(stratagemContext);
+                stratagemsData.use(holder, player);
+
+                if (payload.side() == StratagemInstance.Side.PLAYER)
+                {
+                    ServerPlayNetworking.send(player, UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID()));
+                }
+                else
+                {
+                    for (var serverPlayer : PlayerLookup.all(server))
+                    {
+                        ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(stratagemsData));
+                    }
+                }
             }
             else
             {
-                for (var serverPlayer : PlayerLookup.all(server))
-                {
-                    ServerPlayNetworking.send(serverPlayer, UpdateServerStratagemsPacket.create(stratagemsData));
-                }
+                var instance = stratagemsData.instanceByHolder(holder);
+                ModConstants.LOGGER.info("{}", Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state).getString());
             }
         });
 

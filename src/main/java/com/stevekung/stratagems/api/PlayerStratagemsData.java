@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
-import com.stevekung.stratagems.api.util.StratagemUtils;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -34,6 +33,12 @@ public class PlayerStratagemsData implements StratagemsData
     }
 
     @Override
+    public boolean canUse(Holder<Stratagem> holder, Player player)
+    {
+        return this.instanceByHolder(holder).canUse(this.player.getServer(), player, false);
+    }
+
+    @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
         this.instanceByHolder(holder).use(this.player.getServer(), player, false);
@@ -48,7 +53,9 @@ public class PlayerStratagemsData implements StratagemsData
     @Override
     public void add(Holder<Stratagem> holder, int id)
     {
-        this.instances.put(holder, StratagemUtils.createInstanceForPlayer(holder, id));
+        var properties = holder.value().properties();
+        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, StratagemInstance.Side.PLAYER);
+        this.instances.put(holder, instance);
     }
 
     @Override

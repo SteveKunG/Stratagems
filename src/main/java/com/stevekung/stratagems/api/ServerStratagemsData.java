@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-
 import com.google.common.collect.Maps;
-import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.api.StratagemInstance.Side;
 import com.stevekung.stratagems.api.util.CustomDataFixTypes;
 
@@ -22,7 +19,6 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 public class ServerStratagemsData extends SavedData implements StratagemsData
 {
-    private static final Logger LOGGER = LogUtils.getLogger();
     private static final String STRATAGEM_FILE_ID = "server_stratagems";
     private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
     private final ServerLevel level;
@@ -57,19 +53,16 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     }
 
     @Override
+    public boolean canUse(Holder<Stratagem> holder, Player player)
+    {
+        return this.instanceByHolder(holder).canUse(this.level.getServer(), player, true);
+    }
+
+    @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
-        var instance = this.instanceByHolder(holder);
-
-        if (instance.canUse(this.level.getServer(), player, true))
-        {
-            instance.use(this.level.getServer(), player, true);
-            this.setDirty();
-        }
-        else
-        {
-            LOGGER.info("Cannot use {} stratagem because it's in {} state!", instance.stratagem().name().getString(), instance.state);
-        }
+        this.instanceByHolder(holder).use(this.level.getServer(), player, true);
+        this.setDirty();
     }
 
     @Override

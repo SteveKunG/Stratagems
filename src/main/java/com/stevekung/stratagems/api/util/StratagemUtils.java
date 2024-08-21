@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Lists;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.StratagemsData;
 import com.stevekung.stratagems.api.packet.StratagemEntryData;
 import com.stevekung.stratagems.api.references.ModRegistries;
@@ -64,11 +63,5 @@ public class StratagemUtils
     public static Component decorateStratagemList(Collection<StratagemInstance> list)
     {
         return ComponentUtils.formatList(list, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
-    }
-
-    public static StratagemInstance createInstanceForPlayer(Holder<Stratagem> holder, int id)
-    {
-        var properties = holder.value().properties();
-        return new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, StratagemInstance.Side.PLAYER);
     }
 }

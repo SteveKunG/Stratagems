@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
@@ -121,8 +122,9 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
 
         if (this.level() instanceof ServerLevel serverLevel)
         {
+            var holder = this.getVariant();
             var stratagemPod = new StratagemPod(ModEntities.STRATAGEM_POD, this.level());
-            stratagemPod.setVariant(this.getVariant());
+            stratagemPod.setVariant(holder);
             stratagemPod.moveTo(this.blockPosition(), 0.0f, 0.0f);
             this.level().addFreshEntity(stratagemPod);
 
@@ -131,19 +133,27 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
                 var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
                 var stratagemsData = this.getSide() == StratagemInstance.Side.SERVER ? serverLevel.getServer().overworld().stratagemsData() : serverPlayer.stratagemsData();
 
-                this.getVariant().value().action().action(stratagemContext);
-                stratagemsData.use(this.getVariant(), serverPlayer);
-
-                if (this.getSide() == StratagemInstance.Side.SERVER)
+                if (stratagemsData.canUse(holder, serverPlayer))
                 {
-                    for (var player : PlayerLookup.all(this.getServer()))
+                    holder.value().action().action(stratagemContext);
+                    stratagemsData.use(holder, serverPlayer);
+
+                    if (this.getSide() == StratagemInstance.Side.SERVER)
                     {
-                        ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(stratagemsData));
+                        for (var player : PlayerLookup.all(this.getServer()))
+                        {
+                            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(stratagemsData));
+                        }
+                    }
+                    else
+                    {
+                        ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(stratagemsData, serverPlayer.getUUID()));
                     }
                 }
                 else
                 {
-                    ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(stratagemsData, serverPlayer.getUUID()));
+                    var instance = stratagemsData.instanceByHolder(holder);
+                    ModConstants.LOGGER.info("{}", Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state).getString());
                 }
             }
             else
