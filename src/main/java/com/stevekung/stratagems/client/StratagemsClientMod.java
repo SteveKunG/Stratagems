@@ -151,7 +151,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (!minecraft.isPaused() && level.tickRateManager().runsNormally())
         {
-            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values().forEach(instance -> instance.tick(null, player, false));
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values().forEach(instance -> instance.tick(player));
         }
 
         minecraft.getProfiler().pop();
@@ -284,7 +284,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 var stratagemName = stratagem.name();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
-                var codeMatched = code.startsWith(inputCode) && instance.canUse(null, player, false);
+                var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
                 var combinedArrows = new StringBuilder();
                 var statusText = Component.empty();
 
@@ -321,7 +321,7 @@ public class StratagemsClientMod implements ClientModInitializer
                         var arrows = ModConstants.charToArrow(codeChar[i]);
                         combinedArrows.append(arrows);
 
-                        if (instance.canUse(null, player, false))
+                        if (instance.canUse(player))
                         {
                             guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, codeMatched ? white : gray);
                         }

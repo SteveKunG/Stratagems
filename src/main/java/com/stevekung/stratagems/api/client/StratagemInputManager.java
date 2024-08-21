@@ -44,17 +44,17 @@ public class StratagemInputManager
 
     public static boolean noneMatch(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player, false)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
+        return all(player).stream().filter(instance -> instance.canUse(player)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
     }
 
     public static Optional<StratagemInstance> foundMatchFirst(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player, false) && instance.getCode().equals(inputCode)).findFirst();
+        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).findFirst();
     }
 
     public static StratagemInstance getInstanceFromCode(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(null, player, false) && instance.getCode().equals(inputCode)).findFirst().get();
+        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).findFirst().get();
     }
 
     public boolean isMenuOpen()

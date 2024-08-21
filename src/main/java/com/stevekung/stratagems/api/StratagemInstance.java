@@ -114,6 +114,11 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         return this.stratagem;
     }
 
+    public void tick(Player player)
+    {
+        this.tick(null, player, false);
+    }
+
     public void tick(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
     {
         this.getRule().tick(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
@@ -127,6 +132,11 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public void reset(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
     {
         this.getRule().onReset(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
+    }
+
+    public boolean canUse(Player player)
+    {
+        return this.canUse(null, player, false);
     }
 
     public boolean canUse(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer)
