@@ -6,16 +6,14 @@ import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
-import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
+import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.references.StratagemSounds;
+import com.stevekung.stratagems.api.util.PacketUtils;
 import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.Stratagems;
 
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -140,14 +138,11 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
 
                     if (this.getSide() == StratagemInstance.Side.SERVER)
                     {
-                        for (var player : PlayerLookup.all(this.getServer()))
-                        {
-                            ServerPlayNetworking.send(player, UpdateServerStratagemsPacket.create(stratagemsData));
-                        }
+                        PacketUtils.sendClientUpdatePacketS2P(this.getServer(), UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
                     }
                     else
                     {
-                        ServerPlayNetworking.send(serverPlayer, UpdatePlayerStratagemsPacket.create(stratagemsData, serverPlayer.getUUID()));
+                        PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
                     }
                 }
                 else

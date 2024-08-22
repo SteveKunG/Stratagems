@@ -1,19 +1,14 @@
 package com.stevekung.stratagems.api.packet;
 
-import java.util.Locale;
 import java.util.UUID;
-import java.util.function.IntFunction;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.stevekung.stratagems.api.ModConstants;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.util.ByIdMap;
 
 public record UpdateStratagemPacket(Action action, StratagemEntryData entryData, @Nullable UUID uuid) implements CustomPacketPayload
 {
@@ -48,26 +43,5 @@ public record UpdateStratagemPacket(Action action, StratagemEntryData entryData,
         UPDATE,
         ADD,
         REMOVE;
-
-        private static final Action[] VALUES = values();
-        public static final IntFunction<Action> BY_ID = ByIdMap.continuous(Action::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
-        public static final StreamCodec<ByteBuf, Action> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Action::ordinal);
-
-        public static Action byName(String name)
-        {
-            for (var state : VALUES)
-            {
-                if (name.equalsIgnoreCase(state.name()))
-                {
-                    return state;
-                }
-            }
-            return UPDATE;
-        }
-
-        public String getName()
-        {
-            return this.name().toLowerCase(Locale.ROOT);
-        }
     }
 }

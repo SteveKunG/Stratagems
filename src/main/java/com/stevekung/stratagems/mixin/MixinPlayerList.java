@@ -6,9 +6,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
+import com.stevekung.stratagems.api.util.PacketUtils;
 
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +19,6 @@ public class MixinPlayerList
     private void respawn(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, CallbackInfoReturnable<ServerPlayer> info, @Local(index = 6, ordinal = 1) ServerPlayer serverPlayer)
     {
         serverPlayer.stratagemsData().instances().putAll(player.stratagemsData().instances());
-        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(serverPlayer.stratagemsData(), serverPlayer.getUUID())));
+        PacketUtils.sendClientSetPlayerStratagemsPacket(serverPlayer, serverPlayer.stratagemsData());
     }
 }

@@ -48,7 +48,7 @@ public class StratagemsClientMod implements ClientModInitializer
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
         HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
 
-        ClientPlayNetworking.registerGlobalReceiver(UpdatePlayerStratagemsPacket.TYPE, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(SetPlayerStratagemsPacket.TYPE, (payload, context) ->
         {
             var player = context.player();
             var level = context.client().level;
@@ -62,7 +62,7 @@ public class StratagemsClientMod implements ClientModInitializer
             }
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(UpdateServerStratagemsPacket.TYPE, (payload, context) ->
+        ClientPlayNetworking.registerGlobalReceiver(SetServerStratagemsPacket.TYPE, (payload, context) ->
         {
             LOGGER.info("Received server stratagem packet");
             ModConstants.CLIENT_SERVER_STRATAGEM_LIST.clear();

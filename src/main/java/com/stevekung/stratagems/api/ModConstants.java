@@ -44,8 +44,8 @@ public interface ModConstants
     {
         ResourceLocation SPAWN_STRATAGEM = id("spawn_stratagem");
         ResourceLocation USE_REPLENISH_STRATAGEM = id("use_replenish_stratagem");
-        ResourceLocation UPDATE_PLAYER_STRATAGEMS = id("update_player_stratagems");
-        ResourceLocation UPDATE_SERVER_STRATAGEMS = id("update_server_stratagems");
+        ResourceLocation SET_PLAYER_STRATAGEMS = id("set_player_stratagems");
+        ResourceLocation SET_SERVER_STRATAGEMS = id("set_server_stratagems");
         ResourceLocation UPDATE_STRATAGEM = id("update_stratagem");
         ResourceLocation CLEAR_STRATAGEMS = id("clear_stratagems");
     }

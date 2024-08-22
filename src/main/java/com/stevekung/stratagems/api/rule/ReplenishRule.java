@@ -6,14 +6,11 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
-import com.stevekung.stratagems.api.packet.StratagemEntryData;
-import com.stevekung.stratagems.api.packet.UpdatePlayerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.UpdateServerStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.StratagemRules;
+import com.stevekung.stratagems.api.util.PacketUtils;
 
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -73,6 +70,18 @@ public class ReplenishRule implements StratagemRule
 
                 LOGGER.info("Replenished {} stratagem!", replenishedStratagem.stratagem().name().getString());
 
+                if (context.isServer())
+                {
+                    PacketUtils.sendClientUpdatePacketS2P(context.server(), UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
+                }
+                else
+                {
+                    if (player instanceof ServerPlayer serverPlayer)
+                    {
+                        PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
+                    }
+                }
+
                 // Remove this replenished stratagem
                 stratagemsData.remove(instance.getStratagem());
 
@@ -106,23 +115,20 @@ public class ReplenishRule implements StratagemRule
         var player = context.player();
         var stratagemsData = context.isServer() ? context.server().overworld().stratagemsData() : player.stratagemsData();
 
-        // Remove this replenished stratagem
-        stratagemsData.remove(instance.getStratagem());
-
         if (context.isServer())
         {
-            for (var serverPlayer : context.server().getPlayerList().getPlayers())
-            {
-                serverPlayer.connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance))));
-            }
+            PacketUtils.sendClientUpdatePacketS2P(context.server(), UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
         }
         else
         {
             if (player instanceof ServerPlayer serverPlayer)
             {
-                serverPlayer.connection.send(new ClientboundCustomPayloadPacket(new UpdateStratagemPacket(UpdateStratagemPacket.Action.REMOVE, StratagemEntryData.fromInstance(instance), player.getUUID())));
+                PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
             }
         }
+
+        // Remove this replenished stratagem
+        stratagemsData.remove(instance.getStratagem());
 
         LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
     }
@@ -148,21 +154,6 @@ public class ReplenishRule implements StratagemRule
             }).allMatch(instancex -> instancex.state == StratagemState.UNAVAILABLE))
             {
                 this.onUse(context);
-
-                if (context.isServer())
-                {
-                    for (var serverPlayer : server.getPlayerList().getPlayers())
-                    {
-                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdateServerStratagemsPacket.create(stratagemsData)));
-                    }
-                }
-                else
-                {
-                    if (player instanceof ServerPlayer serverPlayer)
-                    {
-                        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(UpdatePlayerStratagemsPacket.create(stratagemsData, player.getUUID())));
-                    }
-                }
             }
         }
     }
