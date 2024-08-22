@@ -11,7 +11,6 @@ import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemsData;
 import com.stevekung.stratagems.api.packet.StratagemEntryData;
-import com.stevekung.stratagems.api.references.ModRegistries;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -49,9 +48,8 @@ public class StratagemUtils
         return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.maxUse, instance.state, instance.side)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
-    public static Map<Holder<Stratagem>, StratagemInstance> entryToMap(Collection<StratagemEntryData> list, Level level)
+    public static Map<Holder<Stratagem>, StratagemInstance> entryToMap(Collection<StratagemEntryData> list, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        Function<ResourceKey<Stratagem>, Holder<Stratagem>> function = resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey);
         return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new StratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.maxUse(), entry.state(), entry.side())));
     }
 

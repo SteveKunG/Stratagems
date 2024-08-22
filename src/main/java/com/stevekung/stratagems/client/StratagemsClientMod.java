@@ -58,7 +58,7 @@ public class StratagemsClientMod implements ClientModInitializer
             {
                 LOGGER.info("Add stratagem from packet to {}", level.getPlayerByUUID(payload.uuid()).getName().getString());
                 player.stratagemsData().clear();
-                player.stratagemsData().instances().putAll(StratagemUtils.entryToMap(playerStratagems, level));
+                player.stratagemsData().instances().putAll(StratagemUtils.entryToMap(playerStratagems, resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
             }
         });
 
