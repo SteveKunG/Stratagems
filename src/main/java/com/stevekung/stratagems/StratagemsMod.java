@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 
@@ -112,7 +113,7 @@ public class StratagemsMod implements ModInitializer
             var serverStratagems = server.overworld().stratagemsData();
 
             PacketUtils.sendClientSetPlayerStratagemsPacket(player, playerStratagems);
-            PacketUtils.sendClientSetServerStratagemsPacket(server, serverStratagems);
+            player.connection.send(new ClientboundCustomPayloadPacket(SetServerStratagemsPacket.create(serverStratagems)));
             ModConstants.LOGGER.info("Send server stratagem packet to {} in total {}", player.getName().getString(), serverStratagems.size());
             ModConstants.LOGGER.info("Send player stratagem packet to {} in total {}", player.getName().getString(), playerStratagems.size());
         });
