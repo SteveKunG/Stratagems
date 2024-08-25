@@ -56,6 +56,7 @@ public class ReinforceRule implements StratagemRule
         if (instance.state != StratagemState.COOLDOWN && instance.maxUse == 0)
         {
             instance.cooldown = instance.stratagem().properties().cooldown();
+            instance.lastMaxCooldown = instance.cooldown;
             instance.state = StratagemState.COOLDOWN;
             LOGGER.info("{} stratagem has no remaining use, cooldown: {}", instance.stratagem().name().getString(), StratagemUtils.formatTickDuration(instance.cooldown, level));
         }

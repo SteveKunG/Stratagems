@@ -167,6 +167,7 @@ public class DepletedRule implements StratagemRule
                     LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.COOLDOWN);
                     instance.state = StratagemState.COOLDOWN;
                     instance.cooldown = properties.cooldown();
+                    instance.lastMaxCooldown = instance.cooldown;
                 }
             }
 

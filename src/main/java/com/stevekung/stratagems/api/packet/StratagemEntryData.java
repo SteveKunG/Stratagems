@@ -8,11 +8,11 @@ import com.stevekung.stratagems.api.references.ModRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 
-public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, StratagemInstance.Side side, boolean shouldDisplay)
+public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, StratagemInstance.Side side, boolean shouldDisplay)
 {
     public StratagemEntryData(FriendlyByteBuf buffer)
     {
-        this(buffer.readResourceKey(ModRegistries.STRATAGEM), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readEnum(StratagemState.class), buffer.readEnum(StratagemInstance.Side.class), buffer.readBoolean());
+        this(buffer.readResourceKey(ModRegistries.STRATAGEM), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readEnum(StratagemState.class), buffer.readEnum(StratagemInstance.Side.class), buffer.readBoolean());
     }
 
     public void write(FriendlyByteBuf buffer)
@@ -22,6 +22,7 @@ public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int i
         buffer.writeInt(this.inboundDuration);
         buffer.writeInt(this.duration);
         buffer.writeInt(this.cooldown);
+        buffer.writeInt(this.lastMaxCooldown);
         buffer.writeInt(this.maxUse);
         buffer.writeEnum(this.state);
         buffer.writeEnum(this.side);
@@ -30,6 +31,6 @@ public record StratagemEntryData(ResourceKey<Stratagem> stratagem, int id, int i
 
     public static StratagemEntryData fromInstance(StratagemInstance instance)
     {
-        return new StratagemEntryData(instance.getResourceKey(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay);
+        return new StratagemEntryData(instance.getResourceKey(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.lastMaxCooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay);
     }
 }

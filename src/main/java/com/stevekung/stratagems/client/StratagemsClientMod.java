@@ -101,7 +101,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay());
+            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
@@ -408,7 +408,7 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             //TODO Fix cooldown display logic
             var currentCooldown = instance.cooldown;
-            var maxCooldown = stratagem.properties().cooldown();
+            var maxCooldown = instance.lastMaxCooldown;
 
             if (currentCooldown > maxCooldown - 100 || currentCooldown < 100)
             {

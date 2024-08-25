@@ -30,18 +30,20 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public int inboundDuration;
     public int duration;
     public int cooldown;
+    public int lastMaxCooldown; // Used only on client
     public int maxUse;
     public StratagemState state;
     public final Side side;
     public final boolean shouldDisplay;
 
-    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay)
+    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay)
     {
         this.id = id;
         this.stratagem = stratagem;
         this.inboundDuration = inboundDuration;
         this.duration = duration;
         this.cooldown = cooldown;
+        this.lastMaxCooldown = lastMaxCooldown;
         this.maxUse = maxUse;
         this.state = state;
         this.side = side;
@@ -61,6 +63,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         }
 
         compoundTag.putInt(ModConstants.Tag.COOLDOWN, this.cooldown);
+        compoundTag.putInt(ModConstants.Tag.LAST_MAX_COOLDOWN, this.lastMaxCooldown);
 
         if (this.maxUse > 0)
         {
@@ -71,6 +74,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         compoundTag.putInt(ModConstants.Tag.ID, this.id);
         compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
         compoundTag.putString(ModConstants.Tag.SIDE, this.side.getName());
+        compoundTag.putBoolean(ModConstants.Tag.SHOULD_DISPLAY, this.shouldDisplay);
     }
 
     public static StratagemInstance load(CompoundTag compoundTag, Level level)
@@ -95,13 +99,14 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         }
 
         var cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
+        var lastMaxCooldown = compoundTag.getInt(ModConstants.Tag.LAST_MAX_COOLDOWN);
 
         if (compoundTag.contains(ModConstants.Tag.MAX_USE, Tag.TAG_INT))
         {
             maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
         }
 
-        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, maxUse, state, side, shouldDisplay);
+        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay);
     }
 
     public void resetStratagemTicks(StratagemProperties properties)
@@ -109,6 +114,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         this.inboundDuration = properties.inboundDuration();
         this.duration = properties.duration();
         this.cooldown = properties.cooldown();
+        this.lastMaxCooldown = this.cooldown;
         this.maxUse = properties.maxUse();
     }
 

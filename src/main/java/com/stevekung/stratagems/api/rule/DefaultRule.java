@@ -76,6 +76,7 @@ public class DefaultRule implements StratagemRule
                 LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.COOLDOWN);
                 instance.state = StratagemState.COOLDOWN;
                 instance.cooldown = stratagem.properties().cooldown();
+                instance.lastMaxCooldown = instance.cooldown;
             }
 
             if (instance.state == StratagemState.COOLDOWN)

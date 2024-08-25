@@ -62,6 +62,7 @@ public class ReplenishRule implements StratagemRule
 
                 // replenished cooldown from replenishing properties
                 replenishedStratagem.cooldown = properties.cooldown();
+                replenishedStratagem.lastMaxCooldown = properties.cooldown();
 
                 if (replenishedProperties.maxUse() > 0)
                 {
