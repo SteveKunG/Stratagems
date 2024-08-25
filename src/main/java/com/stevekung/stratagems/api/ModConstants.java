@@ -70,5 +70,6 @@ public interface ModConstants
         String MAX_USE = "max_use";
         String STATE = "state";
         String SIDE = "side";
+        String SHOULD_DISPLAY = "should_display";
     }
 }

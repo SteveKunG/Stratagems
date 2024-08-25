@@ -101,7 +101,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.maxUse(), entryData.state(), entryData.side());
+            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
@@ -381,7 +381,10 @@ public class StratagemsClientMod implements ClientModInitializer
                 renderIcon(guiGraphics, minecraft, instance, stratagem.display(), index);
                 guiGraphics.pose().popPose();
             }
-            index++;
+            if (instance.shouldDisplay)
+            {
+                index++;
+            }
         }
         guiGraphics.fill(4, 12, 84 + max, 56 + index * 25, -1, grayAlpha);
     }
@@ -393,6 +396,10 @@ public class StratagemsClientMod implements ClientModInitializer
         var code = stratagem.code();
         var equals = manager.hasSelected() && code.equals(manager.getSelected().getCode()) && instance.side == manager.getSelected().side;
 
+        if (!instance.shouldDisplay)
+        {
+            return false;
+        }
         if (equals || instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
         {
             return true;

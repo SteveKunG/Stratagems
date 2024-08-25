@@ -33,8 +33,9 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public int maxUse;
     public StratagemState state;
     public final Side side;
+    public final boolean shouldDisplay;
 
-    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, Side side)
+    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay)
     {
         this.id = id;
         this.stratagem = stratagem;
@@ -44,6 +45,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         this.maxUse = maxUse;
         this.state = state;
         this.side = side;
+        this.shouldDisplay = shouldDisplay;
     }
 
     public void save(CompoundTag compoundTag)
@@ -80,6 +82,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         var id = compoundTag.getInt(ModConstants.Tag.ID);
         var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
         var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
+        var shouldDisplay = compoundTag.getBoolean(ModConstants.Tag.SHOULD_DISPLAY);
 
         if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
         {
@@ -98,7 +101,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
             maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
         }
 
-        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, maxUse, state, side);
+        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, maxUse, state, side, shouldDisplay);
     }
 
     public void resetStratagemTicks(StratagemProperties properties)

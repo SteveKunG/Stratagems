@@ -74,8 +74,14 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     @Override
     public void add(Holder<Stratagem> holder, int id)
     {
+        this.add(holder, id, true);
+    }
+
+    @Override
+    public void add(Holder<Stratagem> holder, int id, boolean shouldDisplay)
+    {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER);
+        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER, shouldDisplay);
         this.instances.put(holder, instance);
         this.setDirty();
     }

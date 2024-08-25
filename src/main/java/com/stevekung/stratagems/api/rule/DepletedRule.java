@@ -1,9 +1,13 @@
 package com.stevekung.stratagems.api.rule;
 
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
@@ -82,18 +86,19 @@ public class DepletedRule implements StratagemRule
             var category = replenish.category();
             var replenisherOptional = replenish.replenisher();
             var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
+            Supplier<Stream<StratagemInstance>> sameReplenishStratagem = () -> stratagemsData.stream().filter(instancex -> instancex.stratagem().properties().replenish().map(stratagemReplenish -> stratagemReplenish.category().equals(category)).orElse(false));
+            var sameCategoryId = sameReplenishStratagem.get().mapToInt(instancex -> instancex.id).findFirst().getAsInt();
 
             if (replenisherOptional.isPresent())
             {
                 var replenisherKey = replenisherOptional.get();
                 var registryAccess = context.isServer() ? server.registryAccess() : player.level().registryAccess();
                 var replenisherStratagem = registryAccess.registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
-                var sameCategoryId = stratagemsData.stream().filter(instancex -> instancex.stratagem().properties().replenish().map(stratagemReplenish -> stratagemReplenish.category().equals(category)).orElse(false)).mapToInt(instancex -> instancex.id).findFirst().getAsInt();
 
                 if (!StratagemUtils.anyMatch(stratagemsData, replenisherStratagem))
                 {
                     // Add replenish stratagem on top of this instance
-                    stratagemsData.add(replenisherStratagem, sameCategoryId - 1);
+                    stratagemsData.add(replenisherStratagem, sameCategoryId - 1, sameReplenishStratagem.get().count() > 1);
 
                     if (context.isServer())
                     {
