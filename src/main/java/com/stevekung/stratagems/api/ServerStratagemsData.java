@@ -102,13 +102,13 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
             entry.getValue().reset(this.level.getServer(), null, true);
         }
         this.setDirty();
-        this.nextAvailableId = 0;
     }
 
     @Override
     public void clear()
     {
         this.instances.clear();
+        this.nextAvailableId = 0;
         this.setDirty();
     }
 
