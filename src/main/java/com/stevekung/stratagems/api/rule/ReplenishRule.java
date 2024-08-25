@@ -70,18 +70,6 @@ public class ReplenishRule implements StratagemRule
 
                 LOGGER.info("Replenished {} stratagem!", replenishedStratagem.stratagem().name().getString());
 
-                if (context.isServer())
-                {
-                    PacketUtils.sendClientUpdatePacketS2P(context.server(), UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
-                }
-                else
-                {
-                    if (player instanceof ServerPlayer serverPlayer)
-                    {
-                        PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
-                    }
-                }
-
                 // Remove this replenished stratagem
                 stratagemsData.remove(instance.getStratagem());
 
@@ -115,6 +103,9 @@ public class ReplenishRule implements StratagemRule
         var player = context.player();
         var stratagemsData = context.isServer() ? context.server().overworld().stratagemsData() : player.stratagemsData();
 
+        // Remove this replenished stratagem
+        stratagemsData.remove(instance.getStratagem());
+
         if (context.isServer())
         {
             PacketUtils.sendClientUpdatePacketS2P(context.server(), UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
@@ -126,9 +117,6 @@ public class ReplenishRule implements StratagemRule
                 PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
             }
         }
-
-        // Remove this replenished stratagem
-        stratagemsData.remove(instance.getStratagem());
 
         LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
     }
@@ -154,6 +142,18 @@ public class ReplenishRule implements StratagemRule
             }).allMatch(instancex -> instancex.state == StratagemState.UNAVAILABLE))
             {
                 this.onUse(context);
+
+                if (context.isServer())
+                {
+                    PacketUtils.sendClientSetServerStratagemsPacket(server, stratagemsData);
+                }
+                else
+                {
+                    if (player instanceof ServerPlayer serverPlayer)
+                    {
+                        PacketUtils.sendClientSetPlayerStratagemsPacket(serverPlayer, stratagemsData);
+                    }
+                }
             }
         }
     }

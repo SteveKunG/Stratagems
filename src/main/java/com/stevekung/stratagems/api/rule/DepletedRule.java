@@ -46,9 +46,9 @@ public class DepletedRule implements StratagemRule
             if (replenishOptional.isPresent())
             {
                 var category = replenishOptional.get().category();
-                var stratagemsData = context.isServer() ? server.overworld().stratagemsData().listInstances() : player.stratagemsData().listInstances();
+                var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
-                stratagemsData.forEach(instancex ->
+                stratagemsData.listInstances().forEach(instancex ->
                 {
                     var otherReplenishOptional = instancex.stratagem().properties().replenish();
 
@@ -57,6 +57,18 @@ public class DepletedRule implements StratagemRule
                         instancex.state = StratagemState.IN_USE;
                     }
                 });
+
+                if (context.isServer())
+                {
+                    PacketUtils.sendClientSetServerStratagemsPacket(server, stratagemsData);
+                }
+                else
+                {
+                    if (player instanceof ServerPlayer serverPlayer)
+                    {
+                        PacketUtils.sendClientSetPlayerStratagemsPacket(serverPlayer, stratagemsData);
+                    }
+                }
             }
 
             instance.maxUse--;
