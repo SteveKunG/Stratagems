@@ -217,8 +217,8 @@ public class StratagemsClientMod implements ClientModInitializer
                         return;
                     }
 
-                    minecraft.player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
-                    minecraft.getSoundManager().play(new StratagemSoundInstance(minecraft.player));
+                    player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
+                    minecraft.getSoundManager().play(new StratagemSoundInstance(player));
 
                     manager.clearInputCode();
                     manager.setMenuOpen(false);
@@ -241,14 +241,14 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (fail)
         {
-            minecraft.player.playSound(StratagemSounds.STRATAGEM_FAIL, 1f, 1f);
+            player.playSound(StratagemSounds.STRATAGEM_FAIL, 1f, 1f);
         }
         else
         {
             if (arrowKeySound)
             {
                 // this is a little detail in HD2 when you're typing stratagem code and sound pitch increased
-                minecraft.player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * manager.getInputCode().length());
+                player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * manager.getInputCode().length());
             }
         }
     }
@@ -270,9 +270,16 @@ public class StratagemsClientMod implements ClientModInitializer
         var lightGray = DyeColor.LIGHT_GRAY.getTextColor();
         var grayAlpha = FastColor.ARGB32.color(128, 128, 128, 128);
 
-        guiGraphics.drawString(minecraft.font, "Menu Active: " + manager.isMenuOpen(), guiGraphics.guiWidth() / 2 - "Menu Active: ".length(), 10, white);
+        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.label"), 18, 18, white);
 
         var inputCode = manager.getInputCode();
+        var baseX = 36;
+        var baseY = 36;
+        var baseXIcon = 12;
+        var baseYIcon = 38;
+        var baseYSecond = 12;
+        var baseSpacing = 28;
+        var arrowSpacing = 8;
         var index = 0;
         var max = 0;
 
@@ -295,7 +302,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     nameColor = lightGray;
                 }
 
-                guiGraphics.drawString(minecraft.font, stratagemName, 32, 20 + index * 30, nameColor);
+                guiGraphics.drawString(minecraft.font, stratagemName, baseX, baseY + index * baseSpacing, nameColor);
 
                 if (instance.state == StratagemState.UNAVAILABLE)
                 {
@@ -308,10 +315,9 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     if (equals)
                     {
-                        guiGraphics.drawString(minecraft.font, stratagem.name(), 32, 20 + index * 30, white);
-
+                        guiGraphics.drawString(minecraft.font, stratagem.name(), baseX, baseY + index * baseSpacing, white);
                         Chars.asList(codeChar).forEach(character -> combinedArrows.append(ModConstants.charToArrow(character)));
-                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.activating"), 32, 32 + index * 30, white);
+                        guiGraphics.drawString(minecraft.font, Component.translatable("stratagem.menu.activating"), baseX, baseY + baseYSecond + index * baseSpacing, white);
                     }
                 }
                 else
@@ -323,7 +329,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                         if (instance.canUse(player))
                         {
-                            guiGraphics.drawString(minecraft.font, arrows, 32 + i * 8, 32 + index * 30, codeMatched ? white : gray);
+                            guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, codeMatched ? white : gray);
                         }
                     }
                 }
@@ -346,7 +352,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (!StringUtil.isNullOrEmpty(statusText.getString()))
                 {
-                    guiGraphics.drawString(minecraft.font, statusText, 32, 32 + index * 30, statusColor);
+                    guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, statusColor);
                 }
 
                 var arrowWidth = minecraft.font.width(combinedArrows.toString()) + 10;
@@ -372,13 +378,13 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     for (var i = 0; i < inputCodeChars.length; i++)
                     {
-                        guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), 32 + i * 8, 32 + index * 30, gray);
+                        guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, gray);
                     }
                 }
 
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);
-                renderIcon(guiGraphics, minecraft, instance, stratagem.display(), index);
+                renderIcon(guiGraphics, minecraft, instance, stratagem.display(), index, baseXIcon, baseYIcon, baseSpacing);
                 guiGraphics.pose().popPose();
             }
             if (instance.shouldDisplay)
@@ -406,7 +412,6 @@ public class StratagemsClientMod implements ClientModInitializer
         }
         if (instance.state == StratagemState.COOLDOWN)
         {
-            //TODO Fix cooldown display logic
             var currentCooldown = instance.cooldown;
             var maxCooldown = instance.lastMaxCooldown;
 
@@ -418,42 +423,42 @@ public class StratagemsClientMod implements ClientModInitializer
         return manager.isMenuOpen();
     }
 
-    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, StratagemInstance instance, StratagemDisplay display, int index)
+    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, StratagemInstance instance, StratagemDisplay display, int index, int x, int y, int spacing)
     {
         switch (display.type())
         {
             case ITEM -> display.itemStack().ifPresent(itemStack ->
             {
-                guiGraphics.renderItem(itemStack, 8, 22 + index * 30);
+                guiGraphics.renderItem(itemStack, x, y + index * spacing);
 
                 if (display.maxUseAsCount())
                 {
                     if (instance.maxUse > 0)
                     {
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, String.valueOf(instance.maxUse));
+                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, x, y + index * spacing, String.valueOf(instance.maxUse));
                     }
                 }
                 else
                 {
-                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, itemStack, 8, 22 + index * 30, displayCount));
+                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, itemStack, x, y + index * spacing, displayCount));
                 }
             });
-            case TEXTURE -> display.texture().ifPresent(resourceLocation -> guiGraphics.blit(resourceLocation, 8, 22 + index * 30, 0, 0, 16, 16, 16, 16));
+            case TEXTURE -> display.texture().ifPresent(resourceLocation -> guiGraphics.blit(resourceLocation, x, y + index * spacing, 0, 0, 16, 16, 16, 16));
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
             {
                 var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
-                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), 8, 22 + index * 30, 16);
+                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), x, y + index * spacing, 16);
 
                 if (display.maxUseAsCount())
                 {
                     if (instance.maxUse > 0)
                     {
-                        guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, String.valueOf(instance.maxUse));
+                        guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), x, y + index * spacing, String.valueOf(instance.maxUse));
                     }
                 }
                 else
                 {
-                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), 8, 22 + index * 30, displayCount));
+                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), x, y + index * spacing, displayCount));
                 }
             });
         }
