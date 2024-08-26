@@ -9,6 +9,9 @@ import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.references.StratagemRules;
 import com.stevekung.stratagems.api.util.StratagemUtils;
 
+/**
+ * A basic rule for a stratagem ticking.
+ */
 public class DefaultRule implements StratagemRule
 {
     public static final MapCodec<DefaultRule> CODEC = MapCodec.unit(new DefaultRule());

@@ -6,10 +6,10 @@ public class StratagemMenuRenderUtil
 {
     public static void renderBackground(GuiGraphics guiGraphics, int x, int y, int width, int height, int z, int color)
     {
-        int i = x - 3;
-        int j = y - 3;
-        int k = width + 3 + 3;
-        int l = height + 3 + 3;
+        var i = x - 3;
+        var j = y - 3;
+        var k = width + 3 + 3;
+        var l = height + 3 + 3;
         renderRectangle(guiGraphics, i, j, k, l, z, color);
         renderVerticalLine(guiGraphics, i - 5, j, l, z, color);
     }

@@ -18,6 +18,9 @@ import com.stevekung.stratagems.api.util.StratagemUtils;
 
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * An advanced rule for a stratagem which can be depleted when has no remaining use.
+ */
 public class DepletedRule implements StratagemRule
 {
     public static final MapCodec<DepletedRule> CODEC = MapCodec.unit(new DepletedRule());
@@ -32,6 +35,7 @@ public class DepletedRule implements StratagemRule
     @Override
     public boolean canUse(StratagemInstanceContext context)
     {
+        // Can use when ready and has remaining use
         return context.instance().isReady() && context.instance().maxUse > 0;
     }
 
@@ -44,14 +48,16 @@ public class DepletedRule implements StratagemRule
         var stratagem = instance.stratagem();
         var replenishOptional = stratagem.properties().replenish();
 
+        // Check has remaining use
         if (instance.maxUse > 0)
         {
-            // Set state from READY to IN_USE
             if (replenishOptional.isPresent())
             {
                 var category = replenishOptional.get().category();
                 var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
+                // Set other stratagems that have the same category to IN_USE just like Eagle stratagem.
+                // And check if it is not in the unavailable state.
                 stratagemsData.listInstances().forEach(instancex ->
                 {
                     var otherReplenishOptional = instancex.stratagem().properties().replenish();
@@ -62,6 +68,7 @@ public class DepletedRule implements StratagemRule
                     }
                 });
 
+                // Send an update packet to its side
                 if (context.isServer())
                 {
                     PacketUtils.sendClientSetServerStratagemsPacket(server, stratagemsData);
@@ -79,13 +86,15 @@ public class DepletedRule implements StratagemRule
             LOGGER.info("{} stratagem has maxUse: {}", stratagem.name().getString(), instance.maxUse);
         }
 
-        // Add replenisher stratagem when max use is lower than original
+        // Add replenisher stratagem when max use is lower than initial value
         if (instance.maxUse < stratagem.properties().maxUse() && replenishOptional.isPresent())
         {
             var replenish = replenishOptional.get();
             var category = replenish.category();
             var replenisherOptional = replenish.replenisher();
             var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
+
+            // Supply same stratagem category
             Supplier<Stream<StratagemInstance>> sameReplenishStratagem = () -> stratagemsData.stream().filter(instancex -> instancex.stratagem().properties().replenish().map(stratagemReplenish -> stratagemReplenish.category().equals(category)).orElse(false));
             var sameCategoryId = sameReplenishStratagem.get().mapToInt(instancex -> instancex.id).findFirst().getAsInt();
 

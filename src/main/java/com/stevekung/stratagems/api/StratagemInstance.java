@@ -30,7 +30,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public int inboundDuration;
     public int duration;
     public int cooldown;
-    public int lastMaxCooldown; // Used only on client
+    public int lastMaxCooldown; // Used only on the client
     public int maxUse;
     public StratagemState state;
     public final Side side;

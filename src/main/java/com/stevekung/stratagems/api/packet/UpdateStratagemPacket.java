@@ -42,6 +42,6 @@ public record UpdateStratagemPacket(Action action, StratagemEntryData entryData,
     {
         UPDATE,
         ADD,
-        REMOVE;
+        REMOVE
     }
 }

@@ -15,6 +15,9 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 
+/**
+ * An advanced stratagem rule that replenishes stratagems which depleted state with the same category
+ */
 public class ReplenishRule implements StratagemRule
 {
     public static final MapCodec<ReplenishRule> CODEC = MapCodec.unit(new ReplenishRule());
@@ -48,6 +51,7 @@ public class ReplenishRule implements StratagemRule
             var stratagemReplenish = replenishOptional.get();
             var toReplenishSet = stratagemReplenish.toReplenish().get();
 
+            // Check other stratagems are contains in toReplenish() tag.
             for (var replenishedStratagem : stratagemsData.stream().filter(stratagem -> toReplenishSet.contains(stratagem.getStratagem())).toList())
             {
                 replenishedStratagem.state = StratagemState.COOLDOWN;
@@ -60,7 +64,7 @@ public class ReplenishRule implements StratagemRule
                     replenishedStratagem.duration = replenishedProperties.duration();
                 }
 
-                // replenished cooldown from replenishing properties
+                // Replenished cooldown from this stratagem properties
                 replenishedStratagem.cooldown = properties.cooldown();
                 replenishedStratagem.lastMaxCooldown = properties.cooldown();
 
@@ -80,6 +84,7 @@ public class ReplenishRule implements StratagemRule
 
             var replenishSoundOptional = stratagemReplenish.replenishSound();
 
+            // If the replenished stratagem count is more than 0, send only one play sound packet.
             if (replenishSoundOptional.isPresent() && count > 0)
             {
                 if (context.isServer())
@@ -107,6 +112,7 @@ public class ReplenishRule implements StratagemRule
         // Remove this replenished stratagem
         stratagemsData.remove(instance.getStratagem());
 
+        // Send an update packet to its side
         if (context.isServer())
         {
             PacketUtils.sendClientUpdatePacketS2P(context.server(), UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
@@ -136,6 +142,7 @@ public class ReplenishRule implements StratagemRule
             var category = replenishOptional.get().category();
             var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
+            // Check if all the stratagems are depleted then use this replenished stratagem
             if (stratagemsData.stream().filter(instancex ->
             {
                 var otherReplenishOptional = instancex.stratagem().properties().replenish();
@@ -144,6 +151,7 @@ public class ReplenishRule implements StratagemRule
             {
                 this.onUse(context);
 
+                // Send an update packet to its side
                 if (context.isServer())
                 {
                     PacketUtils.sendClientSetServerStratagemsPacket(server, stratagemsData);
