@@ -10,8 +10,10 @@ import com.stevekung.stratagems.api.PlayerStratagemsData;
 import com.stevekung.stratagems.api.accessor.StratagemsDataAccessor;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 
 @Mixin(Player.class)
 public abstract class MixinPlayer extends LivingEntity implements StratagemsDataAccessor
@@ -52,5 +54,14 @@ public abstract class MixinPlayer extends LivingEntity implements StratagemsData
     private void readAdditionalSaveData(CompoundTag compound, CallbackInfo info)
     {
         this.stratagems.load(compound);
+    }
+
+    @Inject(method = "remove", at = @At("TAIL"))
+    private void remove(RemovalReason reason, CallbackInfo info)
+    {
+        if (reason == RemovalReason.KILLED && Player.class.cast(this) instanceof ServerPlayer serverPlayer)
+        {
+            serverPlayer.setGameMode(GameType.SPECTATOR);
+        }
     }
 }

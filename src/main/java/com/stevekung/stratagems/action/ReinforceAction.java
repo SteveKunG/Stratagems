@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.api.action.StratagemAction;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.action.StratagemActionType;
+import com.stevekung.stratagems.registry.ModGameRules;
 import com.stevekung.stratagems.registry.StratagemActionTypes;
 
 import net.minecraft.world.entity.LivingEntity;
@@ -25,6 +26,9 @@ public record ReinforceAction() implements StratagemAction
     {
         //TODO Temp
         var level = context.level();
+
+        level.getGameRules().getRule(ModGameRules.REINFORCE_ON_DEATH).get();
+
         var optional = level.players().stream().filter(LivingEntity::isDeadOrDying).flatMap(serverPlayer -> Optional.of(serverPlayer).stream()).findFirst();
         optional.ifPresent(level::addRespawnedPlayer);
     }

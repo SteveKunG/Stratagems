@@ -11,6 +11,8 @@
         "MixinServerPlayer"
     ],
     "client": [
+        "client.MixinClientPacketListener",
+        "client.MixinMinecraft"
     ],
     "injectors": {
         "defaultRequire": 1
