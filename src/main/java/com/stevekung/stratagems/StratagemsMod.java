@@ -47,6 +47,7 @@ public class StratagemsMod implements ModInitializer
 
         PayloadTypeRegistry.playC2S().register(SpawnStratagemPacket.TYPE, SpawnStratagemPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(UseReplenishStratagemPacket.TYPE, UseReplenishStratagemPacket.CODEC);
+        PayloadTypeRegistry.playC2S().register(PlayStratagemInputSoundPacket.TYPE, PlayStratagemInputSoundPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(SetPlayerStratagemsPacket.TYPE, SetPlayerStratagemsPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(SetServerStratagemsPacket.TYPE, SetServerStratagemsPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(UpdateStratagemPacket.TYPE, UpdateStratagemPacket.CODEC);
@@ -93,6 +94,20 @@ public class StratagemsMod implements ModInitializer
             {
                 var instance = stratagemsData.instanceByHolder(holder);
                 ModConstants.LOGGER.info("{}", Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state.getTranslationName()).getString());
+            }
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(PlayStratagemInputSoundPacket.TYPE, (payload, context) ->
+        {
+            var player = context.player();
+
+            switch (payload.soundType())
+            {
+                // this is a little detail in HD2 when you're typing stratagem code and sound pitch increased
+                case CLICK ->
+                        player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * payload.inputLength());
+                case FAIL -> player.playSound(StratagemSounds.STRATAGEM_FAIL, 1f, 1f);
+                case SELECT -> player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
             }
         });
 

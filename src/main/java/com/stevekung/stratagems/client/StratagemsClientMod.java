@@ -11,7 +11,6 @@ import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
 import com.stevekung.stratagems.api.packet.*;
 import com.stevekung.stratagems.api.references.ModRegistries;
-import com.stevekung.stratagems.api.references.StratagemSounds;
 import com.stevekung.stratagems.api.util.StratagemUtils;
 import com.stevekung.stratagems.client.renderer.StratagemPodRenderer;
 import com.stevekung.stratagems.registry.ModEntities;
@@ -219,7 +218,7 @@ public class StratagemsClientMod implements ClientModInitializer
                         return;
                     }
 
-                    player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
+                    ClientPlayNetworking.send(new PlayStratagemInputSoundPacket(PlayStratagemInputSoundPacket.SoundType.SELECT));
                     minecraft.getSoundManager().play(new StratagemSoundInstance(player));
 
                     manager.clearInputCode();
@@ -243,14 +242,13 @@ public class StratagemsClientMod implements ClientModInitializer
 
         if (fail)
         {
-            player.playSound(StratagemSounds.STRATAGEM_FAIL, 1f, 1f);
+            ClientPlayNetworking.send(new PlayStratagemInputSoundPacket(PlayStratagemInputSoundPacket.SoundType.FAIL));
         }
         else
         {
             if (arrowKeySound)
             {
-                // this is a little detail in HD2 when you're typing stratagem code and sound pitch increased
-                player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * manager.getInputCode().length());
+                ClientPlayNetworking.send(new PlayStratagemInputSoundPacket(PlayStratagemInputSoundPacket.SoundType.CLICK, manager.getInputCode().length()));
             }
         }
     }
