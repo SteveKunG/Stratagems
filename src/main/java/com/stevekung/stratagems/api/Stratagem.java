@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.util.ExtraCodecs;
 
 public record Stratagem(String code, Component name, StratagemDisplay display, StratagemAction action, StratagemRule rule, StratagemProperties properties)
@@ -29,7 +28,6 @@ public record Stratagem(String code, Component name, StratagemDisplay display, S
             StratagemRules.CODEC.optionalFieldOf("rule", DefaultRule.defaultRule().build()).forGetter(Stratagem::rule),
             StratagemProperties.CODEC.fieldOf("properties").forGetter(Stratagem::properties)
             ).apply(instance, Stratagem::new));
-    public static final Codec<Holder<Stratagem>> CODEC = RegistryFileCodec.create(ModRegistries.STRATAGEM, DIRECT_CODEC);
     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Stratagem>> STREAM_CODEC = ByteBufCodecs.holderRegistry(ModRegistries.STRATAGEM);
 
     private static DataResult<String> validateStratagemCode(String value)

@@ -37,6 +37,6 @@ public record PlayStratagemInputSoundPacket(SoundType soundType, int inputLength
     {
         CLICK,
         FAIL,
-        SELECT;
+        SELECT
     }
 }

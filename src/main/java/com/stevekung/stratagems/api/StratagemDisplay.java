@@ -29,19 +29,6 @@ public record StratagemDisplay(Type type, Optional<ItemStack> itemStack, Optiona
         PLAYER_ICON;
 
         public static final Codec<Type> CODEC = StringRepresentable.fromValues(Type::values);
-        private static final Type[] VALUES = values();
-
-        public static Type byName(String name)
-        {
-            for (var state : VALUES)
-            {
-                if (name.equalsIgnoreCase(state.name()))
-                {
-                    return state;
-                }
-            }
-            return ITEM;
-        }
 
         public String getName()
         {
