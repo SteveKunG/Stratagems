@@ -100,14 +100,14 @@ public class StratagemsMod implements ModInitializer
         ServerPlayNetworking.registerGlobalReceiver(PlayStratagemInputSoundPacket.TYPE, (payload, context) ->
         {
             var player = context.player();
+            var level = player.level();
 
             switch (payload.soundType())
             {
                 // this is a little detail in HD2 when you're typing stratagem code and sound pitch increased
-                case CLICK ->
-                        player.playSound(StratagemSounds.STRATAGEM_CLICK, 0.5f, 1.0f + 0.025f * payload.inputLength());
-                case FAIL -> player.playSound(StratagemSounds.STRATAGEM_FAIL, 1f, 1f);
-                case SELECT -> player.playSound(StratagemSounds.STRATAGEM_SELECT, 0.8f, 1.0f);
+                case CLICK -> level.playSound(null, player.blockPosition(), StratagemSounds.STRATAGEM_CLICK, SoundSource.PLAYERS, 0.5f, 1.0f + 0.025f * payload.inputLength());
+                case FAIL -> level.playSound(null, player.blockPosition(), StratagemSounds.STRATAGEM_FAIL, SoundSource.PLAYERS, 1f, 1f);
+                case SELECT -> level.playSound(null, player.blockPosition(), StratagemSounds.STRATAGEM_SELECT, SoundSource.PLAYERS, 0.8f, 1.0f);
             }
         });
 
