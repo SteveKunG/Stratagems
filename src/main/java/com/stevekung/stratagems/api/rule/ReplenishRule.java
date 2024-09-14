@@ -109,9 +109,6 @@ public class ReplenishRule implements StratagemRule
         var player = context.player();
         var stratagemsData = context.isServer() ? context.server().overworld().stratagemsData() : player.stratagemsData();
 
-        // Remove this replenished stratagem
-        stratagemsData.remove(instance.getStratagem());
-
         // Send an update packet to its side
         if (context.isServer())
         {
@@ -124,6 +121,9 @@ public class ReplenishRule implements StratagemRule
                 PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.REMOVE, stratagemsData.instanceByHolder(instance.getStratagem()));
             }
         }
+
+        // Remove this replenished stratagem
+        stratagemsData.remove(instance.getStratagem());
 
         LOGGER.info("Remove {} replenisher stratagem on reset!", instance.stratagem().name().getString());
     }
