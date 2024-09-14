@@ -107,7 +107,7 @@ public class DepletedRule implements StratagemRule
                 if (!StratagemUtils.anyMatch(stratagemsData, replenisherStratagem))
                 {
                     // Add replenish stratagem on top of this instance
-                    stratagemsData.add(replenisherStratagem, sameCategoryId - 1, sameReplenishStratagem.get().count() > 1);
+                    stratagemsData.add(replenisherStratagem, sameCategoryId - 1, instance.maxUse > 1 || sameReplenishStratagem.get().count() > 1);
 
                     if (context.isServer())
                     {
