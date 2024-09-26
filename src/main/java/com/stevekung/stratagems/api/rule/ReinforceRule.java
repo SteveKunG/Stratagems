@@ -26,7 +26,7 @@ public class ReinforceRule implements StratagemRule
     @Override
     public boolean canUse(StratagemInstanceContext context)
     {
-        return context.instance().maxUse > 0;
+        return context.instance().isReady() && context.instance().maxUse > 0;
     }
 
     @Override
