@@ -4,10 +4,8 @@ import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.StratagemDisplay;
-import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.*;
+import com.stevekung.stratagems.api.client.ClientStratagemInstance;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
 import com.stevekung.stratagems.api.packet.*;
 import com.stevekung.stratagems.api.references.ModRegistries;
@@ -59,7 +57,7 @@ public class StratagemsClientMod implements ClientModInitializer
             {
                 LOGGER.info("Add stratagem from packet to {}", level.getPlayerByUUID(payload.uuid()).getName().getString());
                 player.stratagemsData().clear();
-                player.stratagemsData().instances().putAll(StratagemUtils.entryToMap(playerStratagems, resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
+                player.stratagemsData().instances().putAll(StratagemUtils.clientEntryToMap(playerStratagems, resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
             }
         });
 
@@ -67,7 +65,7 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             LOGGER.info("Received server stratagem packet");
             ModConstants.CLIENT_SERVER_STRATAGEM_LIST.clear();
-            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.putAll(StratagemUtils.mapToInstance(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
+            ModConstants.CLIENT_SERVER_STRATAGEM_LIST.putAll(StratagemUtils.clientEntryToMap(payload.serverEntries(), resourceKey -> context.client().level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(resourceKey)));
         });
 
         ClientPlayNetworking.registerGlobalReceiver(ClearStratagemsPacket.TYPE, (payload, context) ->
@@ -102,7 +100,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new StratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay());
+            var instance = new ClientStratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
@@ -296,75 +294,28 @@ public class StratagemsClientMod implements ClientModInitializer
         var backgroundWidth = 0;
         var backgroundHeight = 0;
 
-        for (var instance : StratagemInputManager.all(player))
+        for (var stratagemInstance : StratagemInputManager.all(player))
         {
-            var stratagem = instance.stratagem();
-            var stratagemName = stratagem.name();
-            var code = stratagem.code();
-            var codeChar = code.toCharArray();
-            var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
-            var combinedArrows = new StringBuilder();
-            var statusText = Component.empty();
-            var nameColor = codeMatched ? white : gray;
-
-            if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
+            if (stratagemInstance instanceof ClientStratagemInstance instance)
             {
-                nameColor = lightGray;
-            }
+                var stratagem = instance.stratagem();
+                var stratagemName = stratagem.name();
+                var code = stratagem.code();
+                var codeChar = code.toCharArray();
+                var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
+                var combinedArrows = new StringBuilder();
+                var statusText = Component.empty();
+                var nameColor = codeMatched ? white : gray;
 
-            if (instance.state == StratagemState.UNAVAILABLE)
-            {
-                statusText = Component.translatable("stratagem.menu.unavailable");
-            }
-
-            if (manager.hasSelected() && instance.side == manager.getSelected().side)
-            {
-                var equals = code.equals(manager.getSelected().getCode());
-
-                if (equals)
-                {
-                    statusText = Component.translatable("stratagem.menu.activating");
-                }
-            }
-
-            Chars.asList(codeChar).forEach(character -> combinedArrows.append(ModConstants.charToArrow(character)));
-
-            var statusColor = codeMatched ? white : gray;
-
-            if (!instance.isReady())
-            {
                 if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
                 {
-                    statusText = Component.translatable("stratagem.menu.inbound").append(" ").append(StratagemUtils.formatTickDuration(instance.inboundDuration, level));
-                    statusColor = lightGray;
+                    nameColor = lightGray;
                 }
-                if (instance.state == StratagemState.COOLDOWN && instance.cooldown > 0)
+
+                if (instance.state == StratagemState.UNAVAILABLE)
                 {
-                    statusText = Component.translatable("stratagem.menu.cooldown").append(" ").append(StratagemUtils.formatTickDuration(instance.cooldown, level));
-                    statusColor = lightGray;
+                    statusText = Component.translatable("stratagem.menu.unavailable");
                 }
-            }
-
-            var arrowWidth = minecraft.font.width(combinedArrows.toString());
-            var nameWidth = minecraft.font.width(stratagemName);
-            var statusWidth = minecraft.font.width(statusText);
-
-            if (arrowWidth > max)
-            {
-                max = arrowWidth;
-            }
-            if (nameWidth > max)
-            {
-                max = nameWidth;
-            }
-            if (statusWidth > max)
-            {
-                max = statusWidth;
-            }
-
-            if (shouldRender(instance))
-            {
-                guiGraphics.drawString(minecraft.font, stratagemName, baseX, baseY + index * baseSpacing, nameColor);
 
                 if (manager.hasSelected() && instance.side == manager.getSelected().side)
                 {
@@ -372,54 +323,104 @@ public class StratagemsClientMod implements ClientModInitializer
 
                     if (equals)
                     {
-                        guiGraphics.drawString(minecraft.font, stratagem.name(), baseX, baseY + index * baseSpacing, white);
-                        guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, white);
+                        statusText = Component.translatable("stratagem.menu.activating");
                     }
                 }
-                else
-                {
-                    for (var i = 0; i < codeChar.length; i++)
-                    {
-                        var arrows = ModConstants.charToArrow(codeChar[i]);
 
-                        if (instance.canUse(player))
+                Chars.asList(codeChar).forEach(character -> combinedArrows.append(ModConstants.charToArrow(character)));
+
+                var statusColor = codeMatched ? white : gray;
+
+                if (!instance.isReady())
+                {
+                    if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
+                    {
+                        statusText = Component.translatable("stratagem.menu.inbound").append(" ").append(StratagemUtils.formatTickDuration(instance.inboundDuration, level));
+                        statusColor = lightGray;
+                    }
+                    if (instance.state == StratagemState.COOLDOWN && instance.cooldown > 0)
+                    {
+                        statusText = Component.translatable("stratagem.menu.cooldown").append(" ").append(StratagemUtils.formatTickDuration(instance.cooldown, level));
+                        statusColor = lightGray;
+                    }
+                }
+
+                var arrowWidth = minecraft.font.width(combinedArrows.toString());
+                var nameWidth = minecraft.font.width(stratagemName);
+                var statusWidth = minecraft.font.width(statusText);
+
+                if (arrowWidth > max)
+                {
+                    max = arrowWidth;
+                }
+                if (nameWidth > max)
+                {
+                    max = nameWidth;
+                }
+                if (statusWidth > max)
+                {
+                    max = statusWidth;
+                }
+
+                if (shouldRender(instance))
+                {
+                    guiGraphics.drawString(minecraft.font, stratagemName, baseX, baseY + index * baseSpacing, nameColor);
+
+                    if (manager.hasSelected() && instance.side == manager.getSelected().side)
+                    {
+                        var equals = code.equals(manager.getSelected().getCode());
+
+                        if (equals)
                         {
-                            guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, codeMatched ? white : gray);
+                            guiGraphics.drawString(minecraft.font, stratagem.name(), baseX, baseY + index * baseSpacing, white);
+                            guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, white);
                         }
                     }
-                }
-
-                if (!StringUtil.isNullOrEmpty(statusText.getString()))
-                {
-                    guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, statusColor);
-                }
-
-                if (codeMatched)
-                {
-                    var inputCodeChars = inputCode.toCharArray();
-
-                    for (var i = 0; i < inputCodeChars.length; i++)
+                    else
                     {
-                        guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, gray);
+                        for (var i = 0; i < codeChar.length; i++)
+                        {
+                            var arrows = ModConstants.charToArrow(codeChar[i]);
+
+                            if (instance.canUse(player))
+                            {
+                                guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, codeMatched ? white : gray);
+                            }
+                        }
+                    }
+
+                    if (!StringUtil.isNullOrEmpty(statusText.getString()))
+                    {
+                        guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, statusColor);
+                    }
+
+                    if (codeMatched)
+                    {
+                        var inputCodeChars = inputCode.toCharArray();
+
+                        for (var i = 0; i < inputCodeChars.length; i++)
+                        {
+                            guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, gray);
+                        }
+                    }
+
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);
+                    renderIcon(guiGraphics, minecraft, instance, stratagem.display(), index, baseXIcon, baseYIcon, baseSpacing);
+                    guiGraphics.pose().popPose();
+
+                    backgroundWidth = 22 + max + 20;
+                    backgroundHeight = 24 + index * 30;
+
+                    if (!manager.isMenuOpen())
+                    {
+                        StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38 + index * 30, backgroundWidth, 24, -1, grayAlpha);
                     }
                 }
-
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);
-                renderIcon(guiGraphics, minecraft, instance, stratagem.display(), index, baseXIcon, baseYIcon, baseSpacing);
-                guiGraphics.pose().popPose();
-
-                backgroundWidth = 22 + max + 20;
-                backgroundHeight = 24 + index * 30;
-
-                if (!manager.isMenuOpen())
+                if (instance.shouldDisplay)
                 {
-                    StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38 + index * 30, backgroundWidth, 24, -1, grayAlpha);
+                    index++;
                 }
-            }
-            if (instance.shouldDisplay)
-            {
-                index++;
             }
         }
         if (manager.isMenuOpen())
@@ -428,35 +429,27 @@ public class StratagemsClientMod implements ClientModInitializer
         }
     }
 
-    private static boolean shouldRender(StratagemInstance instance)
+    private static boolean shouldRender(ClientStratagemInstance instance)
     {
         var manager = StratagemInputManager.getInstance();
         var stratagem = instance.stratagem();
         var code = stratagem.code();
         var equals = manager.hasSelected() && code.equals(manager.getSelected().getCode()) && instance.side == manager.getSelected().side;
 
-        if (!instance.shouldDisplay)
-        {
-            return false;
-        }
-        if (equals || instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
+        if (manager.isMenuOpen() || instance.shouldDisplay || equals || instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
         {
             return true;
         }
-        if (instance.state == StratagemState.COOLDOWN)
+        else if (instance.state == StratagemState.COOLDOWN)
         {
             var currentCooldown = instance.cooldown;
             var maxCooldown = instance.lastMaxCooldown;
-
-            if (currentCooldown > maxCooldown - 100 || currentCooldown < 100)
-            {
-                return true;
-            }
+            return currentCooldown > maxCooldown - 100 || currentCooldown < 100;
         }
-        return manager.isMenuOpen();
+        return false;
     }
 
-    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, StratagemInstance instance, StratagemDisplay display, int index, int x, int y, int spacing)
+    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int index, int x, int y, int spacing)
     {
         switch (display.type())
         {
