@@ -3,6 +3,10 @@
   "name": {
     "translate": "stratagem.stratagems.supply_chest"
   },
+  "display": {
+    "type": "texture",
+    "texture": "stratagems:textures/stratagem/supply_chest.png"
+  },
   "action": {
     "type": "stratagems:spawn_supply",
     "loot_table": "minecraft:chests/spawn_bonus_chest"
@@ -14,9 +18,5 @@
     "beam_color": -9185281,
     "cooldown": 6000,
     "inbound_duration": 200
-  },
-  "display": {
-    "type": "texture",
-    "texture": "stratagems:textures/stratagem/supply_chest.png"
   }
 }

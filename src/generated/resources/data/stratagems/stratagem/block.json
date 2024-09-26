@@ -3,6 +3,15 @@
   "name": {
     "translate": "stratagem.stratagems.block"
   },
+  "display": {
+    "type": "item",
+    "display_count_override": "64",
+    "item": {
+      "count": 1,
+      "id": "minecraft:stone"
+    },
+    "max_use_as_count": false
+  },
   "action": {
     "type": "stratagems:spawn_item",
     "primary": {
@@ -17,14 +26,5 @@
     "beam_color": -9185281,
     "cooldown": 1200,
     "inbound_duration": 100
-  },
-  "display": {
-    "type": "item",
-    "display_count_override": "64",
-    "item": {
-      "count": 1,
-      "id": "minecraft:stone"
-    },
-    "max_use_as_count": false
   }
 }

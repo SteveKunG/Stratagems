@@ -3,6 +3,13 @@
   "name": {
     "translate": "stratagem.stratagems.tnt"
   },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:tnt"
+    }
+  },
   "action": {
     "type": "stratagems:spawn_bomb"
   },
@@ -18,13 +25,6 @@
     "replenish": {
       "category": "tnt",
       "replenisher": "stratagems:tnt_rearm"
-    }
-  },
-  "display": {
-    "type": "item",
-    "item": {
-      "count": 1,
-      "id": "minecraft:tnt"
     }
   }
 }

@@ -3,6 +3,15 @@
   "name": {
     "translate": "stratagem.stratagems.fast_tnt"
   },
+  "display": {
+    "type": "item",
+    "display_count_override": "F",
+    "item": {
+      "count": 1,
+      "id": "minecraft:tnt"
+    },
+    "max_use_as_count": false
+  },
   "action": {
     "type": "stratagems:spawn_bomb",
     "fuse": 40
@@ -20,14 +29,5 @@
       "category": "tnt",
       "replenisher": "stratagems:tnt_rearm"
     }
-  },
-  "display": {
-    "type": "item",
-    "display_count_override": "F",
-    "item": {
-      "count": 1,
-      "id": "minecraft:tnt"
-    },
-    "max_use_as_count": false
   }
 }

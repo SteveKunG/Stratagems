@@ -3,6 +3,13 @@
   "name": {
     "translate": "stratagem.stratagems.tnt_rearm"
   },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:redstone_torch"
+    }
+  },
   "action": {
     "type": "stratagems:empty"
   },
@@ -18,13 +25,6 @@
       "category": "tnt",
       "replenish_sound": "minecraft:block.beacon.activate",
       "to_replenish": "#stratagems:tnt_replenish"
-    }
-  },
-  "display": {
-    "type": "item",
-    "item": {
-      "count": 1,
-      "id": "minecraft:redstone_torch"
     }
   }
 }

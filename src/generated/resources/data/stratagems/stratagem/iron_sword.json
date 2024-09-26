@@ -3,6 +3,13 @@
   "name": {
     "translate": "stratagem.stratagems.iron_sword"
   },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:iron_sword"
+    }
+  },
   "action": {
     "type": "stratagems:spawn_item",
     "primary": {
@@ -17,12 +24,5 @@
     "beam_color": -9185281,
     "cooldown": 6000,
     "inbound_duration": 100
-  },
-  "display": {
-    "type": "item",
-    "item": {
-      "count": 1,
-      "id": "minecraft:iron_sword"
-    }
   }
 }

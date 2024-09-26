@@ -3,6 +3,13 @@
   "name": {
     "translate": "stratagem.stratagems.bow"
   },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:bow"
+    }
+  },
   "action": {
     "type": "stratagems:spawn_item",
     "primary": {
@@ -21,12 +28,5 @@
     "beam_color": -9185281,
     "cooldown": 6000,
     "inbound_duration": 100
-  },
-  "display": {
-    "type": "item",
-    "item": {
-      "count": 1,
-      "id": "minecraft:bow"
-    }
   }
 }
