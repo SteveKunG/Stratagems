@@ -19,11 +19,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.level.Level;
 
 public class StratagemUtils
 {
+    private static final String JAMMED_CHARS = "!\"#$%&()*+-/:;<=>?@[\\]^_{|}~";
+
     public static String formatTickDuration(int duration, Level level)
     {
         return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, level.tickRateManager().tickrate());
@@ -62,5 +65,28 @@ public class StratagemUtils
     public static Component decorateStratagemList(Collection<StratagemInstance> list)
     {
         return ComponentUtils.formatList(list, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
+    }
+
+    public static String generateJammedText(String text, RandomSource randomSource, double chance)
+    {
+        var jammedText = new StringBuilder(text);
+
+        // Iterate through the original string
+        for (var i = 0; i < jammedText.length(); i++)
+        {
+            // Check if the current character is not a space
+            if (jammedText.charAt(i) == ' ')
+            {
+                continue;
+            }
+
+            if (randomSource.nextDouble() < chance)
+            {
+                // Replace the current character with a random character
+                var randomChar = JAMMED_CHARS.charAt(randomSource.nextInt(JAMMED_CHARS.length()));
+                jammedText.setCharAt(i, randomChar);
+            }
+        }
+        return jammedText.toString();
     }
 }

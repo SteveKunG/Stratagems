@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.api.*;
+import com.stevekung.stratagems.api.ModConstants;
+import com.stevekung.stratagems.api.StratagemDisplay;
+import com.stevekung.stratagems.api.StratagemInstance;
+import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.client.ClientStratagemInstance;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
 import com.stevekung.stratagems.api.packet.*;
@@ -299,7 +302,7 @@ public class StratagemsClientMod implements ClientModInitializer
             if (stratagemInstance instanceof ClientStratagemInstance instance)
             {
                 var stratagem = instance.stratagem();
-                var stratagemName = stratagem.name();
+                var stratagemName = instance.state == StratagemState.BLOCKED ? Component.literal(instance.getJammedName()) : stratagem.name();
                 var code = stratagem.code();
                 var codeChar = code.toCharArray();
                 var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
@@ -312,7 +315,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     nameColor = lightGray;
                 }
 
-                if (instance.state == StratagemState.UNAVAILABLE)
+                if (instance.state == StratagemState.BLOCKED || instance.state == StratagemState.UNAVAILABLE)
                 {
                     statusText = Component.translatable("stratagem.menu.unavailable");
                 }
