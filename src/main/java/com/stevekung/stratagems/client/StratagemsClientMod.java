@@ -436,7 +436,7 @@ public class StratagemsClientMod implements ClientModInitializer
         var code = stratagem.code();
         var equals = manager.hasSelected() && code.equals(manager.getSelected().getCode()) && instance.side == manager.getSelected().side;
 
-        if (manager.isMenuOpen() || instance.shouldDisplay || equals || instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
+        if (manager.isMenuOpen() && instance.shouldDisplay || equals || instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
         {
             return true;
         }
