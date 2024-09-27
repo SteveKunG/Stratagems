@@ -42,7 +42,7 @@ public class StratagemUtils
         return data.stream().map(StratagemInstance::getStratagem).noneMatch(holderx -> holderx == holder);
     }
 
-    public static Map<Holder<Stratagem>, StratagemInstance> clientMapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
+    public static Map<Holder<Stratagem>, ClientStratagemInstance> clientMapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
         return entries.stream().map(entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
     }
@@ -52,7 +52,7 @@ public class StratagemUtils
         return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.lastMaxCooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
-    public static Map<Holder<Stratagem>, StratagemInstance> clientEntryToMap(Collection<StratagemEntryData> list, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
+    public static Map<Holder<Stratagem>, ClientStratagemInstance> clientEntryToMap(Collection<StratagemEntryData> list, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
         return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay())));
     }

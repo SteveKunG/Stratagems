@@ -24,7 +24,7 @@ public class StratagemInputManager
     private boolean menuOpen;
     private String inputCode = "";
     @Nullable
-    private StratagemInstance selected;
+    private ClientStratagemInstance selected;
 
     private final Minecraft minecraft;
 
@@ -47,14 +47,14 @@ public class StratagemInputManager
         return all(player).stream().filter(instance -> instance.canUse(player)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
     }
 
-    public static Optional<StratagemInstance> foundMatchFirst(String inputCode, Player player)
+    public static Optional<ClientStratagemInstance> foundMatchFirst(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).findFirst();
+        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).map(ClientStratagemInstance.class::cast).findFirst();
     }
 
-    public static StratagemInstance getInstanceFromCode(String inputCode, Player player)
+    public static Optional<ClientStratagemInstance> getInstanceFromCode(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).findFirst().get();
+        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).map(ClientStratagemInstance.class::cast).findFirst();
     }
 
     public boolean isMenuOpen()
@@ -99,12 +99,12 @@ public class StratagemInputManager
     }
 
     @Nullable
-    public StratagemInstance getSelected()
+    public ClientStratagemInstance getSelected()
     {
         return this.selected;
     }
 
-    public void setSelected(StratagemInstance selected)
+    public void setSelected(ClientStratagemInstance selected)
     {
         this.selected = selected;
     }

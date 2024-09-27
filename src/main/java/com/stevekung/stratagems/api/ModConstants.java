@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+import com.stevekung.stratagems.api.client.ClientStratagemInstance;
 import com.stevekung.stratagems.api.references.ModRegistries;
 
 import net.minecraft.core.Holder;
@@ -14,7 +15,7 @@ import net.minecraft.tags.TagKey;
 
 public interface ModConstants
 {
-    Map<Holder<Stratagem>, StratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Maps.newLinkedHashMap();
+    Map<Holder<Stratagem>, ClientStratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Maps.newLinkedHashMap();
     Map<Character, Character> WASD_TO_ARROWS = Map.of('w', '↑', 'a', '←', 's', '↓', 'd', '→');
     String MOD_ID = "stratagems";
     Logger LOGGER = LoggerFactory.getLogger("Stratagems");
