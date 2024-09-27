@@ -291,6 +291,7 @@ public class StratagemsClientMod implements ClientModInitializer
         }
     }
 
+    @SuppressWarnings("incomplete-switch")
     private static void renderHud(GuiGraphics guiGraphics, DeltaTracker deltaTracker)
     {
         var manager = StratagemInputManager.getInstance();
@@ -370,7 +371,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
                 var combinedArrows = new StringBuilder();
                 var statusText = Component.empty();
-                var nameColor = codeMatched ? white : gray;
+                var textColor = codeMatched ? white : gray;
 
                 if (!instance.selected)
                 {
@@ -389,29 +390,39 @@ public class StratagemsClientMod implements ClientModInitializer
                     }
                 }
 
-                if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
+                switch (instance.state)
                 {
-                    instance.animationTime = xStop;
-                }
-                if (instance.state == StratagemState.COOLDOWN)
-                {
-                    var currentCooldown = instance.cooldown;
-                    var maxCooldown = instance.lastMaxCooldown;
+                    case COOLDOWN -> {
+                        var currentCooldown = instance.cooldown;
+                        var maxCooldown = instance.lastMaxCooldown;
 
-                    if (currentCooldown > maxCooldown - 100 || currentCooldown < 100)
-                    {
-                        instance.animationTime = xStop;
+                        if (currentCooldown > maxCooldown - 100 || currentCooldown < 100)
+                        {
+                            instance.animationTime = xStop;
+                        }
+
+                        if (!instance.isReady() && instance.cooldown > 0)
+                        {
+                            statusText = Component.translatable("stratagem.menu.cooldown").append(" ").append(StratagemUtils.formatTickDuration(instance.cooldown, level));
+                            textColor = lightGray;
+                        }
                     }
-                }
+                    case INBOUND -> {
+                        if (instance.inboundDuration > 0)
+                        {
+                            textColor = lightGray;
+                            instance.animationTime = xStop;
 
-                if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
-                {
-                    nameColor = lightGray;
-                }
-
-                if (instance.state == StratagemState.BLOCKED || instance.state == StratagemState.UNAVAILABLE)
-                {
-                    statusText = Component.translatable("stratagem.menu.unavailable");
+                            if (!instance.isReady())
+                            {
+                                statusText = Component.translatable("stratagem.menu.inbound").append(" ").append(StratagemUtils.formatTickDuration(instance.inboundDuration, level));
+                                textColor = lightGray;
+                            }
+                        }
+                    }
+                    case BLOCKED, UNAVAILABLE -> {
+                        statusText = Component.translatable("stratagem.menu.unavailable");
+                    }
                 }
 
                 if (manager.hasSelected() && instance.side == manager.getSelected().side)
@@ -425,22 +436,6 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
 
                 Chars.asList(codeChar).forEach(character -> combinedArrows.append(ModConstants.charToArrow(character)));
-
-                var statusColor = codeMatched ? white : gray;
-
-                if (!instance.isReady())
-                {
-                    if (instance.state == StratagemState.INBOUND && instance.inboundDuration > 0)
-                    {
-                        statusText = Component.translatable("stratagem.menu.inbound").append(" ").append(StratagemUtils.formatTickDuration(instance.inboundDuration, level));
-                        statusColor = lightGray;
-                    }
-                    if (instance.state == StratagemState.COOLDOWN && instance.cooldown > 0)
-                    {
-                        statusText = Component.translatable("stratagem.menu.cooldown").append(" ").append(StratagemUtils.formatTickDuration(instance.cooldown, level));
-                        statusColor = lightGray;
-                    }
-                }
 
                 var arrowWidth = minecraft.font.width(combinedArrows.toString());
                 var nameWidth = minecraft.font.width(stratagemName);
@@ -464,7 +459,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 if (shouldRenderForMenu(instance))
                 {
-                    guiGraphics.drawString(minecraft.font, stratagemName, baseX, baseY + index * baseSpacing, nameColor);
+                    guiGraphics.drawString(minecraft.font, stratagemName, baseX, baseY + index * baseSpacing, textColor);
 
                     if (manager.hasSelected() && instance.side == manager.getSelected().side)
                     {
@@ -483,14 +478,14 @@ public class StratagemsClientMod implements ClientModInitializer
 
                             if (instance.canUse(player))
                             {
-                                guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, statusColor);
+                                guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, textColor);
                             }
                         }
                     }
 
                     if (!StringUtil.isNullOrEmpty(statusText.getString()))
                     {
-                        guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, statusColor);
+                        guiGraphics.drawString(minecraft.font, statusText, baseX, baseY + baseYSecond + index * baseSpacing, textColor);
                     }
 
                     if (codeMatched && !manager.hasSelected())
