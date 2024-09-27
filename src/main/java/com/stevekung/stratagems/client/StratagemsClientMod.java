@@ -343,21 +343,24 @@ public class StratagemsClientMod implements ClientModInitializer
         if (!manager.isMenuOpen() && visible)
         {
             visible = false;
-            animationTime = 0f;
+            animationTime = xStop;
         }
 
-        if (visible && animationTime >= xStart && animationTime < xStop)
+        if (animationTime >= xStart && animationTime <= xStop)
         {
-            animationTime += deltaTracker.getGameTimeDeltaTicks() * speed;
-
-            if (animationTime > xStop)
+            if (visible)
             {
-                animationTime = xStop;
+                animationTime += deltaTracker.getGameTimeDeltaTicks() * speed;
+
+                if (animationTime > xStop)
+                {
+                    animationTime = xStop;
+                }
             }
-        }
-        if (!visible && animationTime > xStart && animationTime <= xStop)
-        {
-            animationTime -= deltaTracker.getGameTimeDeltaTicks() * speed;
+            else
+            {
+                animationTime -= deltaTracker.getGameTimeDeltaTicks() * speed;
+            }
         }
 
         for (var stratagemInstance : StratagemInputManager.all(player))
@@ -373,9 +376,9 @@ public class StratagemsClientMod implements ClientModInitializer
                 var statusText = Component.empty();
                 var textColor = codeMatched ? white : gray;
 
-                if (!instance.selected)
+                if (!instance.selected && instance.animationTime >= xStart && instance.animationTime <= xStop)
                 {
-                    if (instance.visible && instance.animationTime >= xStart && instance.animationTime < xStop)
+                    if (instance.visible)
                     {
                         instance.animationTime += deltaTracker.getGameTimeDeltaTicks() * speed;
 
@@ -384,7 +387,7 @@ public class StratagemsClientMod implements ClientModInitializer
                             instance.animationTime = xStop;
                         }
                     }
-                    if (!instance.visible && instance.animationTime > xStart && instance.animationTime <= xStop)
+                    else
                     {
                         instance.animationTime -= deltaTracker.getGameTimeDeltaTicks() * speed;
                     }
