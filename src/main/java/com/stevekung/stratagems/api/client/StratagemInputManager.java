@@ -10,7 +10,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.references.StratagemSounds;
 
 import net.minecraft.client.Minecraft;
@@ -47,14 +46,9 @@ public class StratagemInputManager
         return all(player).stream().filter(instance -> instance.canUse(player)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
     }
 
-    public static Optional<ClientStratagemInstance> foundMatchFirst(String inputCode, Player player)
-    {
-        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).map(ClientStratagemInstance.class::cast).findFirst();
-    }
-
     public static Optional<ClientStratagemInstance> getInstanceFromCode(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).map(ClientStratagemInstance.class::cast).findFirst();
+        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).findFirst();
     }
 
     public boolean isMenuOpen()
@@ -109,8 +103,9 @@ public class StratagemInputManager
         this.selected = selected;
     }
 
-    public static List<StratagemInstance> all(Player player)
+    public static List<ClientStratagemInstance> all(Player player)
     {
-        return Lists.newArrayList(Iterables.concat(Ordering.natural().sortedCopy(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values()), Ordering.natural().sortedCopy(player.stratagemsData().listInstances())));
+        var allList = Lists.newArrayList(Iterables.concat(Ordering.natural().sortedCopy(ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values()), Ordering.natural().sortedCopy(player.stratagemsData().listInstances())));
+        return allList.stream().map(ClientStratagemInstance.class::cast).toList();
     }
 }
