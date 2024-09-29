@@ -416,8 +416,11 @@ public class StratagemsClientMod implements ClientModInitializer
                         }
                     }
                 }
-                case BLOCKED, UNAVAILABLE -> {
+                case UNAVAILABLE -> {
                     statusText = Component.translatable("stratagem.menu.unavailable");
+                }
+                case BLOCKED -> {
+                    statusText = Component.translatable("stratagem.menu.jammed");
                 }
             }
 

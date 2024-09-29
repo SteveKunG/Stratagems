@@ -23,7 +23,7 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer
     @Inject(method = "tick", at = @At("TAIL"))
     private void tick(CallbackInfo info)
     {
-        if (this.level().getGameTime() % 8L == 0L)
+        if (this.level().getGameTime() % 16L == 0L)
         {
             for (var instance : StratagemInputManager.all(this))
             {

@@ -22,7 +22,11 @@
   "stratagem.menu.cooldown": "Cooldown",
   "stratagem.menu.activating": "Activating",
   "stratagem.menu.unavailable": "Unavailable",
+  "stratagem.menu.jammed": "Jammed",
   "stratagem.menu.tminus": "T-",
+  "stratagem.menu.jammed_uppercase": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "stratagem.menu.jammed_lowercase": "abcdefghijklmnopqrstuvwxyz",
+  "stratagem.menu.jammed_numbers": "0123456789",
 
   "stratagem.state.ready": "Ready",
   "stratagem.state.in_use": "In use",

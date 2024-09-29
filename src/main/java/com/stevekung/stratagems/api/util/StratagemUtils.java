@@ -25,8 +25,6 @@ import net.minecraft.world.level.Level;
 
 public class StratagemUtils
 {
-    private static final String JAMMED_CHARS = "!\"#$%&()*+-/:;<=>?@[\\]^_{|}~";
-
     public static String formatTickDuration(int duration, Level level)
     {
         return Component.translatable("stratagem.menu.tminus").getString() + StringUtil.formatTickDuration(duration, level.tickRateManager().tickrate());
@@ -74,19 +72,25 @@ public class StratagemUtils
         // Iterate through the original string
         for (var i = 0; i < jammedText.length(); i++)
         {
-            // Check if the current character is not a space
-            if (jammedText.charAt(i) == ' ')
-            {
-                continue;
-            }
-
             if (randomSource.nextDouble() < chance)
             {
                 // Replace the current character with a random character
-                var randomChar = JAMMED_CHARS.charAt(randomSource.nextInt(JAMMED_CHARS.length()));
+                var jammedChar = getJammedChars();
+                var randomChar = jammedChar.charAt(randomSource.nextInt(jammedChar.length()));
                 jammedText.setCharAt(i, randomChar);
             }
         }
         return jammedText.toString();
+    }
+
+    private static String getJammedChars()
+    {
+        return Component.translatable("stratagem.menu.jammed_uppercase").getString() + // Uppercase
+                Component.translatable("stratagem.menu.jammed_lowercase").getString() + // Lowercase
+                Component.translatable("stratagem.menu.jammed_numbers").getString() + // Numbers
+                "!@#$%^&*()_+" + // Shifted number row
+                "-=[]\\;',./" + // Unshifted
+                "`~" + // Shifted backtick
+                "{}|:\"<>?"; // Shifted symbols
     }
 }
