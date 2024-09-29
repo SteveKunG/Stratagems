@@ -505,7 +505,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (!manager.isMenuOpen() && shouldRenderSingleBackground(instance))
             {
-                StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38 + index * 30, backgroundWidth, 24, -1, grayAlpha);
+                StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38 + index * 30, backgroundWidth, 24, -1, grayAlpha, false);
             }
 
             guiGraphics.pose().popPose();
@@ -519,7 +519,7 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(animationTime, 0, 0);
-            StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38, backgroundWidth, backgroundHeight, -1, grayAlpha);
+            StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38, backgroundWidth, backgroundHeight, -1, grayAlpha, true);
             guiGraphics.pose().popPose();
         }
     }
