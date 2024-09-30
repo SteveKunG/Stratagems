@@ -40,9 +40,9 @@ public class StratagemsClientMod implements ClientModInitializer
     private static final Logger LOGGER = LogUtils.getLogger();
     private static float animationTime;
     private static boolean visible;
-    private static float xStart = -200f;
-    private static float xStop = 0f;
-    private static float speed = 100f;
+    private static final float xStart = -200f;
+    private static final float xStop = 0f;
+    private static final float speed = 100f;
 
     @Override
     public void onInitializeClient()
@@ -416,12 +416,8 @@ public class StratagemsClientMod implements ClientModInitializer
                         }
                     }
                 }
-                case UNAVAILABLE -> {
-                    statusText = Component.translatable("stratagem.menu.unavailable");
-                }
-                case BLOCKED -> {
-                    statusText = Component.translatable("stratagem.menu.jammed");
-                }
+                case UNAVAILABLE -> statusText = Component.translatable("stratagem.menu.unavailable");
+                case BLOCKED -> statusText = Component.translatable("stratagem.menu.jammed");
             }
 
             if (manager.hasSelected() && instance.side == manager.getSelected().side)
