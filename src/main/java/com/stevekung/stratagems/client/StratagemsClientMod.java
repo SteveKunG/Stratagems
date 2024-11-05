@@ -174,10 +174,20 @@ public class StratagemsClientMod implements ClientModInitializer
 
         var manager = StratagemInputManager.getInstance();
 
-        if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
+        if (!ModConstants.CLIENT_SERVER_STRATAGEM_LIST.isEmpty())
         {
-            manager.setMenuOpen(!manager.isMenuOpen());
-            manager.clearSelected();
+            if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
+            {
+                manager.setMenuOpen(!manager.isMenuOpen());
+                manager.clearSelected();
+            }
+        }
+        else
+        {
+            if (manager.isMenuOpen())
+            {
+                manager.setMenuOpen(false);
+            }
         }
 
         var arrowKeySound = false;
