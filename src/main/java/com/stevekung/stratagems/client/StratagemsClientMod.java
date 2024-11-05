@@ -3,6 +3,11 @@ package com.stevekung.stratagems.client;
 import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.StratagemDisplay;
@@ -19,6 +24,7 @@ import com.stevekung.stratagems.registry.ModEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -27,6 +33,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
@@ -44,9 +51,13 @@ public class StratagemsClientMod implements ClientModInitializer
     private static final float xStop = 0f;
     private static final float speed = 100f;
 
+    private static ShaderInstance staticNoiseShader;
+
     @Override
     public void onInitializeClient()
     {
+        CoreShaderRegistrationCallback.EVENT.register(context -> context.register(ModConstants.id("static_noise"), DefaultVertexFormat.POSITION_TEX, program -> staticNoiseShader = program));
+
         KeyBindings.init();
 
         EntityRendererRegistry.register(ModEntities.STRATAGEM_BALL, ThrownItemRenderer::new);
@@ -361,7 +372,8 @@ public class StratagemsClientMod implements ClientModInitializer
         for (var instance : StratagemInputManager.all(player))
         {
             var stratagem = instance.stratagem();
-            var stratagemName = instance.state == StratagemState.BLOCKED ? Component.literal(instance.getJammedName()) : stratagem.name();
+            var isBlocked = instance.state == StratagemState.BLOCKED;
+            var stratagemName = isBlocked ? Component.literal(instance.getJammedName()) : stratagem.name();
             var code = stratagem.code();
             var codeChar = code.toCharArray();
             var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
@@ -495,7 +507,16 @@ public class StratagemsClientMod implements ClientModInitializer
 
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);
-                renderIcon(guiGraphics, minecraft, instance, stratagem.display(), index, baseXIcon, baseYIcon, baseSpacing);
+
+                if (isBlocked)
+                {
+                    renderStaticNoiseShader(guiGraphics, baseXIcon, baseYIcon + index * baseSpacing);
+                }
+                else
+                {
+                    renderIcon(guiGraphics, minecraft, instance, stratagem.display(), baseXIcon, baseYIcon + index * baseSpacing, isBlocked);
+                }
+
                 guiGraphics.pose().popPose();
 
                 backgroundWidth = 22 + max + 20;
@@ -548,44 +569,60 @@ public class StratagemsClientMod implements ClientModInitializer
         return false;
     }
 
-    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int index, int x, int y, int spacing)
+    private static void renderStaticNoiseShader(GuiGraphics guiGraphics, int x, int y)
+    {
+        var size = 16;
+        var zOffset = 300;
+
+        RenderSystem.setShader(() -> staticNoiseShader);
+        var matrix4f = guiGraphics.pose().last().pose();
+        var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.addVertex(matrix4f, x, y, zOffset).setUv(0.0F, 0.0F); // top left
+        buffer.addVertex(matrix4f, x, y + size, zOffset).setUv(1.0F, 0.0F); // bottom left
+        buffer.addVertex(matrix4f, x + size, y + size, zOffset).setUv(1.0F, 1.0F); // bottom right
+        buffer.addVertex(matrix4f, x + size, y, zOffset).setUv(0.0F, 1.0F); // top right
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
+    }
+
+    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y, boolean isBlocked)
     {
         switch (display.type())
         {
             case ITEM -> display.itemStack().ifPresent(itemStack ->
             {
-                guiGraphics.renderItem(itemStack, x, y + index * spacing);
-
-                if (display.maxUseAsCount())
-                {
-                    if (instance.maxUse > 0)
-                    {
-                        guiGraphics.renderItemDecorations(minecraft.font, itemStack, x, y + index * spacing, String.valueOf(instance.maxUse));
-                    }
-                }
-                else
-                {
-                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, itemStack, x, y + index * spacing, displayCount));
-                }
+                guiGraphics.renderItem(itemStack, x, y);
+                renderDecoratedCount(guiGraphics, itemStack, minecraft, instance, display, x, y, isBlocked);
             });
-            case TEXTURE -> display.texture().ifPresent(resourceLocation -> guiGraphics.blit(resourceLocation, x, y + index * spacing, 0, 0, 16, 16, 16, 16));
+            case TEXTURE -> display.texture().ifPresent(resourceLocation ->
+            {
+                guiGraphics.blit(resourceLocation, x, y, 0, 0, 16, 16, 16, 16);
+                renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y, isBlocked);
+            });
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
             {
                 var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
-                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), x, y + index * spacing, 16);
-
-                if (display.maxUseAsCount())
-                {
-                    if (instance.maxUse > 0)
-                    {
-                        guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), x, y + index * spacing, String.valueOf(instance.maxUse));
-                    }
-                }
-                else
-                {
-                    display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, new ItemStack(Items.STONE), x, y + index * spacing, displayCount));
-                }
+                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), x, y, 16);
+                renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y, isBlocked);
             });
+        }
+    }
+
+    private static void renderDecoratedCount(GuiGraphics guiGraphics, ItemStack itemStack, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y, boolean isBlocked)
+    {
+        if (isBlocked)
+        {
+            return;
+        }
+        if (display.maxUseAsCount())
+        {
+            if (instance.maxUse > 0)
+            {
+                guiGraphics.renderItemDecorations(minecraft.font, itemStack, x, y, String.valueOf(instance.maxUse));
+            }
+        }
+        else
+        {
+            display.displayCountOverride().ifPresent(displayCount -> guiGraphics.renderItemDecorations(minecraft.font, itemStack, x, y, displayCount));
         }
     }
 }
