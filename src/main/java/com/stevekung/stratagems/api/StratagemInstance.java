@@ -148,6 +148,11 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         this.getRule().onReset(StratagemInstanceContext.create(this, minecraftServer, player, isServer));
     }
 
+    public void block(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer, boolean unblock)
+    {
+        this.getRule().onBlocked(StratagemInstanceContext.create(this, minecraftServer, player, isServer), unblock);
+    }
+
     public boolean canUse(Player player)
     {
         return this.canUse(null, player, false);

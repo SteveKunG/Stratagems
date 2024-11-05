@@ -37,6 +37,24 @@ public interface StratagemRule
     }
 
     /**
+     * Called when being blocked or use by command
+     *
+     * @param context this stratagem context
+     * @param unblock unblock flag
+     */
+    default void onBlocked(StratagemInstanceContext context, boolean unblock)
+    {
+        if (unblock)
+        {
+            context.instance().state = StratagemState.READY;
+        }
+        else
+        {
+            context.instance().state = StratagemState.BLOCKED;
+        }
+    }
+
+    /**
      * Called from both server and client ticking
      *
      * @param context this stratagem context

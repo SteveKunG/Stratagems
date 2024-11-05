@@ -46,6 +46,22 @@
   "commands.stratagem.use.player.specific.failed": "Stratagem doesn't exists on the player",
   "commands.stratagem.use.server.specific.failed": "Stratagem doesn't exists on the server",
 
+  "commands.stratagem.block.everything.success": "All Stratagems have been blocked",
+  "commands.stratagem.block.server.everything.success": "All Server Stratagems have been blocked",
+  "commands.stratagem.block.player.everything.success": "All %s Stratagems have been blocked",
+  "commands.stratagem.block.server.success": "Server %s Stratagem have been blocked",
+  "commands.stratagem.block.player.success": "%s's %s stratagem have been blocked",
+  "commands.stratagem.block.player.specific.failed": "Failed to block player stratagem",
+  "commands.stratagem.block.server.specific.failed": "Failed to block server stratagem",
+
+  "commands.stratagem.unblock.everything.success": "All Stratagems have been unblocked",
+  "commands.stratagem.unblock.server.everything.success": "All Server Stratagems have been unblocked",
+  "commands.stratagem.unblock.player.everything.success": "All %s Stratagems have been unblocked",
+  "commands.stratagem.unblock.server.success": "Server %s Stratagem have been unblocked",
+  "commands.stratagem.unblock.player.success": "%s's %s stratagem have been unblocked",
+  "commands.stratagem.unblock.player.specific.failed": "Failed to unblock player stratagem",
+  "commands.stratagem.unblock.server.specific.failed": "Failed to unblock server stratagem",
+
   "commands.stratagem.reset.everything.success": "All Stratagems have been reset",
   "commands.stratagem.reset.server.everything.success": "All Server Stratagems have been reset",
   "commands.stratagem.reset.player.everything.success": "All %s Stratagems have been reset",

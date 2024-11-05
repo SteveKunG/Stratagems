@@ -32,6 +32,10 @@ public class StratagemCommands
     private static final SimpleCommandExceptionType ERROR_USE_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.use.server.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_RESET_PLAYER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.reset.player.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_RESET_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.reset.server.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_BLOCK_PLAYER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.block.player.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_BLOCK_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.block.server.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_UNBLOCK_PLAYER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.unblock.player.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_UNBLOCK_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.unblock.server.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_REMOVE_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.remove.server.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_LIST_EMPTY_SERVER = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.list.server.empty"));
 
@@ -76,9 +80,39 @@ public class StratagemCommands
                                         .then(Commands.argument("pos", BlockPosArgument.blockPos())
                                                 .executes(commandContext -> useStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), BlockPosArgument.getLoadedBlockPos(commandContext, "pos"), null))))))
 
+                .then(Commands.literal("block")
+                        .then(Commands.literal("*")
+                                .executes(commandContext -> blockAllStratagems(commandContext.getSource(), false)))
+                        .then(Commands.literal("player")
+                                .then(Commands.argument("player", EntityArgument.players())
+                                        .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                                .executes(commandContext -> blockStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), EntityArgument.getPlayer(commandContext, "player"), false)))
+                                        .then(Commands.literal("*")
+                                                .executes(commandContext -> blockAllPlayerStratagem(commandContext.getSource(), EntityArgument.getPlayer(commandContext, "player"), false)))))
+                        .then(Commands.literal("server")
+                                .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                        .executes(commandContext -> blockStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), null, false)))
+                                .then(Commands.literal("*")
+                                        .executes(commandContext -> blockAllServerStratagem(commandContext.getSource(), false)))))
+
+                .then(Commands.literal("unblock")
+                        .then(Commands.literal("*")
+                                .executes(commandContext -> blockAllStratagems(commandContext.getSource(), true)))
+                        .then(Commands.literal("player")
+                                .then(Commands.argument("player", EntityArgument.players())
+                                        .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                                .executes(commandContext -> blockStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), EntityArgument.getPlayer(commandContext, "player"), true)))
+                                        .then(Commands.literal("*")
+                                                .executes(commandContext -> blockAllPlayerStratagem(commandContext.getSource(), EntityArgument.getPlayer(commandContext, "player"), true)))))
+                        .then(Commands.literal("server")
+                                .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                        .executes(commandContext -> blockStratagem(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), null, true)))
+                                .then(Commands.literal("*")
+                                        .executes(commandContext -> blockAllServerStratagem(commandContext.getSource(), true)))))
+
                 .then(Commands.literal("reset")
                         .then(Commands.literal("*")
-                                .executes(commandContext -> resetAllStratagem(commandContext.getSource())))
+                                .executes(commandContext -> resetAllStratagems(commandContext.getSource())))
                         .then(Commands.literal("player")
                                 .then(Commands.argument("player", EntityArgument.players())
                                         .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
@@ -217,7 +251,107 @@ public class StratagemCommands
         return 1;
     }
 
-    private static int resetAllStratagem(CommandSourceStack source)
+    private static int blockAllStratagems(CommandSourceStack source, boolean unblock)
+    {
+        var server = source.getServer();
+        var serverStratagems = server.overworld().stratagemsData();
+
+        serverStratagems.block(unblock);
+
+        for (var instance : serverStratagems.listInstances())
+        {
+            PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.UPDATE, instance);
+        }
+
+        server.getPlayerList().getPlayers().forEach(serverPlayer ->
+        {
+            serverPlayer.stratagemsData().block(unblock);
+
+            for (var instance : serverPlayer.stratagemsData().listInstances())
+            {
+                PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.UPDATE, instance);
+            }
+        });
+
+        source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.everything.success" : "commands.stratagem.block.everything.success"), true);
+        return 1;
+    }
+
+    private static int blockStratagem(CommandSourceStack source, Holder<Stratagem> holder, @Nullable ServerPlayer serverPlayer, boolean unblock) throws CommandSyntaxException
+    {
+        var server = source.getServer();
+        var isPlayer = serverPlayer != null;
+        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.overworld().stratagemsData();
+        var stratagem = holder.value();
+
+        if (StratagemUtils.noneMatch(stratagemsData, holder))
+        {
+            if (isPlayer)
+            {
+                if (unblock)
+                {
+                    throw ERROR_UNBLOCK_PLAYER_SPECIFIC_FAILED.create();
+                }
+                else
+                {
+                    throw ERROR_BLOCK_PLAYER_SPECIFIC_FAILED.create();
+                }
+            }
+            else
+            {
+                if (unblock)
+                {
+                    throw ERROR_UNBLOCK_SERVER_SPECIFIC_FAILED.create();
+                }
+                else
+                {
+                    throw ERROR_BLOCK_SERVER_SPECIFIC_FAILED.create();
+                }
+            }
+        }
+
+        stratagemsData.block(holder, unblock);
+        PacketUtils.sendClientUpdateStratagemPacket(server, serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
+
+        if (isPlayer)
+        {
+            source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.player.success" : "commands.stratagem.block.player.success", serverPlayer.getDisplayName(), StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
+        }
+        else
+        {
+            source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.server.success" : "commands.stratagem.block.server.success", StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
+        }
+        return 1;
+    }
+
+    private static int blockAllServerStratagem(CommandSourceStack source, boolean unblock)
+    {
+        var server = source.getServer();
+        var stratagemsData = server.overworld().stratagemsData();
+
+        stratagemsData.block(unblock);
+
+        for (var instance : stratagemsData.listInstances())
+        {
+            PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.UPDATE, instance);
+        }
+
+        source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.server.everything.success": "commands.stratagem.block.server.everything.success"), true);
+        return 1;
+    }
+
+    private static int blockAllPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, boolean unblock)
+    {
+        for (var instance : serverPlayer.stratagemsData().listInstances())
+        {
+            instance.block(source.getServer(), serverPlayer, false, unblock);
+            PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.UPDATE, instance);
+        }
+        source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.player.everything.success" : "commands.stratagem.block.player.everything.success", serverPlayer.getDisplayName()), true);
+        return 1;
+    }
+
+    private static int resetAllStratagems(CommandSourceStack source)
     {
         var server = source.getServer();
         var serverStratagems = server.overworld().stratagemsData();

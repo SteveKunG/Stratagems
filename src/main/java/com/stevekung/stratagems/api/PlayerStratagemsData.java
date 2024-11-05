@@ -86,6 +86,21 @@ public class PlayerStratagemsData implements StratagemsData
     }
 
     @Override
+    public void block(boolean unblock)
+    {
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().block(this.player.getServer(), this.player, false, unblock);
+        }
+    }
+
+    @Override
+    public void block(Holder<Stratagem> holder, boolean unblock)
+    {
+        this.instanceByHolder(holder).block(this.player.getServer(), this.player, false, unblock);
+    }
+
+    @Override
     public void clear()
     {
         this.instances.clear();

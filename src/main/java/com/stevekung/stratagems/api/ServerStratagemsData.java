@@ -111,6 +111,23 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     }
 
     @Override
+    public void block(boolean unblock)
+    {
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().block(this.level.getServer(), null, true, unblock);
+        }
+        this.setDirty();
+    }
+
+    @Override
+    public void block(Holder<Stratagem> holder, boolean unblock)
+    {
+        this.instanceByHolder(holder).block(this.level.getServer(), null, true, unblock);
+        this.setDirty();
+    }
+
+    @Override
     public void clear()
     {
         this.instances.clear();
