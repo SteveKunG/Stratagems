@@ -26,7 +26,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
@@ -64,7 +63,6 @@ public class StratagemsClientMod implements ClientModInitializer
         EntityRendererRegistry.register(ModEntities.STRATAGEM_POD, StratagemPodRenderer::new);
 
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
-        HudRenderCallback.EVENT.register(StratagemsClientMod::renderHud);
 
         ClientPlayNetworking.registerGlobalReceiver(SetPlayerStratagemsPacket.TYPE, (payload, context) ->
         {
@@ -298,7 +296,7 @@ public class StratagemsClientMod implements ClientModInitializer
     }
 
     @SuppressWarnings("incomplete-switch")
-    private static void renderHud(GuiGraphics guiGraphics, DeltaTracker deltaTracker)
+    public static void renderHud(GuiGraphics guiGraphics, DeltaTracker deltaTracker)
     {
         var manager = StratagemInputManager.getInstance();
         var minecraft = Minecraft.getInstance();
