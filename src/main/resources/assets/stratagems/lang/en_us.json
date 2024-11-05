@@ -1,14 +1,5 @@
 {
   "stratagem.stratagems.reinforce": "Reinforce",
-  "stratagem.stratagems.bow": "Bow and Arrows",
-  "stratagem.stratagems.supply_chest": "Supply Chest",
-  "stratagem.stratagems.iron_sword": "Iron Sword",
-  "stratagem.stratagems.iron_pickaxe": "Iron Pickaxe",
-  "stratagem.stratagems.block": "Block",
-  "stratagem.stratagems.tnt": "TNT",
-  "stratagem.stratagems.fast_tnt": "Fast TNT",
-  "stratagem.stratagems.long_tnt": "Long TNT",
-  "stratagem.stratagems.tnt_rearm": "TNT Rearm",
 
   "key.categories.stratagems": "Stratagems",
   "key.open_stratagem_menu": "Open Stratagem Menu",
@@ -16,6 +7,9 @@
   "key.stratagem_down": "Stratagem Down",
   "key.stratagem_left": "Stratagem Left",
   "key.stratagem_right": "Stratagem Right",
+
+  "dataPack.stratagem_test_pack.name": "Stratagem Test Pack",
+  "dataPack.stratagem_test_pack.description": "Test Datapack for Stratagems",
 
   "stratagem.menu.label": "☠ Stratagems",
   "stratagem.menu.inbound": "Inbound",

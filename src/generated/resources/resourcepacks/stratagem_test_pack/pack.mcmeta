@@ -1,0 +1,12 @@
+{
+  "pack": {
+    "description": {
+      "translate": "dataPack.stratagem_test_pack.description"
+    },
+    "pack_format": 48,
+    "supported_formats": [
+      34,
+      48
+    ]
+  }
+}

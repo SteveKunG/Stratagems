@@ -26,8 +26,9 @@ public class StratagemDataGenerator implements DataGeneratorEntrypoint
     public void onInitializeDataGenerator(FabricDataGenerator dataGenerator)
     {
         var pack = dataGenerator.createPack();
-        pack.addProvider(StratagemTagsProvider::new);
         pack.addProvider(DynamicRegistryProvider::new);
+
+        new TestStratagemPackGenerator().onInitializeDataGenerator(dataGenerator);
     }
 
     @Override

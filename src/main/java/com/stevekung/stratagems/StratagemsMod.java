@@ -26,6 +26,9 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.sounds.SoundEvents;
@@ -52,6 +55,10 @@ public class StratagemsMod implements ModInitializer
         PayloadTypeRegistry.playS2C().register(SetServerStratagemsPacket.TYPE, SetServerStratagemsPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(UpdateStratagemPacket.TYPE, UpdateStratagemPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(ClearStratagemsPacket.TYPE, ClearStratagemsPacket.CODEC);
+
+        FabricLoader.getInstance().getModContainer(ModConstants.MOD_ID)
+                .map(container -> ResourceManagerHelper.registerBuiltinResourcePack(ModConstants.id("stratagem_test_pack"), container, Component.translatable("dataPack.stratagem_test_pack.name"), ResourcePackActivationType.NORMAL))
+                .filter(success -> !success).ifPresent(success -> ModConstants.LOGGER.warn("Could not register Stratagem Test pack."));
 
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {

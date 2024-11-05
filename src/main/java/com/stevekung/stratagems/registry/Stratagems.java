@@ -46,6 +46,10 @@ public class Stratagems
     public static void bootstrap(BootstrapContext<Stratagem> context)
     {
         register(context, REINFORCE, "wsdaw", new StratagemDisplay(StratagemDisplay.Type.PLAYER_ICON, Optional.empty(), Optional.empty(), Optional.of(new ResolvableProfile(Optional.empty(), Optional.empty(), Util.make(new PropertyMap(), map -> map.put("name", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZjVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0"))))), true, Optional.empty()), ReinforceAction.reinforce(), ReinforceRule.defaultRule(), StratagemProperties.withDepleted(0, 2400, 20, BLUE_COLOR));
+    }
+
+    public static void bootstrapTest(BootstrapContext<Stratagem> context)
+    {
         register(context, BOW, "ssawd", Items.BOW, SpawnItemAction.spawnItems(new ItemStack(Items.BOW), new ItemStack(Items.ARROW, 64)), StratagemProperties.simple(100, 6000, BLUE_COLOR));
         register(context, SUPPLY_CHEST, "sswd", new StratagemDisplay(StratagemDisplay.Type.TEXTURE, Optional.empty(), Optional.of(ModConstants.id("textures/stratagem/supply_chest.png")), Optional.empty(), true, Optional.empty()), SpawnSupplyAction.spawnSupply(BuiltInLootTables.SPAWN_BONUS_CHEST), DefaultRule.defaultRule(), StratagemProperties.simple(200, 6000, BLUE_COLOR));
         register(context, IRON_SWORD, "saswd", Items.IRON_SWORD, SpawnItemAction.spawnItem(new ItemStack(Items.IRON_SWORD)), StratagemProperties.simple(100, 6000, BLUE_COLOR));
