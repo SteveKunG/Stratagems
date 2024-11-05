@@ -161,7 +161,11 @@ public class PlayerStratagemsData implements StratagemsData
             {
                 var instanceTag = listTag.getCompound(i);
                 var instance = StratagemInstance.load(instanceTag, this.player.level());
-                this.instances.put(instance.getStratagem(), instance);
+
+                if (instance != null)
+                {
+                    this.instances.put(instance.getStratagem(), instance);
+                }
             }
         }
         if (compoundTag.contains(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, Tag.TAG_INT))

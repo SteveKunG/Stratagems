@@ -185,7 +185,11 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
             for (var i = 0; i < listTag.size(); i++)
             {
                 var instance = StratagemInstance.load(listTag.getCompound(i), level);
-                data.instances.put(instance.getStratagem(), instance);
+
+                if (instance != null)
+                {
+                    data.instances.put(instance.getStratagem(), instance);
+                }
             }
         }
         return data;

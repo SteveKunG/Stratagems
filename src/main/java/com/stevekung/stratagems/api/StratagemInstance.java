@@ -77,36 +77,41 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         compoundTag.putBoolean(ModConstants.Tag.SHOULD_DISPLAY, this.shouldDisplay);
     }
 
+    @Nullable
     public static StratagemInstance load(CompoundTag compoundTag, Level level)
     {
-        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).orElseThrow();
-        var inboundDuration = 0;
-        var duration = -1;
-        var maxUse = -1;
-        var id = compoundTag.getInt(ModConstants.Tag.ID);
-        var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
-        var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
-        var shouldDisplay = compoundTag.getBoolean(ModConstants.Tag.SHOULD_DISPLAY);
+        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey));
 
-        if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
+        if (stratagem.isPresent())
         {
-            inboundDuration = compoundTag.getInt(ModConstants.Tag.INBOUND_DURATION);
+            var inboundDuration = 0;
+            var duration = -1;
+            var maxUse = -1;
+            var id = compoundTag.getInt(ModConstants.Tag.ID);
+            var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
+            var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
+            var shouldDisplay = compoundTag.getBoolean(ModConstants.Tag.SHOULD_DISPLAY);
+
+            if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
+            {
+                inboundDuration = compoundTag.getInt(ModConstants.Tag.INBOUND_DURATION);
+            }
+
+            if (compoundTag.contains(ModConstants.Tag.DURATION, Tag.TAG_INT))
+            {
+                duration = compoundTag.getInt(ModConstants.Tag.DURATION);
+            }
+
+            var cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
+            var lastMaxCooldown = compoundTag.getInt(ModConstants.Tag.LAST_MAX_COOLDOWN);
+
+            if (compoundTag.contains(ModConstants.Tag.MAX_USE, Tag.TAG_INT))
+            {
+                maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
+            }
+            return new StratagemInstance(id, stratagem.get(), inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay);
         }
-
-        if (compoundTag.contains(ModConstants.Tag.DURATION, Tag.TAG_INT))
-        {
-            duration = compoundTag.getInt(ModConstants.Tag.DURATION);
-        }
-
-        var cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
-        var lastMaxCooldown = compoundTag.getInt(ModConstants.Tag.LAST_MAX_COOLDOWN);
-
-        if (compoundTag.contains(ModConstants.Tag.MAX_USE, Tag.TAG_INT))
-        {
-            maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
-        }
-
-        return new StratagemInstance(id, stratagem, inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay);
+        return null;
     }
 
     public void resetStratagemTicks(StratagemProperties properties)
