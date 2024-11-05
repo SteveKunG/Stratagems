@@ -15,7 +15,7 @@ import net.minecraft.world.level.portal.DimensionTransition;
 public class MixinServerPlayer
 {
     @Inject(method = "changeDimension", at = @At(value = "INVOKE", target = "net/minecraft/server/players/PlayerList.sendActivePlayerEffects(Lnet/minecraft/server/level/ServerPlayer;)V"))
-    private void changeDimension(DimensionTransition transition, CallbackInfoReturnable<Entity> info)
+    private void stratagems$sendStratagemsOnChangeDimension(DimensionTransition transition, CallbackInfoReturnable<Entity> info)
     {
         var serverPlayer = ServerPlayer.class.cast(this);
         PacketUtils.sendClientSetPlayerStratagemsPacket(serverPlayer, serverPlayer.stratagemsData());

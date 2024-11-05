@@ -16,7 +16,7 @@ import net.minecraft.world.entity.Entity;
 public class MixinPlayerList
 {
     @Inject(method = "respawn", at = @At("TAIL"))
-    private void respawn(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, CallbackInfoReturnable<ServerPlayer> info, @Local(index = 6, ordinal = 1) ServerPlayer serverPlayer)
+    private void stratagems$sendStratagemsOnRespawn(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, CallbackInfoReturnable<ServerPlayer> info, @Local(index = 6, ordinal = 1) ServerPlayer serverPlayer)
     {
         serverPlayer.stratagemsData().instances().putAll(player.stratagemsData().instances());
         PacketUtils.sendClientSetPlayerStratagemsPacket(serverPlayer, serverPlayer.stratagemsData());

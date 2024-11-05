@@ -21,7 +21,7 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void tick(CallbackInfo info)
+    private void stratagems$tickJammedText(CallbackInfo info)
     {
         if (this.level().getGameTime() % 16L == 0L)
         {

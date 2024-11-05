@@ -31,25 +31,25 @@ public abstract class MixinPlayer extends LivingEntity implements StratagemsData
     }
 
     @Inject(method = "<init>*", at = @At("TAIL"))
-    private void init(CallbackInfo info)
+    private void stratagems$initPlayerStratagem(CallbackInfo info)
     {
         this.stratagems = new PlayerStratagemsData(Player.class.cast(this));
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void tick(CallbackInfo info)
+    private void stratagems$tick(CallbackInfo info)
     {
         this.stratagems.tick();
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void addStratagemSaveData(CompoundTag compound, CallbackInfo info)
+    private void stratagems$addStratagemSaveData(CompoundTag compound, CallbackInfo info)
     {
         this.stratagems.save(compound);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void readAdditionalSaveData(CompoundTag compound, CallbackInfo info)
+    private void stratagems$readStratagemSaveData(CompoundTag compound, CallbackInfo info)
     {
         this.stratagems.load(compound);
     }
