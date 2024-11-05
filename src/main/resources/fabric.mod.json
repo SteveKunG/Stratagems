@@ -21,7 +21,8 @@
         ]
     },
     "mixins": [
-        "mixins.stratagems.json"
+        "mixins.stratagems.json",
+        "mixins.stratagems_client.json"
     ],
     "depends": {
         "fabricloader": ">=0.15",
