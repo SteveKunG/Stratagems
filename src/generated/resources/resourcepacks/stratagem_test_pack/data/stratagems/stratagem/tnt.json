@@ -14,7 +14,7 @@
     "type": "stratagems:spawn_bomb"
   },
   "rule": {
-    "type": "stratagems:depleted"
+    "type": "stratagems:depleted_rearm"
   },
   "properties": {
     "beam_color": -50116,

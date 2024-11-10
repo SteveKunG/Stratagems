@@ -14,6 +14,7 @@ public class StratagemRules
     public static final StratagemRuleType DEFAULT = new StratagemRuleType(DefaultRule.CODEC);
     public static final StratagemRuleType REINFORCE = new StratagemRuleType(ReinforceRule.CODEC);
     public static final StratagemRuleType DEPLETED = new StratagemRuleType(DepletedRule.CODEC);
+    public static final StratagemRuleType DEPLETED_REARM = new StratagemRuleType(DepletedAndRearmRule.CODEC);
     public static final StratagemRuleType REPLENISH = new StratagemRuleType(ReplenishRule.CODEC);
 
     public static void init()
@@ -21,6 +22,7 @@ public class StratagemRules
         register("default", DEFAULT);
         register("reinforce", REINFORCE);
         register("depleted", DEPLETED);
+        register("depleted_rearm", DEPLETED_REARM);
         register("replenish", REPLENISH);
     }
 

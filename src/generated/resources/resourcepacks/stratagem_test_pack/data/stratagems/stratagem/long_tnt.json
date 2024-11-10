@@ -18,7 +18,7 @@
     "fuse": 100
   },
   "rule": {
-    "type": "stratagems:depleted"
+    "type": "stratagems:depleted_rearm"
   },
   "properties": {
     "beam_color": -50116,
