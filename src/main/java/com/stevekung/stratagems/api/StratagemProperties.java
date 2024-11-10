@@ -30,8 +30,13 @@ public record StratagemProperties(int inboundDuration, int duration, int cooldow
         return new StratagemProperties(inboundDuration, -1, cooldown, maxUse, beamColor, true, true, Optional.of(replenish));
     }
 
-    public static StratagemProperties withDepleted(int inboundDuration, int cooldown, int maxUse, int beamColor)
+    public static StratagemProperties withDepletedAndReplenish(int inboundDuration, int cooldown, int maxUse, int beamColor)
     {
         return new StratagemProperties(inboundDuration, -1, cooldown, maxUse, beamColor, false, true, Optional.empty());
+    }
+
+    public static StratagemProperties withDepleted(int inboundDuration, int cooldown, int maxUse, int beamColor)
+    {
+        return new StratagemProperties(inboundDuration, -1, cooldown, maxUse, beamColor, true, true, Optional.empty());
     }
 }

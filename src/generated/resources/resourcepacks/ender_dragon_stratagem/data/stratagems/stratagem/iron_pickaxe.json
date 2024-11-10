@@ -1,0 +1,30 @@
+{
+  "code": "saswwd",
+  "name": {
+    "translate": "stratagem.stratagems.iron_pickaxe"
+  },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:iron_pickaxe"
+    }
+  },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "primary": {
+      "count": 1,
+      "id": "minecraft:iron_pickaxe"
+    }
+  },
+  "rule": {
+    "type": "stratagems:depleted"
+  },
+  "properties": {
+    "beam_color": -9185281,
+    "can_depleted": true,
+    "cooldown": 1200,
+    "inbound_duration": 100,
+    "max_use": 5
+  }
+}

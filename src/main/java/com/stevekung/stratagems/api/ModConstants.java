@@ -12,6 +12,7 @@ import com.stevekung.stratagems.api.references.ModRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.FastColor;
 
 public interface ModConstants
 {
@@ -19,6 +20,9 @@ public interface ModConstants
     Map<Character, Character> WASD_TO_ARROWS = Map.of('w', '↑', 'a', '←', 's', '↓', 'd', '→');
     String MOD_ID = "stratagems";
     Logger LOGGER = LoggerFactory.getLogger("Stratagems");
+
+    int BLUE_BEAM_COLOR = FastColor.ARGB32.color(115, 215, 255);
+    int RED_BEAM_COLOR = FastColor.ARGB32.color(255, 60, 60);
 
     static String charToArrow(char code)
     {

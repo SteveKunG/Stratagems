@@ -29,6 +29,7 @@ public class StratagemDataGenerator implements DataGeneratorEntrypoint
         pack.addProvider(DynamicRegistryProvider::new);
 
         new TestStratagemPackGenerator().onInitializeDataGenerator(dataGenerator);
+        new EnderDragonStratagemPackGenerator().onInitializeDataGenerator(dataGenerator);
     }
 
     @Override

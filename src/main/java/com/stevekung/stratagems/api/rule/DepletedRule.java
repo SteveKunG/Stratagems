@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.stevekung.stratagems.api.StratagemInstanceContext;
 import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.StratagemRules;
 import com.stevekung.stratagems.api.util.PacketUtils;
 import com.stevekung.stratagems.api.util.StratagemUtils;
@@ -37,35 +38,14 @@ public class DepletedRule implements StratagemRule
     public void onUse(StratagemInstanceContext context)
     {
         var instance = context.instance();
-        var player = context.player();
-        var server = context.server();
         var stratagem = instance.stratagem();
-        var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
         // Check has remaining use
         if (instance.maxUse > 0)
         {
+            context.instance().state = StratagemState.IN_USE;
             instance.maxUse--;
             LOGGER.info("{} stratagem has maxUse: {}", stratagem.name().getString(), instance.maxUse);
-        }
-        if (instance.maxUse == 0)
-        {
-            stratagemsData.remove(instance.getStratagem());            
-
-            // Send an update packet to its side
-            if (context.isServer())
-            {
-                PacketUtils.sendClientSetServerStratagemsPacket(server, stratagemsData);
-            }
-            else
-            {
-                if (player instanceof ServerPlayer serverPlayer)
-                {
-                    PacketUtils.sendClientSetPlayerStratagemsPacket(serverPlayer, stratagemsData);
-                }
-            }
-
-            LOGGER.info("{} stratagem has been removed", stratagem.name().getString());
         }
     }
 
@@ -74,10 +54,12 @@ public class DepletedRule implements StratagemRule
     {
         var instance = context.instance();
         var player = context.player();
+        var server = context.server();
         var stratagem = instance.stratagem();
         var stratagemName = stratagem.name().getString();
         var properties = stratagem.properties();
-        var level = context.isServer() ? context.server().overworld() : player.level();
+        var level = context.isServer() ? server.overworld() : player.level();
+        var stratagemsData = context.isServer() ? server.overworld().stratagemsData() : player.stratagemsData();
 
         if (!instance.isReady())
         {
@@ -111,8 +93,20 @@ public class DepletedRule implements StratagemRule
                 {
                     if (instance.maxUse == 0)
                     {
-                        instance.state = StratagemState.UNAVAILABLE;
-                        LOGGER.info("{} stratagem is now depleted!", stratagemName);
+                        // Send an update packet to its side
+                        if (context.isServer())
+                        {
+                            PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.REMOVE, instance);
+                        }
+                        else
+                        {
+                            if (player instanceof ServerPlayer serverPlayer)
+                            {
+                                PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.REMOVE, instance);
+                            }
+                        }
+                        stratagemsData.remove(instance.getStratagem());
+                        LOGGER.info("{} stratagem has been removed", stratagem.name().getString());
                         return;
                     }
                     LOGGER.info("{} stratagem switch state from {} to {}", stratagemName, instance.state, StratagemState.COOLDOWN);

@@ -1,0 +1,29 @@
+{
+  "code": "wsdaw",
+  "name": {
+    "translate": "stratagem.stratagems.reinforce"
+  },
+  "display": {
+    "type": "player_icon",
+    "player_icon": {
+      "properties": [
+        {
+          "name": "textures",
+          "value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZjVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0"
+        }
+      ]
+    }
+  },
+  "action": {
+    "type": "stratagems:reinforce"
+  },
+  "rule": {
+    "type": "stratagems:reinforce"
+  },
+  "properties": {
+    "beam_color": -9185281,
+    "cooldown": 2400,
+    "inbound_duration": 0,
+    "max_use": 20
+  }
+}

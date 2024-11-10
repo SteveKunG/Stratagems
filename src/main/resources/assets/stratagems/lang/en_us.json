@@ -10,6 +10,8 @@
 
   "dataPack.stratagem_test_pack.name": "Stratagem Test Pack",
   "dataPack.stratagem_test_pack.description": "Test Datapack for Stratagems",
+  "dataPack.ender_dragon_stratagem.name": "Ender Dragon Stratagem Pack",
+  "dataPack.ender_dragon_stratagem.description": "Stratagem Datapack for defeat the Ender Dragon",
 
   "stratagem.menu.label": "☠ Stratagems",
   "stratagem.menu.inbound": "Inbound",

@@ -1,0 +1,30 @@
+{
+  "code": "ssawds",
+  "name": {
+    "translate": "stratagem.stratagems.iron_sword"
+  },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:iron_sword"
+    }
+  },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "primary": {
+      "count": 1,
+      "id": "minecraft:iron_sword"
+    }
+  },
+  "rule": {
+    "type": "stratagems:depleted"
+  },
+  "properties": {
+    "beam_color": -9185281,
+    "can_depleted": true,
+    "cooldown": 1200,
+    "inbound_duration": 100,
+    "max_use": 5
+  }
+}

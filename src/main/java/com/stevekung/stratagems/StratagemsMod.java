@@ -60,6 +60,10 @@ public class StratagemsMod implements ModInitializer
                 .map(container -> ResourceManagerHelper.registerBuiltinResourcePack(ModConstants.id("stratagem_test_pack"), container, Component.translatable("dataPack.stratagem_test_pack.name"), ResourcePackActivationType.NORMAL))
                 .filter(success -> !success).ifPresent(success -> ModConstants.LOGGER.warn("Could not register Stratagem Test pack."));
 
+        FabricLoader.getInstance().getModContainer(ModConstants.MOD_ID)
+                .map(container -> ResourceManagerHelper.registerBuiltinResourcePack(ModConstants.id("ender_dragon_stratagem"), container, Component.translatable("dataPack.ender_dragon_stratagem.name"), ResourcePackActivationType.NORMAL))
+                .filter(success -> !success).ifPresent(success -> ModConstants.LOGGER.warn("Could not register Stratagem Test pack."));
+
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
             var player = context.player();

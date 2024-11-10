@@ -1,0 +1,28 @@
+{
+  "code": "swws",
+  "name": {
+    "translate": "stratagem.stratagems.crafting_table"
+  },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:crafting_table"
+    }
+  },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "primary": {
+      "count": 1,
+      "id": "minecraft:crafting_table"
+    }
+  },
+  "rule": {
+    "type": "stratagems:default"
+  },
+  "properties": {
+    "beam_color": -9185281,
+    "cooldown": 600,
+    "inbound_duration": 60
+  }
+}

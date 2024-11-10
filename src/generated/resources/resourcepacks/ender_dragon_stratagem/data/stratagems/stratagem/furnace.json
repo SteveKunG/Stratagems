@@ -1,0 +1,28 @@
+{
+  "code": "wssw",
+  "name": {
+    "translate": "stratagem.stratagems.furnace"
+  },
+  "display": {
+    "type": "item",
+    "item": {
+      "count": 1,
+      "id": "minecraft:furnace"
+    }
+  },
+  "action": {
+    "type": "stratagems:spawn_item",
+    "primary": {
+      "count": 1,
+      "id": "minecraft:furnace"
+    }
+  },
+  "rule": {
+    "type": "stratagems:default"
+  },
+  "properties": {
+    "beam_color": -9185281,
+    "cooldown": 600,
+    "inbound_duration": 60
+  }
+}
