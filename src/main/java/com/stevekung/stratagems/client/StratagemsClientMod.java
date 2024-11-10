@@ -554,7 +554,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
     private static boolean shouldRenderForMenu(ClientStratagemInstance instance)
     {
-        return instance.animationTime > -180f;
+        return instance.animationTime > -180f && instance.shouldDisplay;
     }
 
     private static boolean shouldRenderSingleBackground(ClientStratagemInstance instance)
