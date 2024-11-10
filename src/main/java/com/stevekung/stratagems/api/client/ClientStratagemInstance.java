@@ -16,6 +16,12 @@ public class ClientStratagemInstance extends StratagemInstance
     public ClientStratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay)
     {
         super(id, stratagem, inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay);
+
+        if (StratagemInputManager.getInstance().isMenuOpen())
+        {
+            this.animationTime = 0f;
+            this.visible = true;
+        }
     }
 
     public String getJammedName()
