@@ -35,6 +35,7 @@ import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.item.DyeColor;
@@ -117,7 +118,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new ClientStratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay());
+            var instance = new ClientStratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay(), entryData.randomize());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
@@ -318,6 +319,7 @@ public class StratagemsClientMod implements ClientModInitializer
             return;
         }
 
+        var random = minecraft.level.getRandom();
         var white = DyeColor.WHITE.getTextColor();
         var gray = DyeColor.GRAY.getTextColor();
         var lightGray = DyeColor.LIGHT_GRAY.getTextColor();
@@ -381,13 +383,19 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             var stratagem = instance.stratagem();
             var isBlocked = instance.state == StratagemState.BLOCKED;
-            var stratagemName = isBlocked && !StringUtil.isNullOrEmpty(instance.getJammedName()) ? Component.literal(instance.getJammedName()) : stratagem.name();
-            var code = stratagem.code();
+            var isRandomized = instance.randomize;
+            var stratagemName = isBlocked || isRandomized && !StringUtil.isNullOrEmpty(instance.getJammedName()) ? Component.literal(instance.getJammedName()) : stratagem.name();
+            var code = isRandomized && !StringUtil.isNullOrEmpty(instance.getRandomizedCode()) ? instance.getRandomizedCode() : stratagem.code();
             var codeChar = code.toCharArray();
             var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
             var combinedArrows = new StringBuilder();
             var statusText = Component.empty();
             var textColor = codeMatched ? white : gray;
+
+            if (isRandomized)
+            {
+                stratagemName = stratagemName.copy().withStyle(style -> style.withFont(ResourceLocation.withDefaultNamespace("alt")));
+            }
 
             if (!instance.selected && instance.animationTime >= xStart && instance.animationTime <= xStop)
             {
@@ -442,7 +450,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (manager.hasSelected() && instance.side == manager.getSelected().side)
             {
-                var equals = code.equals(manager.getSelected().getCode());
+                var equals = !StringUtil.isNullOrEmpty(manager.getSelected().getRandomizedCode()) ? code.equals(manager.getSelected().getRandomizedCode()) : code.equals(manager.getSelected().getCode());
 
                 if (equals)
                 {
@@ -469,6 +477,11 @@ public class StratagemsClientMod implements ClientModInitializer
                 max = statusWidth;
             }
 
+            var rangeMin = 0.0d;
+            var rangeMax = 0.5d;
+            var randomizeX = rangeMin + (rangeMax - rangeMin) * random.nextDouble();
+            var randomizeY = rangeMin + (rangeMax - rangeMin) * random.nextDouble();
+
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(instance.animationTime, 0, 0);
 
@@ -487,6 +500,13 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
                 else
                 {
+                    guiGraphics.pose().pushPose();
+
+                    if (isRandomized)
+                    {
+                        guiGraphics.pose().translate(randomizeX, randomizeY, 0);
+                    }
+
                     for (var i = 0; i < codeChar.length; i++)
                     {
                         var arrows = ModConstants.charToArrow(codeChar[i]);
@@ -496,6 +516,7 @@ public class StratagemsClientMod implements ClientModInitializer
                             guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, textColor);
                         }
                     }
+                    guiGraphics.pose().popPose();
                 }
 
                 if (!StringUtil.isNullOrEmpty(statusText.getString()))
@@ -507,14 +528,27 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     var inputCodeChars = inputCode.toCharArray();
 
+                    guiGraphics.pose().pushPose();
+
+                    if (isRandomized)
+                    {
+                        guiGraphics.pose().translate(randomizeX, randomizeY, 0);
+                    }
+
                     for (var i = 0; i < inputCodeChars.length; i++)
                     {
                         guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, gray);
                     }
+                    guiGraphics.pose().popPose();
                 }
 
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);
+
+                if (isRandomized)
+                {
+                    guiGraphics.pose().translate(randomizeX, randomizeY, 0);
+                }
 
                 if (isBlocked)
                 {

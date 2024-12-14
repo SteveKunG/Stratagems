@@ -14,6 +14,7 @@ import com.stevekung.stratagems.api.references.StratagemSounds;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.Player;
 
 public class StratagemInputManager
@@ -43,12 +44,30 @@ public class StratagemInputManager
 
     public static boolean noneMatch(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(player)).noneMatch(instance -> instance.getCode().startsWith(inputCode));
+        return all(player).stream().filter(instance -> instance.canUse(player)).noneMatch(instance ->
+        {
+            if (!StringUtil.isNullOrEmpty(instance.getRandomizedCode()))
+            {
+                return instance.getRandomizedCode().startsWith(inputCode);
+            }
+            return instance.getCode().startsWith(inputCode);
+        });
     }
 
     public static Optional<ClientStratagemInstance> getInstanceFromCode(String inputCode, Player player)
     {
-        return all(player).stream().filter(instance -> instance.canUse(player) && instance.getCode().equals(inputCode)).findFirst();
+        return all(player).stream().filter(instance ->
+        {
+            if (!instance.canUse(player))
+            {
+                return false;
+            }
+            if (!StringUtil.isNullOrEmpty(instance.getRandomizedCode()))
+            {
+                return instance.getRandomizedCode().equals(inputCode);
+            }
+            return instance.getCode().equals(inputCode);
+        }).findFirst();
     }
 
     public boolean isMenuOpen()

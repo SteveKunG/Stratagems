@@ -35,8 +35,9 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public StratagemState state;
     public final Side side;
     public final boolean shouldDisplay;
+    public boolean randomize;
 
-    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay)
+    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay, boolean randomize)
     {
         this.id = id;
         this.stratagem = stratagem;
@@ -48,6 +49,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         this.state = state;
         this.side = side;
         this.shouldDisplay = shouldDisplay;
+        this.randomize = randomize;
     }
 
     public void save(CompoundTag compoundTag)
@@ -75,6 +77,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
         compoundTag.putString(ModConstants.Tag.SIDE, this.side.getName());
         compoundTag.putBoolean(ModConstants.Tag.SHOULD_DISPLAY, this.shouldDisplay);
+        compoundTag.putBoolean(ModConstants.Tag.RANDOMIZE, this.randomize);
     }
 
     @Nullable
@@ -91,6 +94,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
             var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
             var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
             var shouldDisplay = compoundTag.getBoolean(ModConstants.Tag.SHOULD_DISPLAY);
+            var randomize = compoundTag.getBoolean(ModConstants.Tag.RANDOMIZE);
 
             if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
             {
@@ -109,7 +113,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
             {
                 maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
             }
-            return new StratagemInstance(id, stratagem.get(), inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay);
+            return new StratagemInstance(id, stratagem.get(), inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay, randomize);
         }
         return null;
     }

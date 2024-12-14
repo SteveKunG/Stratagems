@@ -9,13 +9,14 @@ import net.minecraft.core.Holder;
 public class ClientStratagemInstance extends StratagemInstance
 {
     private String jammedName = "";
+    private String randomizedCode = "";
     public float animationTime = -200f;
     public boolean visible;
     public boolean selected;
 
-    public ClientStratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay)
+    public ClientStratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay, boolean randomize)
     {
-        super(id, stratagem, inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay);
+        super(id, stratagem, inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay, randomize);
 
         if (StratagemInputManager.getInstance().isMenuOpen())
         {
@@ -32,5 +33,15 @@ public class ClientStratagemInstance extends StratagemInstance
     public void setJammedName(String jammedName)
     {
         this.jammedName = jammedName;
+    }
+
+    public String getRandomizedCode()
+    {
+        return this.randomizedCode;
+    }
+
+    public void setRandomizedCode(String randomizedCode)
+    {
+        this.randomizedCode = randomizedCode;
     }
 }

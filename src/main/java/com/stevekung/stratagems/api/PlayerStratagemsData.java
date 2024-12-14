@@ -60,7 +60,7 @@ public class PlayerStratagemsData implements StratagemsData
     public void add(Holder<Stratagem> holder, int id, boolean shouldDisplay)
     {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.cooldown(), properties.maxUse(), StratagemState.READY, StratagemInstance.Side.PLAYER, shouldDisplay);
+        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.cooldown(), properties.maxUse(), StratagemState.READY, StratagemInstance.Side.PLAYER, shouldDisplay, false);
         this.instances.put(holder, instance);
     }
 

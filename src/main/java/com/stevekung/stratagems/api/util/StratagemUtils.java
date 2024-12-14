@@ -7,14 +7,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.stevekung.stratagems.api.client.ClientStratagemInstance;
+import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemsData;
+import com.stevekung.stratagems.api.client.ClientStratagemInstance;
 import com.stevekung.stratagems.api.packet.StratagemEntryData;
+import com.stevekung.stratagems.api.references.ModRegistries;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
@@ -42,17 +45,17 @@ public class StratagemUtils
 
     public static Map<Holder<Stratagem>, ClientStratagemInstance> clientMapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        return entries.stream().map(entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
+        return entries.stream().map(entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay(), entry.randomize())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
     }
 
     public static List<StratagemEntryData> mapToEntry(StratagemsData stratagemsData)
     {
-        return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.lastMaxCooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
+        return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.lastMaxCooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay, instance.randomize)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
     public static Map<Holder<Stratagem>, ClientStratagemInstance> clientEntryToMap(Collection<StratagemEntryData> list, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay())));
+        return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay(), entry.randomize())));
     }
 
     public static Component decorateStratagemName(Component name, Holder<Stratagem> holder)
@@ -65,7 +68,7 @@ public class StratagemUtils
         return ComponentUtils.formatList(list, instance -> ComponentUtils.wrapInSquareBrackets(Component.literal(instance.getResourceKey().location().toString())).withStyle(ChatFormatting.GREEN));
     }
 
-    public static String generateJammedText(String text, RandomSource randomSource, double chance)
+    public static String generateJammedText(String text, RandomSource randomSource, double chance, boolean onlyAlphabetChars)
     {
         var jammedText = new StringBuilder(text);
 
@@ -75,12 +78,44 @@ public class StratagemUtils
             if (randomSource.nextDouble() < chance)
             {
                 // Replace the current character with a random character
-                var jammedChar = getJammedChars();
+                var jammedChar = onlyAlphabetChars ? getJammedAlphabetChars() : getJammedChars();
                 var randomChar = jammedChar.charAt(randomSource.nextInt(jammedChar.length()));
                 jammedText.setCharAt(i, randomChar);
             }
         }
         return jammedText.toString();
+    }
+
+    public static String generateRandomizeStratagemCode(RandomSource randomSource, RegistryAccess registryAccess)
+    {
+        var result = new StringBuilder();
+
+        if (randomSource.nextFloat() < 0.8f)
+        {
+            for (int i = 0; i < 4 + randomSource.nextInt(6); i++)
+            {
+                // Pick a random character from the allowed characters
+                char randomChar = ModConstants.ALLOWED_CODE.charAt(randomSource.nextInt(ModConstants.ALLOWED_CODE.length()));
+                result.append(randomChar);
+            }
+        }
+        else if (randomSource.nextFloat() < 0.2f)
+        {
+            // Pick a random existed stratagem code in the registry
+            var list = registryAccess.lookupOrThrow(ModRegistries.STRATAGEM).listElements().toList();
+            return list.stream().skip(randomSource.nextInt(list.size())).findFirst().get().value().code();
+        }
+        else if (randomSource.nextFloat() < 0.1f)
+        {
+            // Pick a random character from the allowed characters
+            char randomChar = ModConstants.ALLOWED_CODE.charAt(randomSource.nextInt(ModConstants.ALLOWED_CODE.length()));
+
+            for (int i = 0; i < randomSource.nextInt(6) + 4; i++)
+            {
+                result.append(randomChar);
+            }
+        }
+        return result.toString();
     }
 
     private static String getJammedChars()
@@ -92,5 +127,11 @@ public class StratagemUtils
                 "-=[]\\;',./" + // Unshifted
                 "`~" + // Shifted backtick
                 "{}|:\"<>?"; // Shifted symbols
+    }
+
+    private static String getJammedAlphabetChars()
+    {
+        return Component.translatable("stratagem.menu.jammed_uppercase").getString() + // Uppercase
+                Component.translatable("stratagem.menu.jammed_lowercase").getString(); // Lowercase
     }
 }

@@ -17,6 +17,7 @@ import net.minecraft.util.FastColor;
 public interface ModConstants
 {
     Map<Holder<Stratagem>, ClientStratagemInstance> CLIENT_SERVER_STRATAGEM_LIST = Maps.newLinkedHashMap();
+    String ALLOWED_CODE = "wasd";
     Map<Character, Character> WASD_TO_ARROWS = Map.of('w', '↑', 'a', '←', 's', '↓', 'd', '→');
     String MOD_ID = "stratagems";
     Logger LOGGER = LoggerFactory.getLogger("Stratagems");
@@ -78,5 +79,6 @@ public interface ModConstants
         String STATE = "state";
         String SIDE = "side";
         String SHOULD_DISPLAY = "should_display";
+        String RANDOMIZE = "randomize";
     }
 }

@@ -27,11 +27,30 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer
         {
             for (var instance : StratagemInputManager.all(this))
             {
-                if (instance.state == StratagemState.BLOCKED)
+                if (instance.state == StratagemState.BLOCKED && !instance.randomize)
                 {
                     var stratagem = instance.stratagem();
                     var stratagemName = stratagem.name();
-                    instance.setJammedName(StratagemUtils.generateJammedText(stratagemName.getString(), this.random, 0.3));
+                    instance.setJammedName(StratagemUtils.generateJammedText(stratagemName.getString(), this.random, 0.3, false));
+                }
+            }
+        }
+        if (this.level().getGameTime() % 40L == 0L)
+        {
+            for (var instance : StratagemInputManager.all(this))
+            {
+                var manager = StratagemInputManager.getInstance();
+
+                if (instance.randomize)
+                {
+                    var stratagem = instance.stratagem();
+                    var stratagemName = stratagem.name();
+                    instance.setJammedName(StratagemUtils.generateJammedText(stratagemName.getString(), this.random, 0.5, true));
+
+                    if (manager.getSelected() != instance)
+                    {
+                        instance.setRandomizedCode(StratagemUtils.generateRandomizeStratagemCode(this.random, this.registryAccess()));
+                    }
                 }
             }
         }
