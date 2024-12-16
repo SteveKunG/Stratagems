@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class PacketUtils
 {
     /**
-     * Send a stratagem update packet to client
+     * Send a stratagem update packet to the client
      */
     public static void sendClientUpdateStratagemPacket(MinecraftServer server, @Nullable ServerPlayer serverPlayer, UpdateStratagemPacket.Action action, StratagemInstance instance)
     {

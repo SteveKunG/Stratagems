@@ -6,7 +6,7 @@ import com.stevekung.stratagems.api.references.StratagemActions;
 /**
  * An empty stratagem action.
  * <p>
- * Using by stratagems that doesn't do an action in the world.
+ * Using by stratagems that don't do any action in the world.
  */
 public record EmptyAction() implements StratagemAction
 {

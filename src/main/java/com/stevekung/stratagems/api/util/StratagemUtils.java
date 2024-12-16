@@ -92,10 +92,10 @@ public class StratagemUtils
 
         if (randomSource.nextFloat() < 0.8f)
         {
-            for (int i = 0; i < 4 + randomSource.nextInt(6); i++)
+            for (var i = 0; i < 4 + randomSource.nextInt(6); i++)
             {
                 // Pick a random character from the allowed characters
-                char randomChar = ModConstants.ALLOWED_CODE.charAt(randomSource.nextInt(ModConstants.ALLOWED_CODE.length()));
+                var randomChar = ModConstants.ALLOWED_CODE.charAt(randomSource.nextInt(ModConstants.ALLOWED_CODE.length()));
                 result.append(randomChar);
             }
         }
@@ -108,12 +108,8 @@ public class StratagemUtils
         else if (randomSource.nextFloat() < 0.1f)
         {
             // Pick a random character from the allowed characters
-            char randomChar = ModConstants.ALLOWED_CODE.charAt(randomSource.nextInt(ModConstants.ALLOWED_CODE.length()));
-
-            for (int i = 0; i < randomSource.nextInt(6) + 4; i++)
-            {
-                result.append(randomChar);
-            }
+            var randomChar = ModConstants.ALLOWED_CODE.charAt(randomSource.nextInt(ModConstants.ALLOWED_CODE.length()));
+            result.append(String.valueOf(randomChar).repeat(Math.max(4, randomSource.nextInt(6) + 4)));
         }
         return result.toString();
     }

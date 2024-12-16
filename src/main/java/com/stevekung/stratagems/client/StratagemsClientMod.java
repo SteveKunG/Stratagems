@@ -261,7 +261,7 @@ public class StratagemsClientMod implements ClientModInitializer
             {
                 if (!instance.visible)
                 {
-                    // Clear selected stratagem after open menu
+                    // Clear selected stratagem after an open menu
                     if (instance.selected)
                     {
                         instance.selected = false;
@@ -556,7 +556,7 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
                 else
                 {
-                    renderIcon(guiGraphics, minecraft, instance, stratagem.display(), baseXIcon, baseYIcon + index * baseSpacing, isBlocked);
+                    renderIcon(guiGraphics, minecraft, instance, stratagem.display(), baseXIcon, baseYIcon + index * baseSpacing);
                 }
 
                 guiGraphics.pose().popPose();
@@ -626,35 +626,31 @@ public class StratagemsClientMod implements ClientModInitializer
         BufferUploader.drawWithShader(buffer.buildOrThrow());
     }
 
-    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y, boolean isBlocked)
+    private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y)
     {
         switch (display.type())
         {
             case ITEM -> display.itemStack().ifPresent(itemStack ->
             {
                 guiGraphics.renderItem(itemStack, x, y);
-                renderDecoratedCount(guiGraphics, itemStack, minecraft, instance, display, x, y, isBlocked);
+                renderDecoratedCount(guiGraphics, itemStack, minecraft, instance, display, x, y);
             });
             case TEXTURE -> display.texture().ifPresent(resourceLocation ->
             {
                 guiGraphics.blit(resourceLocation, x, y, 0, 0, 16, 16, 16, 16);
-                renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y, isBlocked);
+                renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y);
             });
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
             {
                 var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
                 PlayerFaceRenderer.draw(guiGraphics, supplier.get(), x, y, 16);
-                renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y, isBlocked);
+                renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y);
             });
         }
     }
 
-    private static void renderDecoratedCount(GuiGraphics guiGraphics, ItemStack itemStack, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y, boolean isBlocked)
+    private static void renderDecoratedCount(GuiGraphics guiGraphics, ItemStack itemStack, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y)
     {
-        if (isBlocked)
-        {
-            return;
-        }
         if (display.maxUseAsCount())
         {
             if (instance.maxUse > 0)
