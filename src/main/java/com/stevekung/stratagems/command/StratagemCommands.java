@@ -373,7 +373,7 @@ public class StratagemCommands
             PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.UPDATE, instance);
         }
 
-        source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.server.everything.success": "commands.stratagem.block.server.everything.success"), true);
+        source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.server.everything.success" : "commands.stratagem.block.server.everything.success"), true);
         return 1;
     }
 
@@ -387,7 +387,7 @@ public class StratagemCommands
         source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.player.everything.success" : "commands.stratagem.block.player.everything.success", serverPlayer.getDisplayName()), true);
         return 1;
     }
-    
+
     private static int setModifierAllStratagems(CommandSourceStack source, StratagemModifier modifier, boolean clear)
     {
         var server = source.getServer();
@@ -413,7 +413,7 @@ public class StratagemCommands
         source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.everything.success" : "commands.stratagem.modifier.set.everything.success", modifier.getTranslatedName()), true);
         return 1;
     }
-    
+
     private static int setStratagemModifier(CommandSourceStack source, Holder<Stratagem> holder, @Nullable ServerPlayer serverPlayer, StratagemModifier modifier, boolean clear) throws CommandSyntaxException
     {
         var server = source.getServer();
@@ -484,7 +484,7 @@ public class StratagemCommands
             PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.UPDATE, instance);
         }
 
-        source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.server.everything.success": "commands.stratagem.modifier.set.server.everything.success", modifier.getTranslatedName()), true);
+        source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.server.everything.success" : "commands.stratagem.modifier.set.server.everything.success", modifier.getTranslatedName()), true);
         return 1;
     }
 

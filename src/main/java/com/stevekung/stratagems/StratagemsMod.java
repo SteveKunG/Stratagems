@@ -127,7 +127,7 @@ public class StratagemsMod implements ModInitializer
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
         {
             var serverStratagems = server.overworld().stratagemsData();
-            ((ServerStratagemsData)serverStratagems).setDirty();
+            ((ServerStratagemsData) serverStratagems).setDirty();
             server.overworld().getDataStorage().save();
             ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.size(), serverStratagems.stream().map(instance -> instance.getResourceKey().location()).toList());
         });
