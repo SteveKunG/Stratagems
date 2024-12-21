@@ -79,6 +79,6 @@ public interface ModConstants
         String STATE = "state";
         String SIDE = "side";
         String SHOULD_DISPLAY = "should_display";
-        String RANDOMIZE = "randomize";
+        String MODIFIER = "modifier";
     }
 }

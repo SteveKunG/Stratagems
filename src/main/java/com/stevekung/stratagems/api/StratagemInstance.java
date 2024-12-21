@@ -35,9 +35,9 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public StratagemState state;
     public final Side side;
     public final boolean shouldDisplay;
-    public boolean randomize;
+    public StratagemModifier modifier;
 
-    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay, boolean randomize)
+    public StratagemInstance(int id, Holder<Stratagem> stratagem, int inboundDuration, int duration, int cooldown, int lastMaxCooldown, int maxUse, StratagemState state, Side side, boolean shouldDisplay, StratagemModifier modifier)
     {
         this.id = id;
         this.stratagem = stratagem;
@@ -49,7 +49,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         this.state = state;
         this.side = side;
         this.shouldDisplay = shouldDisplay;
-        this.randomize = randomize;
+        this.modifier = modifier;
     }
 
     public void save(CompoundTag compoundTag)
@@ -77,7 +77,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         compoundTag.putString(ModConstants.Tag.STATE, this.state.getName());
         compoundTag.putString(ModConstants.Tag.SIDE, this.side.getName());
         compoundTag.putBoolean(ModConstants.Tag.SHOULD_DISPLAY, this.shouldDisplay);
-        compoundTag.putBoolean(ModConstants.Tag.RANDOMIZE, this.randomize);
+        compoundTag.putString(ModConstants.Tag.MODIFIER, this.modifier.getSerializedName());
     }
 
     @Nullable
@@ -94,7 +94,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
             var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
             var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
             var shouldDisplay = compoundTag.getBoolean(ModConstants.Tag.SHOULD_DISPLAY);
-            var randomize = compoundTag.getBoolean(ModConstants.Tag.RANDOMIZE);
+            var modifier = StratagemModifier.byName(compoundTag.getString(ModConstants.Tag.MODIFIER));
 
             if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
             {
@@ -113,7 +113,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
             {
                 maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
             }
-            return new StratagemInstance(id, stratagem.get(), inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay, randomize);
+            return new StratagemInstance(id, stratagem.get(), inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay, modifier);
         }
         return null;
     }
@@ -155,6 +155,11 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     public void block(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer, boolean unblock)
     {
         this.getRule().onBlocked(StratagemInstanceContext.create(this, minecraftServer, player, isServer), unblock);
+    }
+
+    public void modified(@Nullable MinecraftServer minecraftServer, @Nullable Player player, boolean isServer, StratagemModifier modifier, boolean clear)
+    {
+        this.getRule().onModified(StratagemInstanceContext.create(this, minecraftServer, player, isServer), modifier, clear);
     }
 
     public boolean canUse(Player player)

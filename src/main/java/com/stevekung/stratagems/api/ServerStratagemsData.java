@@ -81,7 +81,7 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     public void add(Holder<Stratagem> holder, int id, boolean shouldDisplay)
     {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER, shouldDisplay, false);
+        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.cooldown(), properties.maxUse(), StratagemState.READY, Side.SERVER, shouldDisplay, StratagemModifier.NONE);
         this.instances.put(holder, instance);
         this.setDirty();
     }
@@ -125,6 +125,21 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     {
         this.instanceByHolder(holder).block(this.level.getServer(), null, true, unblock);
         this.setDirty();
+    }
+
+    @Override
+    public void modified(StratagemModifier modifier, boolean clear)
+    {
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().modified(this.level.getServer(), null, true, modifier, clear);
+        }
+    }
+
+    @Override
+    public void modified(Holder<Stratagem> holder, StratagemModifier modifier, boolean clear)
+    {
+        this.instanceByHolder(holder).modified(this.level.getServer(), null, true, modifier, clear);
     }
 
     @Override

@@ -45,17 +45,17 @@ public class StratagemUtils
 
     public static Map<Holder<Stratagem>, ClientStratagemInstance> clientMapToInstance(Collection<StratagemEntryData> entries, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        return entries.stream().map(entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay(), entry.randomize())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
+        return entries.stream().map(entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay(), entry.modifier())).collect(Collectors.toMap(StratagemInstance::getStratagem, Function.identity()));
     }
 
     public static List<StratagemEntryData> mapToEntry(StratagemsData stratagemsData)
     {
-        return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.lastMaxCooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay, instance.randomize)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
+        return stratagemsData.stream().map(instance -> new StratagemEntryData(instance.getStratagem().unwrapKey().orElseThrow(), instance.id, instance.inboundDuration, instance.duration, instance.cooldown, instance.lastMaxCooldown, instance.maxUse, instance.state, instance.side, instance.shouldDisplay, instance.modifier)).collect(Collectors.toCollection(Lists::newCopyOnWriteArrayList));
     }
 
     public static Map<Holder<Stratagem>, ClientStratagemInstance> clientEntryToMap(Collection<StratagemEntryData> list, Function<ResourceKey<Stratagem>, Holder<Stratagem>> function)
     {
-        return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay(), entry.randomize())));
+        return list.stream().collect(Collectors.toMap(entry -> function.apply(entry.stratagem()), entry -> new ClientStratagemInstance(entry.id(), function.apply(entry.stratagem()), entry.inboundDuration(), entry.duration(), entry.cooldown(), entry.lastMaxCooldown(), entry.maxUse(), entry.state(), entry.side(), entry.shouldDisplay(), entry.modifier())));
     }
 
     public static Component decorateStratagemName(Component name, Holder<Stratagem> holder)

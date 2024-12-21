@@ -32,6 +32,10 @@
   "stratagem.state.unavailable": "Unavailable",
   "stratagem.state.blocked": "Blocked",
 
+  "stratagem.modifier.randomize": "Randomize",
+
+  "argument.stratagemModifier.invalid": "Unknown stratagem modifier '%s'",
+
   "commands.stratagem.add.player.success": "Added %s stratagem to %s",
   "commands.stratagem.add.server.success": "Added %s stratagem to server",
   "commands.stratagem.add.player.failed": "%s already has the stratagem",
@@ -63,6 +67,21 @@
   "commands.stratagem.unblock.player.success": "%s's %s stratagem have been unblocked",
   "commands.stratagem.unblock.player.specific.failed": "Failed to unblock player stratagem",
   "commands.stratagem.unblock.server.specific.failed": "Failed to unblock server stratagem",
+
+  "commands.stratagem.modifier.set.everything.success": "Set %s modifier to all stratagems",
+  "commands.stratagem.modifier.set.server.success": "Set %s modifier to %s server stratagem",
+  "commands.stratagem.modifier.set.player.success": "Set %s modifier to %s's %s stratagem",
+  "commands.stratagem.modifier.set.server.everything.success": "Set %s modifier to server all stratagems",
+  "commands.stratagem.modifier.set.player.everything.success": "Set %s modifier to %s's stratagems",
+  "commands.stratagem.modifier.set.server.specific.failed": "Failed to set modifier to server stratagem",
+  "commands.stratagem.modifier.set.player.specific.failed": "Failed to set modifier to player stratagem",
+  "commands.stratagem.modifier.clear.everything.success": "Clear %s modifier to all stratagems",
+  "commands.stratagem.modifier.clear.server.success": "Clear %s modifier from %s server stratagem",
+  "commands.stratagem.modifier.clear.player.success": "Clear %s modifier from %s's %s stratagem",
+  "commands.stratagem.modifier.clear.server.everything.success": "Clear %s modifier from all server stratagems",
+  "commands.stratagem.modifier.clear.player.everything.success": "Clear %s modifier from all %s's stratagems",
+  "commands.stratagem.modifier.clear.server.specific.failed": "Failed to clear modifier to server stratagem",
+  "commands.stratagem.modifier.clear.player.specific.failed": "Failed to clear modifier to player stratagem",
 
   "commands.stratagem.reset.everything.success": "All Stratagems have been reset",
   "commands.stratagem.reset.server.everything.success": "All Server Stratagems have been reset",

@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.stevekung.stratagems.api.StratagemModifier;
 import com.stevekung.stratagems.api.StratagemState;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
 import com.stevekung.stratagems.api.util.StratagemUtils;
@@ -27,7 +28,7 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer
         {
             for (var instance : StratagemInputManager.all(this))
             {
-                if (instance.state == StratagemState.BLOCKED && !instance.randomize)
+                if (instance.state == StratagemState.BLOCKED && instance.modifier != StratagemModifier.RANDOMIZE)
                 {
                     var stratagem = instance.stratagem();
                     var stratagemName = stratagem.name();
@@ -41,7 +42,7 @@ public abstract class MixinLocalPlayer extends AbstractClientPlayer
             {
                 var manager = StratagemInputManager.getInstance();
 
-                if (instance.randomize)
+                if (instance.modifier == StratagemModifier.RANDOMIZE)
                 {
                     var stratagem = instance.stratagem();
                     var stratagemName = stratagem.name();

@@ -6,12 +6,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.stevekung.stratagems.api.Stratagem;
+import com.stevekung.stratagems.api.StratagemModifier;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.packet.ClearStratagemsPacket;
 import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.util.PacketUtils;
 import com.stevekung.stratagems.api.util.StratagemUtils;
+import com.stevekung.stratagems.command.argument.StratagemModifierArgument;
 
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -36,6 +38,10 @@ public class StratagemCommands
     private static final SimpleCommandExceptionType ERROR_BLOCK_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.block.server.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_UNBLOCK_PLAYER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.unblock.player.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_UNBLOCK_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.unblock.server.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_SET_MODIFIER_PLAYER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.modifier.set.player.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_CLEAR_MODIFIER_PLAYER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.modifier.clear.player.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_SET_MODIFIER_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.modifier.set.server.specific.failed"));
+    private static final SimpleCommandExceptionType ERROR_CLEAR_MODIFIER_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.modifier.clear.server.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_REMOVE_SERVER_SPECIFIC_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.remove.server.specific.failed"));
     private static final SimpleCommandExceptionType ERROR_LIST_EMPTY_SERVER = new SimpleCommandExceptionType(Component.translatable("commands.stratagem.list.server.empty"));
 
@@ -110,6 +116,38 @@ public class StratagemCommands
                                 .then(Commands.literal("*")
                                         .executes(commandContext -> blockAllServerStratagem(commandContext.getSource(), true)))))
 
+                .then(Commands.literal("modifier")
+                        .then(Commands.literal("set")
+                                .then(Commands.argument("modifier", StratagemModifierArgument.stratagemModifier())
+                                        .then(Commands.literal("*")
+                                                .executes(commandContext -> setModifierAllStratagems(commandContext.getSource(), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), false)))
+                                        .then(Commands.literal("player")
+                                                .then(Commands.argument("player", EntityArgument.players())
+                                                        .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                                                .executes(commandContext -> setStratagemModifier(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), EntityArgument.getPlayer(commandContext, "player"), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), false)))
+                                                        .then(Commands.literal("*")
+                                                                .executes(commandContext -> setModifierAllPlayerStratagem(commandContext.getSource(), EntityArgument.getPlayer(commandContext, "player"), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), false)))))
+                                        .then(Commands.literal("server")
+                                                .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                                        .executes(commandContext -> setStratagemModifier(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), null, StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), false)))
+                                                .then(Commands.literal("*")
+                                                        .executes(commandContext -> setModifierAllServerStratagem(commandContext.getSource(), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), false))))))
+                        .then(Commands.literal("clear")
+                                .then(Commands.argument("modifier", StratagemModifierArgument.stratagemModifier())
+                                        .then(Commands.literal("*")
+                                                .executes(commandContext -> setModifierAllStratagems(commandContext.getSource(), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), true)))
+                                        .then(Commands.literal("player")
+                                                .then(Commands.argument("player", EntityArgument.players())
+                                                        .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                                                .executes(commandContext -> setStratagemModifier(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), EntityArgument.getPlayer(commandContext, "player"), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), true)))
+                                                        .then(Commands.literal("*")
+                                                                .executes(commandContext -> setModifierAllPlayerStratagem(commandContext.getSource(), EntityArgument.getPlayer(commandContext, "player"), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), true)))))
+                                        .then(Commands.literal("server")
+                                                .then(Commands.argument("stratagem", ResourceArgument.resource(context, ModRegistries.STRATAGEM))
+                                                        .executes(commandContext -> setStratagemModifier(commandContext.getSource(), ResourceArgument.getResource(commandContext, "stratagem", ModRegistries.STRATAGEM), null, StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), true)))
+                                                .then(Commands.literal("*")
+                                                        .executes(commandContext -> setModifierAllServerStratagem(commandContext.getSource(), StratagemModifierArgument.getStratagemModifier(commandContext, "modifier"), true)))))))
+
                 .then(Commands.literal("reset")
                         .then(Commands.literal("*")
                                 .executes(commandContext -> resetAllStratagems(commandContext.getSource())))
@@ -131,8 +169,7 @@ public class StratagemCommands
                                 .then(Commands.argument("player", EntityArgument.players())
                                         .executes(commandContext -> listPlayerStratagems(commandContext.getSource(), EntityArgument.getPlayer(commandContext, "player")))))
                         .then(Commands.literal("server")
-                                .executes(commandContext -> listServerStratagems(commandContext.getSource()))))
-        );
+                                .executes(commandContext -> listServerStratagems(commandContext.getSource())))));
         //@formatter:on
     }
 
@@ -348,6 +385,106 @@ public class StratagemCommands
             PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.UPDATE, instance);
         }
         source.sendSuccess(() -> Component.translatable(unblock ? "commands.stratagem.unblock.player.everything.success" : "commands.stratagem.block.player.everything.success", serverPlayer.getDisplayName()), true);
+        return 1;
+    }
+    
+    private static int setModifierAllStratagems(CommandSourceStack source, StratagemModifier modifier, boolean clear)
+    {
+        var server = source.getServer();
+        var serverStratagems = server.overworld().stratagemsData();
+
+        serverStratagems.modified(modifier, clear);
+
+        for (var instance : serverStratagems.listInstances())
+        {
+            PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.UPDATE, instance);
+        }
+
+        server.getPlayerList().getPlayers().forEach(serverPlayer ->
+        {
+            serverPlayer.stratagemsData().modified(modifier, clear);
+
+            for (var instance : serverPlayer.stratagemsData().listInstances())
+            {
+                PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.UPDATE, instance);
+            }
+        });
+
+        source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.everything.success" : "commands.stratagem.modifier.set.everything.success", modifier.getTranslatedName()), true);
+        return 1;
+    }
+    
+    private static int setStratagemModifier(CommandSourceStack source, Holder<Stratagem> holder, @Nullable ServerPlayer serverPlayer, StratagemModifier modifier, boolean clear) throws CommandSyntaxException
+    {
+        var server = source.getServer();
+        var isPlayer = serverPlayer != null;
+        var stratagemsData = isPlayer ? serverPlayer.stratagemsData() : server.overworld().stratagemsData();
+        var stratagem = holder.value();
+
+        if (StratagemUtils.noneMatch(stratagemsData, holder))
+        {
+            if (isPlayer)
+            {
+                if (clear)
+                {
+                    throw ERROR_CLEAR_MODIFIER_PLAYER_SPECIFIC_FAILED.create();
+                }
+                else
+                {
+                    throw ERROR_SET_MODIFIER_PLAYER_SPECIFIC_FAILED.create();
+                }
+            }
+            else
+            {
+                if (clear)
+                {
+                    throw ERROR_CLEAR_MODIFIER_SERVER_SPECIFIC_FAILED.create();
+                }
+                else
+                {
+                    throw ERROR_SET_MODIFIER_SERVER_SPECIFIC_FAILED.create();
+                }
+            }
+        }
+
+        stratagemsData.modified(holder, modifier, clear);
+        PacketUtils.sendClientUpdateStratagemPacket(server, serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
+
+        if (isPlayer)
+        {
+            source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.player.success" : "commands.stratagem.modifier.set.player.success", modifier.getTranslatedName(), serverPlayer.getDisplayName(), StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
+        }
+        else
+        {
+            source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.server.success" : "commands.stratagem.modifier.set.server.success", modifier.getTranslatedName(), StratagemUtils.decorateStratagemName(stratagem.name(), holder)), true);
+        }
+        return 1;
+    }
+
+    private static int setModifierAllPlayerStratagem(CommandSourceStack source, ServerPlayer serverPlayer, StratagemModifier modifier, boolean clear)
+    {
+        for (var instance : serverPlayer.stratagemsData().listInstances())
+        {
+            instance.modified(source.getServer(), serverPlayer, false, modifier, clear);
+            PacketUtils.sendClientUpdatePacket2P(serverPlayer, UpdateStratagemPacket.Action.UPDATE, instance);
+        }
+        source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.player.everything.success" : "commands.stratagem.modifier.set.player.everything.success", modifier.getTranslatedName(), serverPlayer.getDisplayName()), true);
+        return 1;
+    }
+
+    private static int setModifierAllServerStratagem(CommandSourceStack source, StratagemModifier modifier, boolean clear)
+    {
+        var server = source.getServer();
+        var stratagemsData = server.overworld().stratagemsData();
+
+        stratagemsData.modified(modifier, clear);
+
+        for (var instance : stratagemsData.listInstances())
+        {
+            PacketUtils.sendClientUpdatePacketS2P(server, UpdateStratagemPacket.Action.UPDATE, instance);
+        }
+
+        source.sendSuccess(() -> Component.translatable(clear ? "commands.stratagem.modifier.clear.server.everything.success": "commands.stratagem.modifier.set.server.everything.success", modifier.getTranslatedName()), true);
         return 1;
     }
 

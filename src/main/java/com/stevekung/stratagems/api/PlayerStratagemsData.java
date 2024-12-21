@@ -60,7 +60,7 @@ public class PlayerStratagemsData implements StratagemsData
     public void add(Holder<Stratagem> holder, int id, boolean shouldDisplay)
     {
         var properties = holder.value().properties();
-        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.cooldown(), properties.maxUse(), StratagemState.READY, StratagemInstance.Side.PLAYER, shouldDisplay, false);
+        var instance = new StratagemInstance(id, holder, properties.inboundDuration(), properties.duration(), properties.cooldown(), properties.cooldown(), properties.maxUse(), StratagemState.READY, StratagemInstance.Side.PLAYER, shouldDisplay, StratagemModifier.NONE);
         this.instances.put(holder, instance);
     }
 
@@ -98,6 +98,21 @@ public class PlayerStratagemsData implements StratagemsData
     public void block(Holder<Stratagem> holder, boolean unblock)
     {
         this.instanceByHolder(holder).block(this.player.getServer(), this.player, false, unblock);
+    }
+
+    @Override
+    public void modified(StratagemModifier modifier, boolean clear)
+    {
+        for (var entry : this.instances.entrySet())
+        {
+            entry.getValue().modified(this.player.getServer(), this.player, false, modifier, clear);
+        }
+    }
+
+    @Override
+    public void modified(Holder<Stratagem> holder, StratagemModifier modifier, boolean clear)
+    {
+        this.instanceByHolder(holder).modified(this.player.getServer(), this.player, false, modifier, clear);
     }
 
     @Override

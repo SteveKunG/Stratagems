@@ -1,6 +1,7 @@
 package com.stevekung.stratagems.api.rule;
 
 import com.stevekung.stratagems.api.StratagemInstanceContext;
+import com.stevekung.stratagems.api.StratagemModifier;
 import com.stevekung.stratagems.api.StratagemState;
 
 public interface StratagemRule
@@ -51,6 +52,25 @@ public interface StratagemRule
         else
         {
             context.instance().state = StratagemState.BLOCKED;
+        }
+    }
+
+    /**
+     * Called when being set or clear modifier by command
+     *
+     * @param context this stratagem context
+     * @param modifier stratagem modifier to apply
+     * @param clear clear a stratagem modifier flag
+     */
+    default void onModified(StratagemInstanceContext context, StratagemModifier modifier, boolean clear)
+    {
+        switch (modifier)
+        {
+            case RANDOMIZE:
+                context.instance().modifier = clear ? StratagemModifier.NONE : StratagemModifier.RANDOMIZE;
+                break;
+            default:
+                break;
         }
     }
 

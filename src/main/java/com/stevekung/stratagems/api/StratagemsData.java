@@ -31,6 +31,10 @@ public interface StratagemsData
 
     void block(Holder<Stratagem> holder, boolean unblock);
 
+    void modified(StratagemModifier modifier, boolean clear);
+
+    void modified(Holder<Stratagem> holder, StratagemModifier modifier, boolean clear);
+
     void clear();
 
     Map<Holder<Stratagem>, StratagemInstance> instances();

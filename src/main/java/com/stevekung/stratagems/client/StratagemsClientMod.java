@@ -9,10 +9,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.logging.LogUtils;
-import com.stevekung.stratagems.api.ModConstants;
-import com.stevekung.stratagems.api.StratagemDisplay;
-import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.StratagemState;
+import com.stevekung.stratagems.api.*;
 import com.stevekung.stratagems.api.client.ClientStratagemInstance;
 import com.stevekung.stratagems.api.client.StratagemInputManager;
 import com.stevekung.stratagems.api.packet.*;
@@ -118,7 +115,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var entryData = payload.entryData();
             var level = context.client().level;
             var holder = level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(entryData.stratagem());
-            var instance = new ClientStratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay(), entryData.randomize());
+            var instance = new ClientStratagemInstance(entryData.id(), holder, entryData.inboundDuration(), entryData.duration(), entryData.cooldown(), entryData.lastMaxCooldown(), entryData.maxUse(), entryData.state(), entryData.side(), entryData.shouldDisplay(), entryData.modifier());
 
             if (entryData.side() == StratagemInstance.Side.SERVER)
             {
@@ -383,7 +380,7 @@ public class StratagemsClientMod implements ClientModInitializer
         {
             var stratagem = instance.stratagem();
             var isBlocked = instance.state == StratagemState.BLOCKED;
-            var isRandomized = instance.randomize;
+            var isRandomized = instance.modifier == StratagemModifier.RANDOMIZE;
             var stratagemName = isBlocked || isRandomized && !StringUtil.isNullOrEmpty(instance.getJammedName()) ? Component.literal(instance.getJammedName()) : stratagem.name();
             var code = isRandomized && !StringUtil.isNullOrEmpty(instance.getRandomizedCode()) ? instance.getRandomizedCode() : stratagem.code();
             var codeChar = code.toCharArray();
