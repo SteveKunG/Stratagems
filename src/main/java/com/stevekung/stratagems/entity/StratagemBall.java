@@ -5,7 +5,6 @@ import java.util.Optional;
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
-import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
 import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
 import com.stevekung.stratagems.api.references.ModRegistries;
@@ -123,18 +122,17 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             var holder = this.getVariant();
             var stratagemPod = new StratagemPod(ModEntities.STRATAGEM_POD, this.level());
             stratagemPod.setVariant(holder);
+            stratagemPod.setOwner(this.getOwner());
             stratagemPod.moveTo(this.blockPosition(), 0.0f, 0.0f);
-            this.level().addFreshEntity(stratagemPod);
 
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {
-                var stratagemContext = new StratagemActionContext(serverPlayer, serverLevel, this.blockPosition(), this.random);
                 var stratagemsData = this.getSide() == StratagemInstance.Side.SERVER ? serverLevel.getServer().overworld().stratagemsData() : serverPlayer.stratagemsData();
 
                 if (stratagemsData.canUse(holder, serverPlayer))
                 {
-                    holder.value().action().action(stratagemContext);
                     stratagemsData.use(holder, serverPlayer);
+                    stratagemPod.setInboundTick(stratagemsData.instanceByHolder(holder).inboundDuration);
 
                     if (this.getSide() == StratagemInstance.Side.SERVER)
                     {
@@ -155,6 +153,8 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             {
                 ModConstants.LOGGER.warn("Stratagem owner is {} rather than a player!", this.getOwner());
             }
+
+            this.level().addFreshEntity(stratagemPod);
 
             this.playSound(StratagemSounds.STRATAGEM_LAND, 1f, 1.0f);
             this.discard();
