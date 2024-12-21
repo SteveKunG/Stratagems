@@ -1,4 +1,4 @@
-package com.stevekung.stratagems.registry;
+package com.stevekung.stratagems.datagen;
 
 import java.util.Optional;
 
