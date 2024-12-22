@@ -381,7 +381,7 @@ public class StratagemsClientMod implements ClientModInitializer
             var stratagem = instance.stratagem();
             var isBlocked = instance.state == StratagemState.BLOCKED;
             var isRandomized = instance.modifier == StratagemModifier.RANDOMIZE;
-            var stratagemName = isBlocked || isRandomized && !StringUtil.isNullOrEmpty(instance.getJammedName()) ? Component.literal(instance.getJammedName()) : stratagem.name();
+            var stratagemName = (isBlocked || isRandomized) && !StringUtil.isNullOrEmpty(instance.getJammedName()) ? Component.literal(instance.getJammedName()) : stratagem.name();
             var code = isRandomized && !StringUtil.isNullOrEmpty(instance.getRandomizedCode()) ? instance.getRandomizedCode() : stratagem.code();
             var codeChar = code.toCharArray();
             var codeMatched = code.startsWith(inputCode) && instance.canUse(player);
