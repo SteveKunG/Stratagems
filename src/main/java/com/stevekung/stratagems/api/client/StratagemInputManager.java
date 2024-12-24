@@ -103,7 +103,7 @@ public class StratagemInputManager
     public void clearSelected()
     {
         this.selected = null;
-        this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
+        this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.location(), SoundSource.PLAYERS);
     }
 
     public boolean hasSelected()

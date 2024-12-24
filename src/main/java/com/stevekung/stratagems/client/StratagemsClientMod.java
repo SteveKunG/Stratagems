@@ -21,7 +21,6 @@ import com.stevekung.stratagems.registry.ModEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
@@ -29,12 +28,16 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
-import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ShaderDefines;
+import net.minecraft.client.renderer.ShaderProgram;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.StringUtil;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -48,12 +51,12 @@ public class StratagemsClientMod implements ClientModInitializer
     private static final float xStop = 0f;
     private static final float speed = 100f;
 
-    private static ShaderInstance staticNoiseShader;
+    private static final ShaderProgram STATIC_NOISE = new ShaderProgram(ModConstants.id("core/static_noise"), DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
 
     @Override
     public void onInitializeClient()
     {
-        CoreShaderRegistrationCallback.EVENT.register(context -> context.register(ModConstants.id("static_noise"), DefaultVertexFormat.POSITION_TEX, program -> staticNoiseShader = program));
+        CoreShaders.getProgramsToPreload().add(STATIC_NOISE);
 
         KeyBindings.init();
 
@@ -161,14 +164,14 @@ public class StratagemsClientMod implements ClientModInitializer
             return;
         }
 
-        minecraft.getProfiler().push("stratagemClient");
+        Profiler.get().push("stratagemClient");
 
         if (!minecraft.isPaused() && level.tickRateManager().runsNormally())
         {
             ModConstants.CLIENT_SERVER_STRATAGEM_LIST.values().forEach(instance -> instance.tick(player));
         }
 
-        minecraft.getProfiler().pop();
+        Profiler.get().pop();
 
         var manager = StratagemInputManager.getInstance();
 
@@ -320,7 +323,7 @@ public class StratagemsClientMod implements ClientModInitializer
         var white = DyeColor.WHITE.getTextColor();
         var gray = DyeColor.GRAY.getTextColor();
         var lightGray = DyeColor.LIGHT_GRAY.getTextColor();
-        var grayAlpha = FastColor.ARGB32.color(128, 128, 128, 128);
+        var grayAlpha = ARGB.color(128, 128, 128, 128);
         var label = Component.translatable("stratagem.menu.label");
 
         label.append(" || ")
@@ -613,7 +616,7 @@ public class StratagemsClientMod implements ClientModInitializer
         var size = 16;
         var zOffset = 300;
 
-        RenderSystem.setShader(() -> staticNoiseShader);
+        RenderSystem.setShader(STATIC_NOISE);
         var matrix4f = guiGraphics.pose().last().pose();
         var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         buffer.addVertex(matrix4f, x, y, zOffset).setUv(0.0F, 0.0F); // top left
@@ -634,7 +637,7 @@ public class StratagemsClientMod implements ClientModInitializer
             });
             case TEXTURE -> display.texture().ifPresent(resourceLocation ->
             {
-                guiGraphics.blit(resourceLocation, x, y, 0, 0, 16, 16, 16, 16);
+                guiGraphics.blit(RenderType::guiTextured, resourceLocation, x, y, 0, 0, 16, 16, 16, 16);
                 renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y);
             });
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->

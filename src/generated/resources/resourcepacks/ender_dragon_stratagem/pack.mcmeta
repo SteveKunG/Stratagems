@@ -3,10 +3,10 @@
     "description": {
       "translate": "dataPack.ender_dragon_stratagem.description"
     },
-    "pack_format": 48,
+    "pack_format": 61,
     "supported_formats": [
-      34,
-      48
+      46,
+      61
     ]
   }
 }

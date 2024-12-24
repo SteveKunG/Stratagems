@@ -33,6 +33,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class StratagemsMod implements ModInitializer
 {
@@ -71,7 +74,7 @@ public class StratagemsMod implements ModInitializer
             var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
-            var stratagemBall = new StratagemBall(level, player);
+            var stratagemBall = new StratagemBall(level, player, new ItemStack(Items.SNOWBALL)); // TODO Temp
             stratagemBall.setVariant(holder);
             stratagemBall.setSide(payload.side());
             stratagemBall.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
@@ -128,7 +131,7 @@ public class StratagemsMod implements ModInitializer
         {
             var serverStratagems = server.overworld().stratagemsData();
             ((ServerStratagemsData) serverStratagems).setDirty();
-            server.overworld().getDataStorage().save();
+            server.overworld().getDataStorage().saveAndJoin();
             ModConstants.LOGGER.info("This world has {} stratagem(s): {}", serverStratagems.size(), serverStratagems.stream().map(instance -> instance.getResourceKey().location()).toList());
         });
 
@@ -146,14 +149,14 @@ public class StratagemsMod implements ModInitializer
 
         ServerTickEvents.START_SERVER_TICK.register(server ->
         {
-            server.getProfiler().push("stratagemServer");
+            Profiler.get().push("stratagemServer");
 
             if (server.tickRateManager().runsNormally())
             {
                 server.overworld().stratagemsData().tick();
             }
 
-            server.getProfiler().pop();
+            Profiler.get().pop();
         });
     }
 

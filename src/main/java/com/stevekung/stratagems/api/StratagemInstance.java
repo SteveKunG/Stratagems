@@ -83,7 +83,7 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     @Nullable
     public static StratagemInstance load(CompoundTag compoundTag, Level level)
     {
-        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey));
+        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey));
 
         if (stratagem.isPresent())
         {

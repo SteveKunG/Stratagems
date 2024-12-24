@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.VariantHolder;
@@ -38,7 +39,6 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
     public StratagemPod(EntityType<? extends StratagemPod> entityType, Level level)
     {
         super(entityType, level);
-        this.noCulling = true;
     }
 
     @Override
@@ -61,11 +61,17 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
     }
 
     @Override
+    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount)
+    {
+        return false;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder)
     {
         var registryAccess = this.registryAccess();
-        var registry = registryAccess.registryOrThrow(ModRegistries.STRATAGEM);
-        builder.define(DATA_STRATAGEM, registry.getHolder(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
+        var registry = registryAccess.lookupOrThrow(ModRegistries.STRATAGEM);
+        builder.define(DATA_STRATAGEM, registry.get(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
     }
 
     @Override
@@ -95,7 +101,7 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
     @Override
     public void readAdditionalSaveData(CompoundTag compound)
     {
-        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).ifPresent(this::setVariant);
+        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey)).ifPresent(this::setVariant);
 
         if (compound.hasUUID("Owner"))
         {

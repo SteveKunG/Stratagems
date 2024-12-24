@@ -4,8 +4,8 @@
     "srcrgb": "srcalpha",
     "dstrgb": "1-srcalpha"
   },
-  "vertex": "stratagems:static_noise",
-  "fragment": "stratagems:static_noise",
+  "vertex": "stratagems:core/static_noise",
+  "fragment": "stratagems:core/static_noise",
   "samplers": [
       { "name": "Sampler0" }
   ],

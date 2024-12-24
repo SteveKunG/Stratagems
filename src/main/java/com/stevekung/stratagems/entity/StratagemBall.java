@@ -27,6 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.VariantHolder;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -42,22 +43,22 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
         super(entityType, level);
     }
 
-    public StratagemBall(Level level, LivingEntity shooter)
+    public StratagemBall(Level level, LivingEntity shooter, ItemStack itemStack)
     {
-        super(ModEntities.STRATAGEM_BALL, shooter, level);
+        super(ModEntities.STRATAGEM_BALL, shooter, level, itemStack);
     }
 
-    public StratagemBall(Level level, double x, double y, double z)
+    public StratagemBall(Level level, double x, double y, double z, ItemStack itemStack)
     {
-        super(ModEntities.STRATAGEM_BALL, x, y, z, level);
+        super(ModEntities.STRATAGEM_BALL, x, y, z, level, itemStack);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder)
     {
         super.defineSynchedData(builder);
-        var registry = this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM);
-        builder.define(DATA_STRATAGEM, registry.getHolder(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
+        var registry = this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM);
+        builder.define(DATA_STRATAGEM, registry.get(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
         builder.define(DATA_STRATAGEM_SIDE, StratagemInstance.Side.SERVER);
     }
 
@@ -94,7 +95,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
     public void readAdditionalSaveData(CompoundTag compound)
     {
         super.readAdditionalSaveData(compound);
-        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().registryOrThrow(ModRegistries.STRATAGEM).getHolder(resourceKey)).ifPresent(this::setVariant);
+        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey)).ifPresent(this::setVariant);
     }
 
     @Override

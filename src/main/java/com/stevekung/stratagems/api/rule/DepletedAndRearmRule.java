@@ -102,7 +102,7 @@ public class DepletedAndRearmRule implements StratagemRule
             {
                 var replenisherKey = replenisherOptional.get();
                 var registryAccess = context.isServer() ? server.registryAccess() : player.level().registryAccess();
-                var replenisherStratagem = registryAccess.registryOrThrow(ModRegistries.STRATAGEM).getHolderOrThrow(replenisherKey);
+                var replenisherStratagem = registryAccess.lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(replenisherKey);
 
                 if (!StratagemUtils.anyMatch(stratagemsData, replenisherStratagem))
                 {
