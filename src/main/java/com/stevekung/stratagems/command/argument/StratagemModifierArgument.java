@@ -37,7 +37,6 @@ public class StratagemModifierArgument implements ArgumentType<StratagemModifier
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public StratagemModifier parse(StringReader reader) throws CommandSyntaxException
     {
         var string = reader.readUnquotedString();
