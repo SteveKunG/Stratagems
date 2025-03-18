@@ -2,6 +2,8 @@ package com.stevekung.stratagems.api;
 
 import java.util.Locale;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 
@@ -15,6 +17,7 @@ public enum StratagemState implements StringRepresentable
     UNAVAILABLE,
     BLOCKED;
 
+    public static final Codec<StratagemState> CODEC = StringRepresentable.fromEnum(StratagemState::values);
     private static final StratagemState[] VALUES = values();
 
     public static StratagemState byName(String name)

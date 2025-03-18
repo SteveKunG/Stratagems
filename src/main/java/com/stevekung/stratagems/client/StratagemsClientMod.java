@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -28,10 +27,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
-import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderDefines;
-import net.minecraft.client.renderer.ShaderProgram;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -51,12 +47,13 @@ public class StratagemsClientMod implements ClientModInitializer
     private static final float xStop = 0f;
     private static final float speed = 100f;
 
-    private static final ShaderProgram STATIC_NOISE = new ShaderProgram(ModConstants.id("core/static_noise"), DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
+    //TODO
+//    private static final ShaderProgram STATIC_NOISE = new ShaderProgram(ModConstants.id("core/static_noise"), DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
 
     @Override
     public void onInitializeClient()
     {
-        CoreShaders.getProgramsToPreload().add(STATIC_NOISE);
+//        CoreShaders.getProgramsToPreload().add(STATIC_NOISE); TODO
 
         KeyBindings.init();
 
@@ -616,14 +613,14 @@ public class StratagemsClientMod implements ClientModInitializer
         var size = 16;
         var zOffset = 300;
 
-        RenderSystem.setShader(STATIC_NOISE);
+//        RenderSystem.setShader(STATIC_NOISE);TODO
         var matrix4f = guiGraphics.pose().last().pose();
         var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         buffer.addVertex(matrix4f, x, y, zOffset).setUv(0.0F, 0.0F); // top left
         buffer.addVertex(matrix4f, x, y + size, zOffset).setUv(1.0F, 0.0F); // bottom left
         buffer.addVertex(matrix4f, x + size, y + size, zOffset).setUv(1.0F, 1.0F); // bottom right
         buffer.addVertex(matrix4f, x + size, y, zOffset).setUv(0.0F, 1.0F); // top right
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
+//        BufferUploader.drawWithShader(buffer.buildOrThrow());TODO
     }
 
     private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y)

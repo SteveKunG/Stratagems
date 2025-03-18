@@ -1,39 +1,63 @@
 package com.stevekung.stratagems.api;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.api.StratagemInstance.Side;
+import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.util.CustomDataFixTypes;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 public class ServerStratagemsData extends SavedData implements StratagemsData
 {
-    private static final String STRATAGEM_FILE_ID = "server_stratagems";
-    private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
-    private final ServerLevel level;
-    private int tick;
-    private int nextAvailableId;
+    public static final Codec<ServerStratagemsData> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(
+                            StratagemWithId.CODEC.listOf().optionalFieldOf("stratagems", List.of()).forGetter(data -> data.instances.entrySet().stream().map(StratagemWithId::from).toList()),
+                            Codec.INT.fieldOf("next_id").forGetter(data -> data.nextAvailableId),
+                            Codec.INT.fieldOf("tick").forGetter(data -> data.tick))
+                    .apply(instance, ServerStratagemsData::new));
 
-    public static SavedData.Factory<ServerStratagemsData> factory(ServerLevel level)
+    public static final SavedDataType<ServerStratagemsData> TYPE = new SavedDataType<>("server_stratagems",
+            context -> new ServerStratagemsData(context.levelOrThrow()), context -> CODEC, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
+
+    private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
+    private ServerLevel level;
+    private int nextAvailableId;
+    private int tick;
+
+    public ServerStratagemsData()
     {
-        return new SavedData.Factory<>(() -> new ServerStratagemsData(level), (compoundTag, provider) -> load(level, compoundTag), CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
+        this.setDirty();
     }
 
     public ServerStratagemsData(ServerLevel level)
     {
+        this();
         this.level = level;
-        this.setDirty();
+    }
+
+    public ServerStratagemsData(List<StratagemWithId> list, int nextAvailableId, int tick)
+    {
+        for (var stratagemWithId : list)
+        {
+            this.instances.put(stratagemWithId.stratagem, stratagemWithId.instance);
+        }
+        this.nextAvailableId = nextAvailableId;
+        this.tick = tick;
     }
 
     @Override
@@ -186,45 +210,9 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         return this.instances.get(holder);
     }
 
-    @Override
-    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider)
+    public static ServerStratagemsData load(CompoundTag compoundTag)
     {
-        var listTag = new ListTag();
-
-        for (var instance : this.listInstances())
-        {
-            var instanceTag = new CompoundTag();
-            instance.save(instanceTag);
-            listTag.add(instanceTag);
-        }
-
-        compoundTag.put(ModConstants.Tag.STRATAGEMS, listTag);
-        compoundTag.putInt(ModConstants.Tag.TICK, this.tick);
-        compoundTag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
-        return compoundTag;
-    }
-
-    public static ServerStratagemsData load(ServerLevel level, CompoundTag compoundTag)
-    {
-        var data = new ServerStratagemsData(level);
-        data.tick = compoundTag.getInt(ModConstants.Tag.TICK);
-        data.nextAvailableId = compoundTag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
-
-        if (compoundTag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
-        {
-            var listTag = compoundTag.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
-
-            for (var i = 0; i < listTag.size(); i++)
-            {
-                var instance = StratagemInstance.load(listTag.getCompound(i), level);
-
-                if (instance != null)
-                {
-                    data.instances.put(instance.getStratagem(), instance);
-                }
-            }
-        }
-        return data;
+        return CODEC.parse(NbtOps.INSTANCE, compoundTag).resultOrPartial().orElseGet(ServerStratagemsData::new);
     }
 
     private int getUniqueId()
@@ -232,8 +220,16 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
         return this.nextAvailableId += 10;
     }
 
-    public static String getFileId()
+    public record StratagemWithId(Holder<Stratagem> stratagem, StratagemInstance instance)
     {
-        return STRATAGEM_FILE_ID;
+        public static final Codec<StratagemWithId> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                        RegistryFixedCodec.create(ModRegistries.STRATAGEM).fieldOf("stratagem").forGetter(StratagemWithId::stratagem),
+                        StratagemInstance.MAP_CODEC.forGetter(StratagemWithId::instance))
+                .apply(instance, StratagemWithId::new));
+
+        public static StratagemWithId from(Map.Entry<Holder<Stratagem>, StratagemInstance> entry)
+        {
+            return new StratagemWithId(entry.getKey(), entry.getValue());
+        }
     }
 }

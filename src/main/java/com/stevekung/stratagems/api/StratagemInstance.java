@@ -7,24 +7,45 @@ import java.util.function.IntFunction;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.rule.StratagemRule;
 
 import io.netty.buffer.ByteBuf;
+
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ByIdMap;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class StratagemInstance implements Comparable<StratagemInstance>
 {
+    public static final MapCodec<StratagemInstance> MAP_CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(
+                            Codec.INT.fieldOf("id").forGetter(stratagem -> stratagem.id),
+                            RegistryFixedCodec.create(ModRegistries.STRATAGEM).fieldOf("stratagem").forGetter(stratagem -> stratagem.stratagem),
+                            Codec.INT.fieldOf("inbound_duration").forGetter(stratagem -> stratagem.inboundDuration),
+                            Codec.INT.fieldOf("duration").forGetter(stratagem -> stratagem.duration),
+                            Codec.INT.fieldOf("cooldown").forGetter(stratagem -> stratagem.cooldown),
+                            Codec.INT.fieldOf("last_max_cooldown").forGetter(stratagem -> stratagem.lastMaxCooldown),
+                            Codec.INT.fieldOf("max_use").forGetter(stratagem -> stratagem.maxUse),
+                            StratagemState.CODEC.fieldOf("state").forGetter(stratagem -> stratagem.state),
+                            Side.CODEC.fieldOf("side").forGetter(stratagem -> stratagem.side),
+                            Codec.BOOL.fieldOf("should_display").forGetter(stratagem -> stratagem.shouldDisplay),
+                            StratagemModifier.CODEC.fieldOf("modifier").forGetter(stratagem -> stratagem.modifier)
+                    )
+                    .apply(instance, StratagemInstance::new));
+
     private final Holder<Stratagem> stratagem;
     public final int id;
     public int inboundDuration;
@@ -83,36 +104,20 @@ public class StratagemInstance implements Comparable<StratagemInstance>
     @Nullable
     public static StratagemInstance load(CompoundTag compoundTag, Level level)
     {
-        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey));
+        var stratagem = Optional.ofNullable(ResourceLocation.tryParse(compoundTag.getString(ModConstants.Tag.STRATAGEM).orElseThrow())).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> level.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey));
 
         if (stratagem.isPresent())
         {
-            var inboundDuration = 0;
-            var duration = -1;
-            var maxUse = -1;
-            var id = compoundTag.getInt(ModConstants.Tag.ID);
-            var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE));
-            var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE));
-            var shouldDisplay = compoundTag.getBoolean(ModConstants.Tag.SHOULD_DISPLAY);
-            var modifier = StratagemModifier.byName(compoundTag.getString(ModConstants.Tag.MODIFIER));
-
-            if (compoundTag.contains(ModConstants.Tag.INBOUND_DURATION, Tag.TAG_INT))
-            {
-                inboundDuration = compoundTag.getInt(ModConstants.Tag.INBOUND_DURATION);
-            }
-
-            if (compoundTag.contains(ModConstants.Tag.DURATION, Tag.TAG_INT))
-            {
-                duration = compoundTag.getInt(ModConstants.Tag.DURATION);
-            }
-
-            var cooldown = compoundTag.getInt(ModConstants.Tag.COOLDOWN);
-            var lastMaxCooldown = compoundTag.getInt(ModConstants.Tag.LAST_MAX_COOLDOWN);
-
-            if (compoundTag.contains(ModConstants.Tag.MAX_USE, Tag.TAG_INT))
-            {
-                maxUse = compoundTag.getInt(ModConstants.Tag.MAX_USE);
-            }
+            var inboundDuration = compoundTag.getIntOr(ModConstants.Tag.INBOUND_DURATION, 0);
+            var duration = compoundTag.getIntOr(ModConstants.Tag.DURATION, -1);
+            var maxUse = compoundTag.getIntOr(ModConstants.Tag.MAX_USE, -1);
+            var id = compoundTag.getInt(ModConstants.Tag.ID).orElseThrow();
+            var state = StratagemState.byName(compoundTag.getString(ModConstants.Tag.STATE).orElse(StratagemState.READY.getName()));
+            var side = Side.byName(compoundTag.getString(ModConstants.Tag.SIDE).orElse(Side.SERVER.getName()));
+            var shouldDisplay = compoundTag.getBooleanOr(ModConstants.Tag.SHOULD_DISPLAY, true);
+            var modifier = StratagemModifier.byName(compoundTag.getString(ModConstants.Tag.MODIFIER).orElse(StratagemModifier.NONE.getSerializedName()));
+            var cooldown = compoundTag.getIntOr(ModConstants.Tag.COOLDOWN, 0);
+            var lastMaxCooldown = compoundTag.getIntOr(ModConstants.Tag.LAST_MAX_COOLDOWN, 0);
             return new StratagemInstance(id, stratagem.get(), inboundDuration, duration, cooldown, lastMaxCooldown, maxUse, state, side, shouldDisplay, modifier);
         }
         return null;
@@ -204,13 +209,14 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         return builder.append(this.id, instance.id).build();
     }
 
-    public enum Side
+    public enum Side implements StringRepresentable
     {
         PLAYER,
         SERVER;
 
         private static final Side[] VALUES = values();
         public static final IntFunction<Side> BY_ID = ByIdMap.continuous(Side::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+        public static final Codec<Side> CODEC = StringRepresentable.fromEnum(Side::values);
         public static final StreamCodec<ByteBuf, Side> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Side::ordinal);
 
         public static Side byName(String name)
@@ -228,6 +234,12 @@ public class StratagemInstance implements Comparable<StratagemInstance>
         public String getName()
         {
             return this.name().toLowerCase(Locale.ROOT);
+        }
+
+        @Override
+        public String getSerializedName()
+        {
+            return this.getName();
         }
     }
 }

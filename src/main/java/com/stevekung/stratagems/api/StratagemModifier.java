@@ -13,7 +13,6 @@ public enum StratagemModifier implements StringRepresentable
     NONE(0, "none"),
     RANDOMIZE(1, "randomize");
 
-    @SuppressWarnings("deprecation")
     public static final StringRepresentable.EnumCodec<StratagemModifier> CODEC = StringRepresentable.fromEnum(StratagemModifier::values);
     public static final IntFunction<StratagemModifier> BY_ID = ByIdMap.continuous(StratagemModifier::id, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
     private static final StratagemModifier[] VALUES = values();

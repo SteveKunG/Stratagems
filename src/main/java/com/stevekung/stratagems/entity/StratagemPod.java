@@ -1,11 +1,9 @@
 package com.stevekung.stratagems.entity;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.action.StratagemActionContext;
 import com.stevekung.stratagems.api.references.ModEntityDataSerializers;
@@ -13,20 +11,19 @@ import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.registry.Stratagems;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.VariantHolder;
+import net.minecraft.world.entity.variant.VariantUtils;
 import net.minecraft.world.level.Level;
 
-public class StratagemPod extends Entity implements VariantHolder<Holder<Stratagem>>
+public class StratagemPod extends Entity
 {
     private static final EntityDataAccessor<Holder<Stratagem>> DATA_STRATAGEM = SynchedEntityData.defineId(StratagemPod.class, ModEntityDataSerializers.STRATAGEM);
 
@@ -69,18 +66,14 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder)
     {
-        var registryAccess = this.registryAccess();
-        var registry = registryAccess.lookupOrThrow(ModRegistries.STRATAGEM);
-        builder.define(DATA_STRATAGEM, registry.get(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
+        builder.define(DATA_STRATAGEM, VariantUtils.getDefaultOrAny(this.registryAccess(), Stratagems.REINFORCE));
     }
 
-    @Override
     public Holder<Stratagem> getVariant()
     {
         return this.entityData.get(DATA_STRATAGEM);
     }
 
-    @Override
     public void setVariant(Holder<Stratagem> variant)
     {
         this.entityData.set(DATA_STRATAGEM, variant);
@@ -89,29 +82,18 @@ public class StratagemPod extends Entity implements VariantHolder<Holder<Stratag
     @Override
     public void addAdditionalSaveData(CompoundTag compound)
     {
-        this.getVariant().unwrapKey().ifPresent(resourceKey -> compound.putString(ModConstants.Tag.VARIANT, resourceKey.location().toString()));
-
-        if (this.ownerUUID != null)
-        {
-            compound.putUUID("Owner", this.ownerUUID);
-        }
+        VariantUtils.writeVariant(compound, this.getVariant());
+        compound.storeNullable("Owner", UUIDUtil.CODEC, this.ownerUUID);
         compound.putInt("InboundTick", this.getInboundTick());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound)
     {
-        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey)).ifPresent(this::setVariant);
-
-        if (compound.hasUUID("Owner"))
-        {
-            this.ownerUUID = compound.getUUID("Owner");
-            this.cachedOwner = null;
-        }
-        if (compound.contains("InboundTick"))
-        {
-            this.setInboundTick(compound.getInt("InboundTick"));
-        }
+        VariantUtils.readVariant(compound, this.registryAccess(), ModRegistries.STRATAGEM).ifPresent(this::setVariant);
+        this.ownerUUID = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
+        this.cachedOwner = null;
+        this.setInboundTick(compound.getIntOr("InboundTick", 0));
     }
 
     public void setOwner(@Nullable final Entity owner)

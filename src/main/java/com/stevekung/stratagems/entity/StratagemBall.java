@@ -1,7 +1,5 @@
 package com.stevekung.stratagems.entity;
 
-import java.util.Optional;
-
 import com.stevekung.stratagems.api.ModConstants;
 import com.stevekung.stratagems.api.Stratagem;
 import com.stevekung.stratagems.api.StratagemInstance;
@@ -18,14 +16,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.VariantHolder;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.variant.VariantUtils;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -33,7 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class StratagemBall extends ThrowableItemProjectile implements VariantHolder<Holder<Stratagem>>
+public class StratagemBall extends ThrowableItemProjectile
 {
     private static final EntityDataAccessor<Holder<Stratagem>> DATA_STRATAGEM = SynchedEntityData.defineId(StratagemBall.class, ModEntityDataSerializers.STRATAGEM);
     private static final EntityDataAccessor<StratagemInstance.Side> DATA_STRATAGEM_SIDE = SynchedEntityData.defineId(StratagemBall.class, ModEntityDataSerializers.STRATAGEM_SIDE);
@@ -57,18 +53,15 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
     protected void defineSynchedData(SynchedEntityData.Builder builder)
     {
         super.defineSynchedData(builder);
-        var registry = this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM);
-        builder.define(DATA_STRATAGEM, registry.get(Stratagems.REINFORCE).or(registry::getAny).orElseThrow());
+        builder.define(DATA_STRATAGEM, VariantUtils.getDefaultOrAny(this.registryAccess(), Stratagems.REINFORCE));
         builder.define(DATA_STRATAGEM_SIDE, StratagemInstance.Side.SERVER);
     }
 
-    @Override
     public Holder<Stratagem> getVariant()
     {
         return this.entityData.get(DATA_STRATAGEM);
     }
 
-    @Override
     public void setVariant(Holder<Stratagem> variant)
     {
         this.entityData.set(DATA_STRATAGEM, variant);
@@ -88,14 +81,14 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
     public void addAdditionalSaveData(CompoundTag compound)
     {
         super.addAdditionalSaveData(compound);
-        this.getVariant().unwrapKey().ifPresent(resourceKey -> compound.putString(ModConstants.Tag.VARIANT, resourceKey.location().toString()));
+        VariantUtils.writeVariant(compound, this.getVariant());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound)
     {
         super.readAdditionalSaveData(compound);
-        Optional.ofNullable(ResourceLocation.tryParse(compound.getString(ModConstants.Tag.VARIANT))).map(resourceLocation -> ResourceKey.create(ModRegistries.STRATAGEM, resourceLocation)).flatMap(resourceKey -> this.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).get(resourceKey)).ifPresent(this::setVariant);
+        VariantUtils.readVariant(compound, this.registryAccess(), ModRegistries.STRATAGEM).ifPresent(this::setVariant);
     }
 
     @Override
@@ -124,7 +117,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
             var stratagemPod = new StratagemPod(ModEntities.STRATAGEM_POD, this.level());
             stratagemPod.setVariant(holder);
             stratagemPod.setOwner(this.getOwner());
-            stratagemPod.moveTo(this.blockPosition(), 0.0f, 0.0f);
+            stratagemPod.snapTo(this.blockPosition(), 0.0f, 0.0f);
 
             if (this.getOwner() instanceof ServerPlayer serverPlayer)
             {

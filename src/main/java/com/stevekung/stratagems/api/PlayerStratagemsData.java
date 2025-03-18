@@ -9,7 +9,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Player;
 
 public class PlayerStratagemsData implements StratagemsData
@@ -183,24 +182,18 @@ public class PlayerStratagemsData implements StratagemsData
 
     public void load(CompoundTag compoundTag)
     {
-        if (compoundTag.contains(ModConstants.Tag.STRATAGEMS, Tag.TAG_LIST))
+        var listTag = compoundTag.getListOrEmpty(ModConstants.Tag.STRATAGEMS);
+
+        for (var i = 0; i < listTag.size(); i++)
         {
-            var listTag = compoundTag.getList(ModConstants.Tag.STRATAGEMS, Tag.TAG_COMPOUND);
+            var instanceTag = listTag.getCompoundOrEmpty(i);
+            var instance = StratagemInstance.load(instanceTag, this.player.level());
 
-            for (var i = 0; i < listTag.size(); i++)
+            if (instance != null)
             {
-                var instanceTag = listTag.getCompound(i);
-                var instance = StratagemInstance.load(instanceTag, this.player.level());
-
-                if (instance != null)
-                {
-                    this.instances.put(instance.getStratagem(), instance);
-                }
+                this.instances.put(instance.getStratagem(), instance);
             }
         }
-        if (compoundTag.contains(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, Tag.TAG_INT))
-        {
-            this.nextAvailableId = compoundTag.getInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID);
-        }
+        this.nextAvailableId = compoundTag.getIntOr(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, 0);
     }
 }

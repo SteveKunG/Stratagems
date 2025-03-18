@@ -60,7 +60,7 @@ public class StratagemUtils
 
     public static Component decorateStratagemName(Component name, Holder<Stratagem> holder)
     {
-        return name.copy().withStyle(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(holder.getRegisteredName()))));
+        return name.copy().withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(Component.literal(holder.getRegisteredName()))));
     }
 
     public static Component decorateStratagemList(Collection<StratagemInstance> list)
