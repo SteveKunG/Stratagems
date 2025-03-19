@@ -52,7 +52,8 @@ public class ReplenishRule implements StratagemRule
             var toReplenishSet = stratagemReplenish.toReplenish().get();
 
             // Check other stratagems are contains in toReplenish() tag.
-            for (var replenishedStratagem : stratagemsData.stream().filter(stratagem -> toReplenishSet.contains(stratagem.getStratagem())).toList())
+            for (var replenishedStratagem : stratagemsData.stream()
+                    .filter(stratagem -> toReplenishSet.contains(stratagem.getStratagem())).toList())
             {
                 replenishedStratagem.state = StratagemState.COOLDOWN;
 

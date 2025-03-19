@@ -16,7 +16,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 public record SpawnSupplyAction(ResourceKey<LootTable> lootTable) implements StratagemAction
 {
-    public static final MapCodec<SpawnSupplyAction> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(ResourceKey.codec(Registries.LOOT_TABLE).fieldOf("loot_table").forGetter(SpawnSupplyAction::lootTable)).apply(instance, SpawnSupplyAction::new));
+    public static final MapCodec<SpawnSupplyAction> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    ResourceKey.codec(Registries.LOOT_TABLE).fieldOf("loot_table").forGetter(SpawnSupplyAction::lootTable))
+            .apply(instance, SpawnSupplyAction::new));
 
     @Override
     public StratagemActionType getType()
