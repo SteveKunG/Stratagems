@@ -55,6 +55,7 @@ public interface ModConstants
         ResourceLocation UPDATE_STRATAGEM = id("update_stratagem");
         ResourceLocation CLEAR_STRATAGEMS = id("clear_stratagems");
         ResourceLocation STRATAGEM_INPUT_SOUND = id("stratagem_input_sound");
+        ResourceLocation CLEAR_INPUT = id("clear_input");
     }
 
     interface StratagemTag

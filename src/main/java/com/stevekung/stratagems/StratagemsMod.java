@@ -55,6 +55,7 @@ public class StratagemsMod implements ModInitializer
         PayloadTypeRegistry.playS2C().register(SetServerStratagemsPacket.TYPE, SetServerStratagemsPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(UpdateStratagemPacket.TYPE, UpdateStratagemPacket.CODEC);
         PayloadTypeRegistry.playS2C().register(ClearStratagemsPacket.TYPE, ClearStratagemsPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(ClearInputPacket.TYPE, ClearInputPacket.CODEC);
 
         FabricLoader.getInstance().getModContainer(ModConstants.MOD_ID)
                 .map(container -> ResourceManagerHelper.registerBuiltinResourcePack(ModConstants.id("stratagem_test_pack"), container, Component.translatable("dataPack.stratagem_test_pack.name"), ResourcePackActivationType.NORMAL))

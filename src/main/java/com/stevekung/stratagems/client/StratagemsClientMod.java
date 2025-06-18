@@ -149,6 +149,14 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
             }
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(ClearInputPacket.TYPE, (payload, context) ->
+        {
+            var manager = StratagemInputManager.getInstance();
+            manager.clearInputCode();
+            manager.clearSelected();
+            manager.setThrowing(false);
+        });
     }
 
     private static void clientTick(Minecraft minecraft)
@@ -177,6 +185,7 @@ public class StratagemsClientMod implements ClientModInitializer
             if (KeyBindings.OPEN_STRATAGEMS_MENU.consumeClick())
             {
                 manager.setMenuOpen(!manager.isMenuOpen());
+                manager.stopSelectSound();
                 manager.clearSelected();
             }
         }
@@ -282,12 +291,13 @@ public class StratagemsClientMod implements ClientModInitializer
             manager.clearInputCode();
         }
 
-        if (manager.hasSelected() && minecraft.options.keyAttack.isDown())
+        if (manager.hasSelected() && !manager.isThrowing() && minecraft.options.keyAttack.isDown())
         {
             LOGGER.info("Throwing {}", manager.getSelected().stratagem().name().getString());
             ClientPlayNetworking.send(new SpawnStratagemPacket(manager.getSelected().getResourceKey(), manager.getSelected().side));
-            manager.clearInputCode();
-            manager.clearSelected();
+            minecraft.getSoundManager().stop(new StratagemSoundInstance(player));
+            manager.stopSelectSound();
+            manager.setThrowing(true);
         }
 
         if (fail)

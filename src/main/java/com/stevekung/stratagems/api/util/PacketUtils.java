@@ -4,10 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.stevekung.stratagems.api.StratagemInstance;
 import com.stevekung.stratagems.api.StratagemsData;
-import com.stevekung.stratagems.api.packet.SetPlayerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.SetServerStratagemsPacket;
-import com.stevekung.stratagems.api.packet.StratagemEntryData;
-import com.stevekung.stratagems.api.packet.UpdateStratagemPacket;
+import com.stevekung.stratagems.api.packet.*;
 
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.server.MinecraftServer;
@@ -68,5 +65,13 @@ public class PacketUtils
         {
             serverPlayer.connection.send(new ClientboundCustomPayloadPacket(SetServerStratagemsPacket.create(stratagemsData)));
         }
+    }
+
+    /**
+     * Send a packet to clear stratagem input
+     */
+    public static void sendClientClearInput(ServerPlayer serverPlayer)
+    {
+        serverPlayer.connection.send(new ClientboundCustomPayloadPacket(new ClearInputPacket()));
     }
 }

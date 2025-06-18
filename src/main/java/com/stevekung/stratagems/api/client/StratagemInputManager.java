@@ -21,6 +21,7 @@ public class StratagemInputManager
 {
     private static StratagemInputManager INSTANCE;
 
+    private boolean throwing;
     private boolean menuOpen;
     private String inputCode = "";
     @Nullable
@@ -103,6 +104,10 @@ public class StratagemInputManager
     public void clearSelected()
     {
         this.selected = null;
+    }
+
+    public void stopSelectSound()
+    {
         this.minecraft.getSoundManager().stop(StratagemSounds.STRATAGEM_SELECT.getLocation(), SoundSource.PLAYERS);
     }
 
@@ -120,6 +125,16 @@ public class StratagemInputManager
     public void setSelected(ClientStratagemInstance selected)
     {
         this.selected = selected;
+    }
+
+    public void setThrowing(boolean throwing)
+    {
+        this.throwing = throwing;
+    }
+
+    public boolean isThrowing()
+    {
+        return this.throwing;
     }
 
     public static List<ClientStratagemInstance> all(Player player)

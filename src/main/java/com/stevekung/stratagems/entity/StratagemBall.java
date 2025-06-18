@@ -148,6 +148,7 @@ public class StratagemBall extends ThrowableItemProjectile implements VariantHol
                     var instance = stratagemsData.instanceByHolder(holder);
                     ModConstants.LOGGER.info("{}", Component.translatable("commands.stratagem.use.failed", instance.stratagem().name(), instance.state.getTranslationName()).getString());
                 }
+                PacketUtils.sendClientClearInput(serverPlayer);
             }
             else
             {
