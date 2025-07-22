@@ -25,7 +25,9 @@ public record ReinforceAction() implements StratagemAction
     {
         //TODO Temp
         var level = context.level();
-        var optional = level.players().stream().filter(LivingEntity::isDeadOrDying).flatMap(serverPlayer -> Optional.of(serverPlayer).stream()).findFirst();
+        var optional = level.players().stream()
+                .filter(LivingEntity::isDeadOrDying)
+                .flatMap(serverPlayer -> Optional.of(serverPlayer).stream()).findFirst();
         optional.ifPresent(level::addRespawnedPlayer);
     }
 
