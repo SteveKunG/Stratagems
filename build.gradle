@@ -1,5 +1,5 @@
 plugins {
-    id "fabric-loom" version "1.10-SNAPSHOT"
+    id "fabric-loom" version "1.11-SNAPSHOT"
     id "idea"
 }
 
@@ -26,13 +26,15 @@ loom {
                 property "devauth.account", "mccommanderz"
             }
         }
-        datagen {
-            server()
-            name "Fabric Data Generation"
-            property "fabric-api.datagen"
-            property "fabric-api.datagen.output-dir", "${file("src/generated/resources")}"
-            runDir "build/datagen"
-        }
+    }
+}
+
+fabricApi {
+    configureDataGeneration {
+        outputDirectory = file("src/generated/resources")
+        addToResources = false
+        strictValidation = true
+        client = true
     }
 }
 
