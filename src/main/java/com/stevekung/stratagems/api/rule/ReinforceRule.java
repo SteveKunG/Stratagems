@@ -34,7 +34,7 @@ public class ReinforceRule implements StratagemRule
     {
         if (context.instance().maxUse > 0)
         {
-            if (context.player() instanceof ServerPlayer serverPlayer && serverPlayer.serverLevel().players().stream().anyMatch(LivingEntity::isDeadOrDying))
+            if (context.player() instanceof ServerPlayer serverPlayer && serverPlayer.level().players().stream().anyMatch(LivingEntity::isDeadOrDying))
             {
                 context.instance().maxUse--;
                 LOGGER.info("{} stratagem has maxUse: {}", context.instance().stratagem().name().getString(), context.instance().maxUse);

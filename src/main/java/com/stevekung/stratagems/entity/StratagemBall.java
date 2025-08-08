@@ -12,7 +12,6 @@ import com.stevekung.stratagems.registry.ModEntities;
 import com.stevekung.stratagems.registry.Stratagems;
 
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -26,6 +25,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
@@ -78,17 +79,17 @@ public class StratagemBall extends ThrowableItemProjectile
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound)
+    public void addAdditionalSaveData(ValueOutput valueOutput)
     {
-        super.addAdditionalSaveData(compound);
-        VariantUtils.writeVariant(compound, this.getVariant());
+        super.addAdditionalSaveData(valueOutput);
+        VariantUtils.writeVariant(valueOutput, this.getVariant());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound)
+    public void readAdditionalSaveData(ValueInput valueInput)
     {
-        super.readAdditionalSaveData(compound);
-        VariantUtils.readVariant(compound, this.registryAccess(), ModRegistries.STRATAGEM).ifPresent(this::setVariant);
+        super.readAdditionalSaveData(valueInput);
+        VariantUtils.readVariant(valueInput, ModRegistries.STRATAGEM).ifPresent(this::setVariant);
     }
 
     @Override

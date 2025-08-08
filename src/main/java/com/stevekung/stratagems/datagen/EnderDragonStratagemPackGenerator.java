@@ -85,7 +85,7 @@ public class EnderDragonStratagemPackGenerator extends StratagemDataGenerator
 
     private static PackMetadataGenerator forFeaturePack(PackOutput output, Component description)
     {
-        var datapackVersion = DetectedVersion.BUILT_IN.getPackVersion(PackType.SERVER_DATA);
-        return new PackMetadataGenerator(output).add(PackMetadataSection.TYPE, new PackMetadataSection(description, datapackVersion, Optional.of(new InclusiveRange<>(DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES), datapackVersion))));
+        var datapackVersion = DetectedVersion.BUILT_IN.packVersion(PackType.SERVER_DATA);
+        return new PackMetadataGenerator(output).add(PackMetadataSection.TYPE, new PackMetadataSection(description, datapackVersion, Optional.of(new InclusiveRange<>(DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES), datapackVersion))));
     }
 }

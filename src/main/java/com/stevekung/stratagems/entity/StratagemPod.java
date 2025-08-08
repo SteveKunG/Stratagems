@@ -12,7 +12,6 @@ import com.stevekung.stratagems.registry.Stratagems;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +21,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.variant.VariantUtils;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class StratagemPod extends Entity
 {
@@ -80,20 +81,20 @@ public class StratagemPod extends Entity
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound)
+    public void addAdditionalSaveData(ValueOutput valueOutput)
     {
-        VariantUtils.writeVariant(compound, this.getVariant());
-        compound.storeNullable("Owner", UUIDUtil.CODEC, this.ownerUUID);
-        compound.putInt("InboundTick", this.getInboundTick());
+        VariantUtils.writeVariant(valueOutput, this.getVariant());
+        valueOutput.storeNullable("Owner", UUIDUtil.CODEC, this.ownerUUID);
+        valueOutput.putInt("InboundTick", this.getInboundTick());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound)
+    public void readAdditionalSaveData(ValueInput valueInput)
     {
-        VariantUtils.readVariant(compound, this.registryAccess(), ModRegistries.STRATAGEM).ifPresent(this::setVariant);
-        this.ownerUUID = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
+        VariantUtils.readVariant(valueInput, ModRegistries.STRATAGEM).ifPresent(this::setVariant);
+        this.ownerUUID = valueInput.read("Owner", UUIDUtil.CODEC).orElse(null);
         this.cachedOwner = null;
-        this.setInboundTick(compound.getIntOr("InboundTick", 0));
+        this.setInboundTick(valueInput.getIntOr("InboundTick", 0));
     }
 
     public void setOwner(@Nullable final Entity owner)

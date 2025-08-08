@@ -3,10 +3,10 @@
     "description": {
       "translate": "dataPack.stratagem_test_pack.description"
     },
-    "pack_format": 71,
+    "pack_format": 81,
     "supported_formats": [
-      55,
-      71
+      64,
+      81
     ]
   }
 }

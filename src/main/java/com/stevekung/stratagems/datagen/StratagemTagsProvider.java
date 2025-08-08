@@ -18,9 +18,10 @@ public class StratagemTagsProvider extends FabricTagProvider<Stratagem>
         super(output, ModRegistries.STRATAGEM, provider);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void addTags(HolderLookup.Provider provider)
     {
-        this.getOrCreateTagBuilder(ModConstants.StratagemTag.TNT_REPLENISH).add(Stratagems.TNT, Stratagems.FAST_TNT, Stratagems.LONG_TNT);
+        this.builder(ModConstants.StratagemTag.TNT_REPLENISH).add(Stratagems.TNT, Stratagems.FAST_TNT, Stratagems.LONG_TNT);
     }
 }

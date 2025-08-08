@@ -8,8 +8,9 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class PlayerStratagemsData implements StratagemsData
 {
@@ -162,31 +163,26 @@ public class PlayerStratagemsData implements StratagemsData
         return this.nextAvailableId += 10;
     }
 
-    public void save(CompoundTag compoundTag)
+    public void save(ValueOutput valueOutput)
     {
         if (!this.instances.isEmpty())
         {
-            var listTag = new ListTag();
+            var typedOutputList = valueOutput.list(ModConstants.Tag.STRATAGEMS, CompoundTag.CODEC);
 
             for (var instances : this.listInstances())
             {
                 var instanceTag = new CompoundTag();
                 instances.save(instanceTag);
-                listTag.add(instanceTag);
+                typedOutputList.add(instanceTag);
             }
-
-            compoundTag.put(ModConstants.Tag.STRATAGEMS, listTag);
         }
-        compoundTag.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
+        valueOutput.putInt(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, this.nextAvailableId);
     }
 
-    public void load(CompoundTag compoundTag)
+    public void load(ValueInput valueInput)
     {
-        var listTag = compoundTag.getListOrEmpty(ModConstants.Tag.STRATAGEMS);
-
-        for (var i = 0; i < listTag.size(); i++)
+        for (var instanceTag : valueInput.listOrEmpty(ModConstants.Tag.STRATAGEMS, CompoundTag.CODEC))
         {
-            var instanceTag = listTag.getCompoundOrEmpty(i);
             var instance = StratagemInstance.load(instanceTag, this.player.level());
 
             if (instance != null)
@@ -194,6 +190,6 @@ public class PlayerStratagemsData implements StratagemsData
                 this.instances.put(instance.getStratagem(), instance);
             }
         }
-        this.nextAvailableId = compoundTag.getIntOr(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, 0);
+        this.nextAvailableId = valueInput.getIntOr(ModConstants.Tag.NEXT_AVAILABLE_STRATAGEM_ID, 0);
     }
 }

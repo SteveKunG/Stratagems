@@ -3,7 +3,6 @@ package com.stevekung.stratagems.client;
 import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -27,7 +26,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -474,13 +473,13 @@ public class StratagemsClientMod implements ClientModInitializer
                 max = statusWidth;
             }
 
-            var rangeMin = 0.0d;
-            var rangeMax = 0.5d;
-            var randomizeX = rangeMin + (rangeMax - rangeMin) * random.nextDouble();
-            var randomizeY = rangeMin + (rangeMax - rangeMin) * random.nextDouble();
+            var rangeMin = 0.0f;
+            var rangeMax = 0.5f;
+            var randomizeX = rangeMin + (rangeMax - rangeMin) * random.nextFloat();
+            var randomizeY = rangeMin + (rangeMax - rangeMin) * random.nextFloat();
 
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(instance.animationTime, 0, 0);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(instance.animationTime, 0);
 
             if (shouldRenderForMenu(instance))
             {
@@ -497,11 +496,11 @@ public class StratagemsClientMod implements ClientModInitializer
                 }
                 else
                 {
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().pushMatrix();
 
                     if (isRandomized)
                     {
-                        guiGraphics.pose().translate(randomizeX, randomizeY, 0);
+                        guiGraphics.pose().translate(randomizeX, randomizeY);
                     }
 
                     for (var i = 0; i < codeChar.length; i++)
@@ -513,7 +512,7 @@ public class StratagemsClientMod implements ClientModInitializer
                             guiGraphics.drawString(minecraft.font, arrows, baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, textColor);
                         }
                     }
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                 }
 
                 if (!StringUtil.isNullOrEmpty(statusText.getString()))
@@ -525,26 +524,27 @@ public class StratagemsClientMod implements ClientModInitializer
                 {
                     var inputCodeChars = inputCode.toCharArray();
 
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().pushMatrix();
 
                     if (isRandomized)
                     {
-                        guiGraphics.pose().translate(randomizeX, randomizeY, 0);
+                        guiGraphics.pose().translate(randomizeX, randomizeY);
                     }
 
                     for (var i = 0; i < inputCodeChars.length; i++)
                     {
                         guiGraphics.drawString(minecraft.font, ModConstants.charToArrow(inputCodeChars[i]), baseX + i * arrowSpacing, baseY + baseYSecond + index * baseSpacing, gray);
                     }
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                 }
 
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(0, 0);
+                //guiGraphics.pose().translate(0, 0, codeMatched ? 0 : -300);TODO
 
                 if (isRandomized)
                 {
-                    guiGraphics.pose().translate(randomizeX, randomizeY, 0);
+                    guiGraphics.pose().translate(randomizeX, randomizeY);
                 }
 
                 if (isBlocked)
@@ -556,7 +556,7 @@ public class StratagemsClientMod implements ClientModInitializer
                     renderIcon(guiGraphics, minecraft, instance, stratagem.display(), baseXIcon, baseYIcon + index * baseSpacing);
                 }
 
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
 
                 backgroundWidth = 22 + max + 20;
                 backgroundHeight = 24 + index * 30;
@@ -564,10 +564,10 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (!manager.isMenuOpen() && shouldRenderSingleBackground(instance))
             {
-                StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38 + index * 30, backgroundWidth, 24, -1, grayAlpha, false);
+                StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38 + index * 30, backgroundWidth, 24, grayAlpha, false);
             }
 
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
 
             if (instance.shouldDisplay)
             {
@@ -576,10 +576,10 @@ public class StratagemsClientMod implements ClientModInitializer
         }
         if (animationTime > -150f)
         {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(animationTime, 0, 0);
-            StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38, backgroundWidth, backgroundHeight, -1, grayAlpha, true);
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(animationTime, 0);
+            StratagemMenuRenderUtil.renderBackground(guiGraphics, 12, 38, backgroundWidth, backgroundHeight, grayAlpha, true);
+            guiGraphics.pose().popMatrix();
         }
     }
 
@@ -614,12 +614,11 @@ public class StratagemsClientMod implements ClientModInitializer
         var zOffset = 300;
 
 //        RenderSystem.setShader(STATIC_NOISE);TODO
-        var matrix4f = guiGraphics.pose().last().pose();
         var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        buffer.addVertex(matrix4f, x, y, zOffset).setUv(0.0F, 0.0F); // top left
-        buffer.addVertex(matrix4f, x, y + size, zOffset).setUv(1.0F, 0.0F); // bottom left
-        buffer.addVertex(matrix4f, x + size, y + size, zOffset).setUv(1.0F, 1.0F); // bottom right
-        buffer.addVertex(matrix4f, x + size, y, zOffset).setUv(0.0F, 1.0F); // top right
+        buffer.addVertex(x, y, zOffset).setUv(0.0F, 0.0F); // top left
+        buffer.addVertex(x, y + size, zOffset).setUv(1.0F, 0.0F); // bottom left
+        buffer.addVertex(x + size, y + size, zOffset).setUv(1.0F, 1.0F); // bottom right
+        buffer.addVertex(x + size, y, zOffset).setUv(0.0F, 1.0F); // top right
 //        BufferUploader.drawWithShader(buffer.buildOrThrow());TODO
     }
 
@@ -634,7 +633,7 @@ public class StratagemsClientMod implements ClientModInitializer
             });
             case TEXTURE -> display.texture().ifPresent(resourceLocation ->
             {
-                guiGraphics.blit(RenderType::guiTextured, resourceLocation, x, y, 0, 0, 16, 16, 16, 16);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, resourceLocation, x, y, 0, 0, 16, 16, 16, 16);
                 renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y);
             });
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->

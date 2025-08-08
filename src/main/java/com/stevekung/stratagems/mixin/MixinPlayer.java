@@ -9,9 +9,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.stevekung.stratagems.api.PlayerStratagemsData;
 import com.stevekung.stratagems.api.accessor.StratagemsDataAccessor;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 @Mixin(Player.class)
 public abstract class MixinPlayer extends LivingEntity implements StratagemsDataAccessor
@@ -43,14 +44,14 @@ public abstract class MixinPlayer extends LivingEntity implements StratagemsData
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void stratagems$addStratagemSaveData(CompoundTag compound, CallbackInfo info)
+    private void stratagems$addStratagemSaveData(ValueOutput valueOutput, CallbackInfo info)
     {
-        this.stratagems.save(compound);
+        this.stratagems.save(valueOutput);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void stratagems$readStratagemSaveData(CompoundTag compound, CallbackInfo info)
+    private void stratagems$readStratagemSaveData(ValueInput valueInput, CallbackInfo info)
     {
-        this.stratagems.load(compound);
+        this.stratagems.load(valueInput);
     }
 }

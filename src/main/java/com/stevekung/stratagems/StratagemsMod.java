@@ -70,7 +70,7 @@ public class StratagemsMod implements ModInitializer
         ServerPlayNetworking.registerGlobalReceiver(SpawnStratagemPacket.TYPE, (payload, context) ->
         {
             var player = context.player();
-            var level = player.serverLevel();
+            var level = player.level();
             var holder = context.server().registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
