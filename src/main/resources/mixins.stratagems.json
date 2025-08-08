@@ -7,6 +7,7 @@
         "MixinArgumentTypeInfos",
         "MixinDataFixSchemas",
         "MixinDataFixTypes",
+        "MixinMinecraftServer",
         "MixinPlayer",
         "MixinPlayerList",
         "MixinServerLevel",
