@@ -3,9 +3,9 @@ package com.stevekung.stratagems.client;
 import org.slf4j.Logger;
 
 import com.google.common.primitives.Chars;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.logging.LogUtils;
 import com.stevekung.stratagems.api.*;
@@ -27,6 +27,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
@@ -47,14 +48,12 @@ public class StratagemsClientMod implements ClientModInitializer
     private static final float xStop = 0f;
     private static final float speed = 100f;
 
-    //TODO
-//    private static final ShaderProgram STATIC_NOISE = new ShaderProgram(ModConstants.id("core/static_noise"), DefaultVertexFormat.POSITION_TEX, ShaderDefines.EMPTY);
+    public static final RenderPipeline STATIC_NOISE = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_SNIPPET).withLocation("pipeline/static_noise").withVertexShader("core/static_noise").withVertexShader("core/position_tex").withFragmentShader("core/position_tex").withSampler("Sampler0").withDepthWrite(false).withColorWrite(true, false).withBlend(BlendFunction.TRANSLUCENT).withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS).build());
+    private static final RenderType STATIC_NOISE_RENDER_TYPE = RenderType.create("static_noise", 1536, false, false, STATIC_NOISE, RenderType.CompositeState.builder().createCompositeState(false));
 
     @Override
     public void onInitializeClient()
     {
-//        CoreShaders.getProgramsToPreload().add(STATIC_NOISE); TODO
-
         KeyBindings.init();
 
         EntityRendererRegistry.register(ModEntities.STRATAGEM_BALL, ThrownItemRenderer::new);
@@ -608,19 +607,21 @@ public class StratagemsClientMod implements ClientModInitializer
         return false;
     }
 
+    //TODO Test
     private static void renderStaticNoiseShader(GuiGraphics guiGraphics, int x, int y)
     {
         var size = 16;
         var zOffset = 300;
 
-//        RenderSystem.setShader(STATIC_NOISE);TODO
-        var matrix4f = guiGraphics.pose().last().pose();
-        var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        buffer.addVertex(matrix4f, x, y, zOffset).setUv(0.0F, 0.0F); // top left
-        buffer.addVertex(matrix4f, x, y + size, zOffset).setUv(1.0F, 0.0F); // bottom left
-        buffer.addVertex(matrix4f, x + size, y + size, zOffset).setUv(1.0F, 1.0F); // bottom right
-        buffer.addVertex(matrix4f, x + size, y, zOffset).setUv(0.0F, 1.0F); // top right
-//        BufferUploader.drawWithShader(buffer.buildOrThrow());TODO
+        guiGraphics.drawSpecial(multiBufferSource ->
+        {
+            var matrix4f = guiGraphics.pose().last().pose();
+            var buffer = multiBufferSource.getBuffer(STATIC_NOISE_RENDER_TYPE);
+            buffer.addVertex(matrix4f, x, y, zOffset).setUv(0.0F, 0.0F); // top left
+            buffer.addVertex(matrix4f, x, y + size, zOffset).setUv(1.0F, 0.0F); // bottom left
+            buffer.addVertex(matrix4f, x + size, y + size, zOffset).setUv(1.0F, 1.0F); // bottom right
+            buffer.addVertex(matrix4f, x + size, y, zOffset).setUv(0.0F, 1.0F); // top right
+        });
     }
 
     private static void renderIcon(GuiGraphics guiGraphics, Minecraft minecraft, ClientStratagemInstance instance, StratagemDisplay display, int x, int y)
