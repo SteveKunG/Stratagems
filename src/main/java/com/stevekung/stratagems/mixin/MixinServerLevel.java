@@ -18,6 +18,6 @@ public abstract class MixinServerLevel implements StratagemsDataAccessor
     @Override
     public ServerStratagemsData stratagemsData()
     {
-        return this.getServer().overworld().getDataStorage().computeIfAbsent(ServerStratagemsData.TYPE);
+        return this.getServer().overworld().getDataStorage().get(ServerStratagemsData.TYPE);
     }
 }
