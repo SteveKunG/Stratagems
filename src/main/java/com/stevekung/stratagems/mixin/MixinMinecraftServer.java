@@ -8,11 +8,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.stevekung.stratagems.api.ServerStratagemsData;
 
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
-@Mixin(ServerLevel.class)
+@Mixin(MinecraftServer.class)
 public class MixinMinecraftServer
 {
     @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "net/minecraft/server/MinecraftServer.readScoreboard(Lnet/minecraft/world/level/storage/DimensionDataStorage;)V"))
