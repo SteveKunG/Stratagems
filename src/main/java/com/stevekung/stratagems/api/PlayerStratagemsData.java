@@ -4,10 +4,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Maps;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -16,11 +19,14 @@ public class PlayerStratagemsData implements StratagemsData
 {
     private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
     private final Player player;
+    @Nullable
+    private final MinecraftServer server;
     private int nextAvailableId;
 
     public PlayerStratagemsData(Player player)
     {
         this.player = player;
+        this.server = player.level().getServer();
     }
 
     @Override
@@ -28,20 +34,20 @@ public class PlayerStratagemsData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().tick(this.player.getServer(), this.player, false);
+            entry.getValue().tick(this.server, this.player, false);
         }
     }
 
     @Override
     public boolean canUse(Holder<Stratagem> holder, Player player)
     {
-        return this.instanceByHolder(holder).canUse(this.player.getServer(), player, false);
+        return this.instanceByHolder(holder).canUse(this.server, player, false);
     }
 
     @Override
     public void use(Holder<Stratagem> holder, Player player)
     {
-        this.instanceByHolder(holder).use(this.player.getServer(), player, false);
+        this.instanceByHolder(holder).use(this.server, player, false);
     }
 
     @Override
@@ -73,7 +79,7 @@ public class PlayerStratagemsData implements StratagemsData
     @Override
     public void reset(Holder<Stratagem> holder)
     {
-        this.instanceByHolder(holder).reset(this.player.getServer(), this.player, false);
+        this.instanceByHolder(holder).reset(this.server, this.player, false);
     }
 
     @Override
@@ -81,7 +87,7 @@ public class PlayerStratagemsData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().reset(this.player.getServer(), this.player, false);
+            entry.getValue().reset(this.server, this.player, false);
         }
     }
 
@@ -90,14 +96,14 @@ public class PlayerStratagemsData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().block(this.player.getServer(), this.player, false, unblock);
+            entry.getValue().block(this.server, this.player, false, unblock);
         }
     }
 
     @Override
     public void block(Holder<Stratagem> holder, boolean unblock)
     {
-        this.instanceByHolder(holder).block(this.player.getServer(), this.player, false, unblock);
+        this.instanceByHolder(holder).block(this.server, this.player, false, unblock);
     }
 
     @Override
@@ -105,14 +111,14 @@ public class PlayerStratagemsData implements StratagemsData
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().modified(this.player.getServer(), this.player, false, modifier, clear);
+            entry.getValue().modified(this.server, this.player, false, modifier, clear);
         }
     }
 
     @Override
     public void modified(Holder<Stratagem> holder, StratagemModifier modifier, boolean clear)
     {
-        this.instanceByHolder(holder).modified(this.player.getServer(), this.player, false, modifier, clear);
+        this.instanceByHolder(holder).modified(this.server, this.player, false, modifier, clear);
     }
 
     @Override

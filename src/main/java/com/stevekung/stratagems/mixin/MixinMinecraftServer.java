@@ -9,14 +9,13 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.stevekung.stratagems.api.ServerStratagemsData;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer
 {
     @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "net/minecraft/server/MinecraftServer.readScoreboard(Lnet/minecraft/world/level/storage/DimensionDataStorage;)V"))
-    private void stratagems$createDataStorage(ChunkProgressListener listener, CallbackInfo info, @Local DimensionDataStorage dimensionDataStorage)
+    private void stratagems$createDataStorage(CallbackInfo info, @Local DimensionDataStorage dimensionDataStorage)
     {
         dimensionDataStorage.computeIfAbsent(ServerStratagemsData.TYPE);
     }

@@ -131,7 +131,7 @@ public class StratagemBall extends ThrowableItemProjectile
 
                     if (this.getSide() == StratagemInstance.Side.SERVER)
                     {
-                        PacketUtils.sendClientUpdatePacketS2P(this.getServer(), UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
+                        PacketUtils.sendClientUpdatePacketS2P(this.level().getServer(), UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
                     }
                     else
                     {

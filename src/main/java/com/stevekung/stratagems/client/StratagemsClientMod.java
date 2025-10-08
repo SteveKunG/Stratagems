@@ -21,7 +21,6 @@ import com.stevekung.stratagems.registry.ModEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
@@ -30,8 +29,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.StringUtil;
@@ -43,6 +44,7 @@ import net.minecraft.world.item.Items;
 public class StratagemsClientMod implements ClientModInitializer
 {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final FontDescription.Resource RANDOMIZED_FONT = new FontDescription.Resource(ResourceLocation.withDefaultNamespace("alt"));
     private static float animationTime;
     private static boolean visible;
     private static final float xStart = -200f;
@@ -57,8 +59,8 @@ public class StratagemsClientMod implements ClientModInitializer
     {
         KeyBindings.init();
 
-        EntityRendererRegistry.register(ModEntities.STRATAGEM_BALL, ThrownItemRenderer::new);
-        EntityRendererRegistry.register(ModEntities.STRATAGEM_POD, StratagemPodRenderer::new);
+        EntityRenderers.register(ModEntities.STRATAGEM_BALL, ThrownItemRenderer::new);
+        EntityRenderers.register(ModEntities.STRATAGEM_POD, StratagemPodRenderer::new);
 
         ClientTickEvents.END_CLIENT_TICK.register(StratagemsClientMod::clientTick);
 
@@ -391,7 +393,7 @@ public class StratagemsClientMod implements ClientModInitializer
 
             if (isRandomized)
             {
-                stratagemName = stratagemName.copy().withStyle(style -> style.withFont(ResourceLocation.withDefaultNamespace("alt")));
+                stratagemName = stratagemName.copy().withStyle(style -> style.withFont(RANDOMIZED_FONT));
             }
 
             if (!instance.selected && instance.animationTime >= xStart && instance.animationTime <= xStop)
@@ -640,8 +642,8 @@ public class StratagemsClientMod implements ClientModInitializer
             });
             case PLAYER_ICON -> display.playerIcon().ifPresent(resolvableProfile ->
             {
-                var supplier = minecraft.getSkinManager().lookupInsecure(resolvableProfile.gameProfile());
-                PlayerFaceRenderer.draw(guiGraphics, supplier.get(), x, y, 16);
+                var renderInfo = minecraft.playerSkinRenderCache().getOrDefault(resolvableProfile);
+                PlayerFaceRenderer.draw(guiGraphics, renderInfo.playerSkin(), x, y, 16);
                 renderDecoratedCount(guiGraphics, new ItemStack(Items.STONE), minecraft, instance, display, x, y);
             });
         }

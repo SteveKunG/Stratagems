@@ -1,7 +1,8 @@
 accessWidener v1 named
 
 accessible class net/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap
+accessible class net/minecraft/world/item/component/ResolvableProfile$Partial
 
 accessible method net/minecraft/core/registries/BuiltInRegistries registerSimple (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/Registry;
-
-accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet/minecraft/client/renderer/culling/Frustum;
+accessible method net/minecraft/world/item/component/ResolvableProfile$Static <init> (Lcom/mojang/datafixers/util/Either;Lnet/minecraft/world/entity/player/PlayerSkin$Patch;)V
+accessible method net/minecraft/world/item/component/ResolvableProfile$Partial <init> (Ljava/util/Optional;Ljava/util/Optional;Lcom/mojang/authlib/properties/PropertyMap;)V

@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.stevekung.stratagems.api.client.ClientStratagemInstance;
 import com.stevekung.stratagems.api.references.ModRegistries;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -37,7 +38,7 @@ public interface ModConstants
 
     interface KeyBindings
     {
-        String CATEGORY = "key.categories.stratagems";
+        KeyMapping.Category CATEGORY = KeyMapping.Category.register(ModConstants.id("key.categories.stratagems"));
 
         String STRATAGEM_MENU = "key.open_stratagem_menu";
         String STRATAGEM_UP = "key.stratagem_up";

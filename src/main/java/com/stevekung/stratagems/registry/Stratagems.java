@@ -2,8 +2,10 @@ package com.stevekung.stratagems.registry;
 
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.datafixers.util.Either;
 import com.stevekung.stratagems.action.ReinforceAction;
 import com.stevekung.stratagems.action.SpawnBombAction;
 import com.stevekung.stratagems.action.SpawnItemAction;
@@ -14,11 +16,11 @@ import com.stevekung.stratagems.api.action.StratagemAction;
 import com.stevekung.stratagems.api.references.ModRegistries;
 import com.stevekung.stratagems.api.rule.*;
 
-import net.minecraft.Util;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ResolvableProfile;
@@ -41,7 +43,9 @@ public class Stratagems
 
     public static void bootstrap(BootstrapContext<Stratagem> context)
     {
-        register(context, REINFORCE, "wsdaw", new StratagemDisplay(StratagemDisplay.Type.PLAYER_ICON, Optional.empty(), Optional.empty(), Optional.of(new ResolvableProfile(Optional.empty(), Optional.empty(), Util.make(new PropertyMap(), map -> map.put("name", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZjVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0"))))), true, Optional.empty()), ReinforceAction.reinforce(), ReinforceRule.defaultRule(), StratagemProperties.withDepletedAndReplenish(0, 2400, 20, ModConstants.BLUE_BEAM_COLOR));
+        var profile = new ResolvableProfile.Static(Either.right(new ResolvableProfile.Partial(Optional.empty(), Optional.empty(), new PropertyMap(ImmutableMultimap.of("name", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZjVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0"))))), PlayerSkin.Patch.EMPTY);
+
+        register(context, REINFORCE, "wsdaw", new StratagemDisplay(StratagemDisplay.Type.PLAYER_ICON, Optional.empty(), Optional.empty(), Optional.of(profile), true, Optional.empty()), ReinforceAction.reinforce(), ReinforceRule.defaultRule(), StratagemProperties.withDepletedAndReplenish(0, 2400, 20, ModConstants.BLUE_BEAM_COLOR));
     }
 
     public static void bootstrapTest(BootstrapContext<Stratagem> context)

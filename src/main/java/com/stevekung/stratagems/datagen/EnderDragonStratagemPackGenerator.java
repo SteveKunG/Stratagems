@@ -1,6 +1,5 @@
 package com.stevekung.stratagems.datagen;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import com.stevekung.stratagems.api.ModConstants;
@@ -10,16 +9,11 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
-import net.minecraft.DetectedVersion;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
-import net.minecraft.util.InclusiveRange;
 
 public class EnderDragonStratagemPackGenerator extends StratagemDataGenerator
 {
@@ -35,7 +29,7 @@ public class EnderDragonStratagemPackGenerator extends StratagemDataGenerator
 
         pack.addProvider((output, provider) -> new LanguageProvider(output, extraProvider));
         pack.addProvider((output, provider) -> new DynamicRegistryProvider(output, extraProvider));
-        pack.addProvider((output, provider) -> forFeaturePack(output, Component.translatable("dataPack.ender_dragon_stratagem.description")));
+        pack.addProvider((output, provider) -> PackMetadataGenerator.forFeaturePack(output, Component.translatable("dataPack.ender_dragon_stratagem.description")));
     }
 
     @Override
@@ -81,11 +75,5 @@ public class EnderDragonStratagemPackGenerator extends StratagemDataGenerator
         {
             return "Test Stratagem Dynamic Registries";
         }
-    }
-
-    private static PackMetadataGenerator forFeaturePack(PackOutput output, Component description)
-    {
-        var datapackVersion = DetectedVersion.BUILT_IN.packVersion(PackType.SERVER_DATA);
-        return new PackMetadataGenerator(output).add(PackMetadataSection.TYPE, new PackMetadataSection(description, datapackVersion, Optional.of(new InclusiveRange<>(DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES), datapackVersion))));
     }
 }
