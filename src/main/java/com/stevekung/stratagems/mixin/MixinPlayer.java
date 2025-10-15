@@ -40,7 +40,7 @@ public abstract class MixinPlayer extends LivingEntity implements StratagemsData
     @Inject(method = "tick", at = @At("TAIL"))
     private void stratagems$tick(CallbackInfo info)
     {
-        this.stratagems.tick();
+        this.stratagems.tick(this.level().getServer());
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))

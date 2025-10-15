@@ -49,7 +49,7 @@ public class StratagemCommands
     {
         //@formatter:off
         dispatcher.register(Commands.literal("stratagem")
-                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_OWNERS))
 
                 .then(Commands.literal("add")
                         .then(Commands.literal("player")
@@ -293,7 +293,7 @@ public class StratagemCommands
         var server = source.getServer();
         var serverStratagems = server.overworld().stratagemsData();
 
-        serverStratagems.block(unblock);
+        serverStratagems.block(server, unblock);
 
         for (var instance : serverStratagems.listInstances())
         {
@@ -302,7 +302,7 @@ public class StratagemCommands
 
         server.getPlayerList().getPlayers().forEach(serverPlayer ->
         {
-            serverPlayer.stratagemsData().block(unblock);
+            serverPlayer.stratagemsData().block(server, unblock);
 
             for (var instance : serverPlayer.stratagemsData().listInstances())
             {
@@ -347,7 +347,7 @@ public class StratagemCommands
             }
         }
 
-        stratagemsData.block(holder, unblock);
+        stratagemsData.block(server, holder, unblock);
         PacketUtils.sendClientUpdateStratagemPacket(server, serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
 
         if (isPlayer)
@@ -366,7 +366,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemsData = server.overworld().stratagemsData();
 
-        stratagemsData.block(unblock);
+        stratagemsData.block(server, unblock);
 
         for (var instance : stratagemsData.listInstances())
         {
@@ -393,7 +393,7 @@ public class StratagemCommands
         var server = source.getServer();
         var serverStratagems = server.overworld().stratagemsData();
 
-        serverStratagems.modified(modifier, clear);
+        serverStratagems.modified(server, modifier, clear);
 
         for (var instance : serverStratagems.listInstances())
         {
@@ -402,7 +402,7 @@ public class StratagemCommands
 
         server.getPlayerList().getPlayers().forEach(serverPlayer ->
         {
-            serverPlayer.stratagemsData().modified(modifier, clear);
+            serverPlayer.stratagemsData().modified(server, modifier, clear);
 
             for (var instance : serverPlayer.stratagemsData().listInstances())
             {
@@ -447,7 +447,7 @@ public class StratagemCommands
             }
         }
 
-        stratagemsData.modified(holder, modifier, clear);
+        stratagemsData.modified(server, holder, modifier, clear);
         PacketUtils.sendClientUpdateStratagemPacket(server, serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
 
         if (isPlayer)
@@ -477,7 +477,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemsData = server.overworld().stratagemsData();
 
-        stratagemsData.modified(modifier, clear);
+        stratagemsData.modified(server, modifier, clear);
 
         for (var instance : stratagemsData.listInstances())
         {
@@ -493,7 +493,7 @@ public class StratagemCommands
         var server = source.getServer();
         var serverStratagems = server.overworld().stratagemsData();
 
-        serverStratagems.reset();
+        serverStratagems.reset(server);
 
         for (var instance : serverStratagems.listInstances())
         {
@@ -502,7 +502,7 @@ public class StratagemCommands
 
         server.getPlayerList().getPlayers().forEach(serverPlayer ->
         {
-            serverPlayer.stratagemsData().reset();
+            serverPlayer.stratagemsData().reset(server);
 
             for (var instance : serverPlayer.stratagemsData().listInstances())
             {
@@ -533,7 +533,7 @@ public class StratagemCommands
             }
         }
 
-        stratagemsData.reset(holder);
+        stratagemsData.reset(server, holder);
         PacketUtils.sendClientUpdateStratagemPacket(server, serverPlayer, UpdateStratagemPacket.Action.UPDATE, stratagemsData.instanceByHolder(holder));
 
         if (isPlayer)
@@ -552,7 +552,7 @@ public class StratagemCommands
         var server = source.getServer();
         var stratagemsData = server.overworld().stratagemsData();
 
-        stratagemsData.reset();
+        stratagemsData.reset(server);
 
         for (var instance : stratagemsData.listInstances())
         {
@@ -625,11 +625,11 @@ public class StratagemCommands
             }
         }
 
-        if (stratagemsData.canUse(holder, serverPlayer))
+        if (stratagemsData.canUse(server, holder, serverPlayer))
         {
             var stratagemContext = new StratagemActionContext(serverPlayer, source.getLevel(), blockPos, source.getLevel().random);
             holder.value().action().action(stratagemContext);
-            stratagemsData.use(holder, serverPlayer);
+            stratagemsData.use(server, holder, serverPlayer);
         }
         else
         {

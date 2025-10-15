@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -16,9 +18,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.RegistryFixedCodec;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
@@ -32,22 +33,15 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
                     .apply(instance, ServerStratagemsData::new));
 
     public static final SavedDataType<ServerStratagemsData> TYPE = new SavedDataType<>("server_stratagems",
-            context -> new ServerStratagemsData(context.levelOrThrow()), context -> CODEC, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
+            ServerStratagemsData::new, CODEC, CustomDataFixTypes.SAVED_DATA_STRATAGEMS);
 
     private final Map<Holder<Stratagem>, StratagemInstance> instances = Maps.newLinkedHashMap();
-    private ServerLevel level;
     private int nextAvailableId;
     private int tick;
 
     public ServerStratagemsData()
     {
         this.setDirty();
-    }
-
-    public ServerStratagemsData(ServerLevel level)
-    {
-        this();
-        this.level = level;
     }
 
     public ServerStratagemsData(List<StratagemWithId> list, int nextAvailableId, int tick)
@@ -61,13 +55,13 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     }
 
     @Override
-    public void tick()
+    public void tick(@Nullable MinecraftServer server)
     {
         this.tick++;
 
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().tick(this.level.getServer(), null, true);
+            entry.getValue().tick(server, null, true);
         }
 
         if (this.tick % 100 == 0)
@@ -77,15 +71,15 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     }
 
     @Override
-    public boolean canUse(Holder<Stratagem> holder, Player player)
+    public boolean canUse(@Nullable MinecraftServer server, Holder<Stratagem> holder, Player player)
     {
-        return this.instanceByHolder(holder).canUse(this.level.getServer(), player, true);
+        return this.instanceByHolder(holder).canUse(server, player, true);
     }
 
     @Override
-    public void use(Holder<Stratagem> holder, Player player)
+    public void use(@Nullable MinecraftServer server, Holder<Stratagem> holder, Player player)
     {
-        this.instanceByHolder(holder).use(this.level.getServer(), player, true);
+        this.instanceByHolder(holder).use(server, player, true);
         this.setDirty();
     }
 
@@ -118,52 +112,52 @@ public class ServerStratagemsData extends SavedData implements StratagemsData
     }
 
     @Override
-    public void reset(Holder<Stratagem> holder)
+    public void reset(@Nullable MinecraftServer server, Holder<Stratagem> holder)
     {
-        this.instanceByHolder(holder).reset(this.level.getServer(), null, true);
+        this.instanceByHolder(holder).reset(server, null, true);
         this.setDirty();
     }
 
     @Override
-    public void reset()
+    public void reset(@Nullable MinecraftServer server)
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().reset(this.level.getServer(), null, true);
+            entry.getValue().reset(server, null, true);
         }
         this.setDirty();
     }
 
     @Override
-    public void block(boolean unblock)
+    public void block(@Nullable MinecraftServer server, boolean unblock)
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().block(this.level.getServer(), null, true, unblock);
+            entry.getValue().block(server, null, true, unblock);
         }
         this.setDirty();
     }
 
     @Override
-    public void block(Holder<Stratagem> holder, boolean unblock)
+    public void block(@Nullable MinecraftServer server, Holder<Stratagem> holder, boolean unblock)
     {
-        this.instanceByHolder(holder).block(this.level.getServer(), null, true, unblock);
+        this.instanceByHolder(holder).block(server, null, true, unblock);
         this.setDirty();
     }
 
     @Override
-    public void modified(StratagemModifier modifier, boolean clear)
+    public void modified(@Nullable MinecraftServer server, StratagemModifier modifier, boolean clear)
     {
         for (var entry : this.instances.entrySet())
         {
-            entry.getValue().modified(this.level.getServer(), null, true, modifier, clear);
+            entry.getValue().modified(server, null, true, modifier, clear);
         }
     }
 
     @Override
-    public void modified(Holder<Stratagem> holder, StratagemModifier modifier, boolean clear)
+    public void modified(@Nullable MinecraftServer server, Holder<Stratagem> holder, StratagemModifier modifier, boolean clear)
     {
-        this.instanceByHolder(holder).modified(this.level.getServer(), null, true, modifier, clear);
+        this.instanceByHolder(holder).modified(server, null, true, modifier, clear);
     }
 
     @Override

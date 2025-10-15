@@ -124,9 +124,9 @@ public class StratagemBall extends ThrowableItemProjectile
             {
                 var stratagemsData = this.getSide() == StratagemInstance.Side.SERVER ? serverLevel.getServer().overworld().stratagemsData() : serverPlayer.stratagemsData();
 
-                if (stratagemsData.canUse(holder, serverPlayer))
+                if (stratagemsData.canUse(serverLevel.getServer(), holder, serverPlayer))
                 {
-                    stratagemsData.use(holder, serverPlayer);
+                    stratagemsData.use(serverLevel.getServer(), holder, serverPlayer);
                     stratagemPod.setInboundTick(stratagemsData.instanceByHolder(holder).inboundDuration);
 
                     if (this.getSide() == StratagemInstance.Side.SERVER)

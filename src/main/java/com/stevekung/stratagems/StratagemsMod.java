@@ -89,11 +89,11 @@ public class StratagemsMod implements ModInitializer
             var stratagemsData = payload.side() == StratagemInstance.Side.PLAYER ? player.stratagemsData() : server.overworld().stratagemsData();
             var holder = server.registryAccess().lookupOrThrow(ModRegistries.STRATAGEM).getOrThrow(payload.stratagem());
 
-            if (stratagemsData.canUse(holder, player))
+            if (stratagemsData.canUse(server, holder, player))
             {
                 var stratagemContext = new StratagemActionContext(player, level, payload.blockPos(), level.random);
                 holder.value().action().action(stratagemContext);
-                stratagemsData.use(holder, player);
+                stratagemsData.use(server, holder, player);
 
                 if (payload.side() == StratagemInstance.Side.PLAYER)
                 {
@@ -153,7 +153,7 @@ public class StratagemsMod implements ModInitializer
 
             if (server.tickRateManager().runsNormally())
             {
-                server.overworld().stratagemsData().tick();
+                server.overworld().stratagemsData().tick(server);
             }
 
             Profiler.get().pop();

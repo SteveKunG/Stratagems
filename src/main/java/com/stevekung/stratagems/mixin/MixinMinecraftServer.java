@@ -14,7 +14,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer
 {
-    @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "net/minecraft/server/MinecraftServer.readScoreboard(Lnet/minecraft/world/level/storage/DimensionDataStorage;)V"))
+    @Inject(method = "createLevels", at = @At(value = "INVOKE", target = "net/minecraft/server/ServerScoreboard.load(Lnet/minecraft/world/scores/ScoreboardSaveData$Packed;)V"))
     private void stratagems$createDataStorage(CallbackInfo info, @Local DimensionDataStorage dimensionDataStorage)
     {
         dimensionDataStorage.computeIfAbsent(ServerStratagemsData.TYPE);
